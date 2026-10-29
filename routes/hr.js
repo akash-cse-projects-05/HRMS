@@ -964,7 +964,7 @@ router.post("/billing/renew", hrAuth, async (req, res) => {
       return res.redirect("/hr/billing?error=Missing+payment+references.+Renewal+aborted.");
     }
 
-    const hmac = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET);
+    const hmac = crypto.createHmac("sha256", (process.env.RAZORPAY_KEY_SECRET || "").trim());
     hmac.update(razorpay_order_id + "|" + razorpay_payment_id);
     const generatedSignature = hmac.digest("hex");
 
