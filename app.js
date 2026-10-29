@@ -72,9 +72,11 @@ const authLimiter = rateLimit({
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Security: HTTP headers protection
+// Security: HTTP headers protection (configured to allow Razorpay checkout modals and bank popups)
 app.use(helmet({
     contentSecurityPolicy: false, // Disable CSP for EJS inline scripts/styles
+    crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
+    crossOriginResourcePolicy: false,
     referrerPolicy: { policy: "strict-origin-when-cross-origin" }
 }));
 
