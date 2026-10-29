@@ -19,16 +19,26 @@ router.get("/login", (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-  const { tenantId, username, password } = req.body;
-  const lowercaseTenantId = tenantId ? tenantId.toLowerCase().trim() : "";
+  const isJson = req.xhr || 
+                 req.query.format === 'json' || 
+                 req.body?.format === 'json' || 
+                 req.headers['content-type']?.includes('application/json') ||
+                 req.headers.accept?.includes('application/json');
+
+  const rawTenantId = req.body.tenantId || req.headers['x-tenant-id'] || req.query.tenantId || req.session?.tenantId || "rsr";
+  const lowercaseTenantId = rawTenantId ? rawTenantId.toLowerCase().trim() : "rsr";
+  const username = (req.body.username || req.body.employeeCode || req.body.email || "").trim();
+  const password = req.body.password || "";
 
   try {
     if (!lowercaseTenantId) {
-      if (req.headers.accept?.includes('application/json') || req.body.format === 'json') {
+      if (isJson) {
         return res.status(400).json({ error: "Please enter your Company ID" });
       }
       return res.render("auth/login", { error: "Please enter your Company ID", company: "" });
     }
+
+
 
     req.session.tenantId = lowercaseTenantId;
 
@@ -47,32 +57,51 @@ router.post("/login", async (req, res) => {
 
       const errorMsg = isConnectionError 
         ? "Could not connect to cloud database, check your internet connection."
-        : `Company ID '${tenantId}' not found or inactive.`;
+        : `Company ID '${rawTenantId}' not found or inactive.`;
 
-      if (req.headers.accept?.includes('application/json') || req.body.format === 'json') {
+      if (isJson) {
         return res.status(isConnectionError ? 503 : 404).json({ error: errorMsg });
       }
-      return res.render("auth/login", { error: errorMsg, company: tenantId });
+      return res.render("auth/login", { error: errorMsg, company: rawTenantId });
     }
 
     const UserModel = tenantConn.model("User", User.schema);
     const EmployeeModel = tenantConn.model("Employee", Employee.schema);
 
-    const user = await UserModel.findOne({ username });
+    console.log(`[Auth/Login] Attempting login: tenant='${lowercaseTenantId}', username='${username}'`);
+
+    const cleanEscape = username.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    // 1. Find user by username / employeeCode (case-insensitive)
+    let user = await UserModel.findOne({
+      username: { $regex: new RegExp(`^${cleanEscape}$`, 'i') }
+    });
+
+    // 2. Fallback: Find user by Employee email address
+    if (!user) {
+      const matchedEmp = await EmployeeModel.findOne({
+        email: { $regex: new RegExp(`^${cleanEscape}$`, 'i') }
+      });
+      if (matchedEmp) {
+        user = await UserModel.findOne({ employeeId: matchedEmp._id });
+      }
+    }
 
     if (!user) {
-      if (req.headers.accept?.includes('application/json')) {
-        return res.status(401).json({ error: "Invalid credentials" });
+      console.log(`[Auth/Login] User not found for username/email '${username}' in tenant '${lowercaseTenantId}'`);
+      if (isJson) {
+        return res.status(401).json({ error: "Invalid credentials: user not found" });
       }
-      return res.render("auth/login", { error: "Invalid credentials", company: tenantId });
+      return res.render("auth/login", { error: "Invalid credentials", company: rawTenantId });
     }
 
     const isMatch = await user.comparePassword(password);
+
     if (!isMatch) {
-      if (req.headers.accept?.includes('application/json')) {
+      if (isJson) {
         return res.status(401).json({ error: "Invalid credentials" });
       }
-      return res.render("auth/login", { error: "Invalid credentials", company: tenantId });
+      return res.render("auth/login", { error: "Invalid credentials", company: rawTenantId });
     }
 
     req.session.userId = user._id; // User model ID
@@ -82,18 +111,32 @@ router.post("/login", async (req, res) => {
     const employee = await EmployeeModel.findById(user.employeeId);
     if (!employee || employee.status !== "Active") {
       req.session.destroy();
-      if (req.headers.accept?.includes('application/json')) {
+      if (isJson) {
         return res.status(403).json({ error: "Access Denied: Your account is inactive. Please contact HR." });
       }
-      return res.render("auth/login", { error: "Access Denied: Your account is inactive. Please contact HR.", company: tenantId });
+      return res.render("auth/login", { error: "Access Denied: Your account is inactive. Please contact HR.", company: rawTenantId });
     }
 
-    if (req.headers.accept?.includes('application/json')) {
+    const isHrUser = user.role === "HR" || user.username?.toLowerCase() === "admin";
+    const userRole = isHrUser ? "HR" : "EMPLOYEE";
+    req.session.role = userRole;
+
+    if (isJson) {
       const cookieSignature = require('cookie-signature');
       const signedSid = 's:' + cookieSignature.sign(req.sessionID, process.env.SESSION_SECRET || "rsr_hrms_secret");
-      return res.json({ success: true, employeeId: employee._id, employeeName: employee.firstName, tenantId: lowercaseTenantId, sessionId: signedSid });
+      return req.session.save((err) => {
+        if (err) console.error("Session save error:", err);
+        return res.json({ 
+          success: true, 
+          role: userRole, 
+          employeeId: employee._id, 
+          employeeName: employee.firstName, 
+          tenantId: lowercaseTenantId, 
+          sessionId: signedSid 
+        });
+      });
     }
-    res.redirect("/dashboard");
+    res.redirect(isHrUser ? "/hr/dashboard" : "/dashboard");
   } catch (err) {
     console.error(err);
     const isConnectionError = err.name === 'MongoNetworkError' || 
@@ -107,10 +150,10 @@ router.post("/login", async (req, res) => {
       ? "Could not connect to cloud database, check your internet connection."
       : "System connection error. Please check your internet and try again.";
 
-    if (req.headers.accept?.includes('application/json')) {
+    if (isJson) {
       return res.status(isConnectionError ? 503 : 500).json({ error: errorMsg });
     }
-    res.render("auth/login", { error: errorMsg, company: tenantId || "" });
+    res.render("auth/login", { error: errorMsg, company: rawTenantId || "" });
   }
 });
 
@@ -192,7 +235,7 @@ router.post("/forgot-password", async (req, res) => {
 
     await sendEmail({
       to: email,
-      subject: 'RSR Aviation HRMS - Password Reset Request',
+      subject: 'HRMS Portal - Password Reset Request',
       html: `
         <p>You are receiving this because you (or someone else) requested a password reset for your account.</p>
         <p><a href="${resetUrl}">Click here to reset your password</a></p>

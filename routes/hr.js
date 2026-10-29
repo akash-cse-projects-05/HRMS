@@ -8,6 +8,22 @@ const Leave = require("../models/Leave");
 const User = require('../models/User');
 
 const Document = require('../models/Documents');
+const CompanySettings = require('../models/CompanySettings');
+const Tenant = require('../models/master/Tenant');
+const multer = require('multer');
+
+// Configure Multer for Logo Upload
+const logoUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB max
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files (PNG, JPG, JPEG, SVG) are allowed for company logo.'));
+    }
+  }
+});
 /* ==========================
    HR AUTH MIDDLEWARE
 ========================== */
@@ -48,47 +64,22 @@ const authLimiter = rateLimit({
 
 // POST HR Login
 router.post("/hr-login", authLimiter, async (req, res) => {
+  const isJson = req.xhr || 
+                 req.query.format === 'json' || 
+                 req.body?.format === 'json' || 
+                 req.headers['content-type']?.includes('application/json') ||
+                 req.headers.accept?.includes('application/json');
+
+  const rawTenantId = req.body.tenantId || req.headers['x-tenant-id'] || req.query.tenantId || req.session?.tenantId || "rsr";
+  const lowercaseTenantId = rawTenantId ? rawTenantId.toLowerCase().trim() : "rsr";
+  const username = (req.body.username || req.body.employeeCode || req.body.email || "").trim();
+  const password = req.body.password || "";
+
   try {
-    const { tenantId, username, password } = req.body;
-    const lowercaseTenantId = tenantId ? tenantId.toLowerCase().trim() : "";
 
-    // System Admin Login (credentials from environment variables)
-    const sysUser = process.env.SYSTEM_HR_USERNAME || 'system';
-    const sysPass = process.env.SYSTEM_HR_PASSWORD || 'password';
-    if (username === sysUser && password === sysPass) {
-      if (!lowercaseTenantId) {
-        if (req.headers.accept?.includes('application/json') || req.body.format === 'json') {
-          return res.status(400).json({ error: "Please enter your Company ID" });
-        }
-        return res.render("hr/login", { error: "Please enter your Company ID", company: "" });
-      }
-
-      // Check if the tenant exists in the master registry first
-      const Tenant = require("../models/master/Tenant");
-      const tenant = await Tenant.findOne({ tenantId: lowercaseTenantId });
-      if (!tenant) {
-        const errorMsg = `Company ID '${tenantId}' not found or inactive.`;
-        if (req.headers.accept?.includes('application/json') || req.body.format === 'json') {
-          return res.status(404).json({ error: errorMsg });
-        }
-        return res.render("hr/login", { error: errorMsg, company: tenantId });
-      }
-
-      req.session.userId = '000000000000000000000000'; // Fake valid ObjectId
-      req.session.employeeId = '000000000000000000000000';
-      req.session.role = "HR";
-      req.session.tenantId = lowercaseTenantId; // Bind dynamically to the entered company ID
-      console.log(`✅ Hardcoded System Admin logged in to Tenant: ${lowercaseTenantId}`);
-      if (req.headers.accept?.includes('application/json')) {
-        const cookieSignature = require('cookie-signature');
-        const signedSid = 's:' + cookieSignature.sign(req.sessionID, process.env.SESSION_SECRET || "rsr_hrms_secret");
-        return res.json({ success: true, role: 'HR', employeeName: 'System Admin', tenantId: lowercaseTenantId, sessionId: signedSid });
-      }
-      return res.redirect("/hr/dashboard");
-    }
 
     if (!lowercaseTenantId) {
-      if (req.headers.accept?.includes('application/json') || req.body.format === 'json') {
+      if (isJson) {
         return res.status(400).json({ error: "Please enter your Company ID" });
       }
       return res.render("hr/login", { error: "Please enter your Company ID", company: "" });
@@ -111,34 +102,52 @@ router.post("/hr-login", authLimiter, async (req, res) => {
 
       const errorMsg = isConnectionError 
         ? "Could not connect to cloud database, check your internet connection."
-        : `Company ID '${tenantId}' not found or inactive.`;
+        : `Company ID '${rawTenantId}' not found or inactive.`;
 
-      if (req.headers.accept?.includes('application/json') || req.body.format === 'json') {
+      if (isJson) {
         return res.status(isConnectionError ? 503 : 404).json({ error: errorMsg });
       }
-      return res.render("hr/login", { error: errorMsg, company: tenantId });
+      return res.render("hr/login", { error: errorMsg, company: rawTenantId });
     }
 
     const UserModel = tenantConn.model("User", User.schema);
     const EmployeeModel = tenantConn.model("Employee", Employee.schema);
 
-    // 1. Find User by username (which corresponds to employeeCode)
-    const user = await UserModel.findOne({ username });
+    console.log(`[HR/Login] Attempting HR login: tenant='${lowercaseTenantId}', username='${username}'`);
+
+    const cleanEscape = username.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    // 1. Find User by username / employeeCode (case-insensitive)
+    let user = await UserModel.findOne({
+      username: { $regex: new RegExp(`^${cleanEscape}$`, 'i') }
+    });
+
+    // 2. Fallback: Find user by Employee email address
+    if (!user) {
+      const matchedEmp = await EmployeeModel.findOne({
+        email: { $regex: new RegExp(`^${cleanEscape}$`, 'i') }
+      });
+      if (matchedEmp) {
+        user = await UserModel.findOne({ employeeId: matchedEmp._id });
+      }
+    }
 
     if (!user) {
-      if (req.headers.accept?.includes('application/json')) {
-        return res.status(401).json({ error: "Invalid credentials" });
+      console.log(`[HR/Login] HR user not found for username/email '${username}' in tenant '${lowercaseTenantId}'`);
+      if (isJson) {
+        return res.status(401).json({ error: "Invalid credentials: user not found" });
       }
-      return res.render("hr/login", { error: "Invalid credentials", company: tenantId });
+      return res.render("hr/login", { error: "Invalid credentials", company: rawTenantId });
     }
 
     // 2. Verify password
     const isMatch = await user.comparePassword(password);
+
     if (!isMatch) {
-      if (req.headers.accept?.includes('application/json')) {
+      if (isJson) {
         return res.status(401).json({ error: "Invalid credentials" });
       }
-      return res.render("hr/login", { error: "Invalid credentials", company: tenantId });
+      return res.render("hr/login", { error: "Invalid credentials", company: rawTenantId });
     }
 
     // 3. Find associated Employee to check Role/Department
@@ -148,18 +157,18 @@ router.post("/hr-login", authLimiter, async (req, res) => {
     });
 
     if (!employee) {
-      if (req.headers.accept?.includes('application/json')) {
+      if (isJson) {
         return res.status(401).json({ error: "Employee record not found or inactive" });
       }
-      return res.render("hr/login", { error: "Employee record not found or inactive", company: tenantId });
+      return res.render("hr/login", { error: "Employee record not found or inactive", company: rawTenantId });
     }
 
     // 4. Role validation
-    if (employee.department !== "HR") {
-      if (req.headers.accept?.includes('application/json')) {
+    if (employee.department !== "HR" && user.role !== "HR") {
+      if (isJson) {
         return res.status(403).json({ error: "Access denied: Not an HR" });
       }
-      return res.render("hr/login", { error: "Access denied: Not an HR", company: tenantId });
+      return res.render("hr/login", { error: "Access denied: Not an HR", company: rawTenantId });
     }
 
     // 5. Create HR session
@@ -170,10 +179,13 @@ router.post("/hr-login", authLimiter, async (req, res) => {
 
     console.log("✅ HR logged in:", employee.employeeCode);
 
-    if (req.headers.accept?.includes('application/json')) {
+    if (isJson) {
       const cookieSignature = require('cookie-signature');
       const signedSid = 's:' + cookieSignature.sign(req.sessionID, process.env.SESSION_SECRET || "rsr_hrms_secret");
-      return res.json({ success: true, role: 'HR', employeeName: employee.firstName, employeeId: employee._id, tenantId: lowercaseTenantId, sessionId: signedSid });
+      return req.session.save((err) => {
+        if (err) console.error("Session save error:", err);
+        return res.json({ success: true, role: 'HR', employeeName: employee.firstName, employeeId: employee._id, tenantId: lowercaseTenantId, sessionId: signedSid });
+      });
     }
     res.redirect("/hr/dashboard");
 
@@ -208,12 +220,21 @@ router.get("/dashboard", hrAuth, async (req, res) => {
     const totalEmployees = await Employee.countDocuments({ status: "Active" });
 
     const todayAttendance = await Attendance.find({ date: today })
-      .populate("employeeId");
+      .populate("employeeId")
+      .populate("shiftId")
+      .sort({ punchIn: -1 });
 
     const present = todayAttendance.length;
     const completed = todayAttendance.filter(a => a.punchOut).length;
     const inProgress = todayAttendance.filter(a => !a.punchOut).length;
     const absent = Math.max(totalEmployees - present, 0);
+
+    // List of active employees who have NOT punched in today
+    const punchedEmployeeIds = todayAttendance.map(a => a.employeeId?._id?.toString()).filter(Boolean);
+    const absentEmployees = await Employee.find({
+      status: "Active",
+      _id: { $nin: punchedEmployeeIds }
+    }).select("firstName lastName employeeCode department designation profilePic email").sort({ firstName: 1 });
 
     const Project = require("../models/Project");
     const Appraisal = require("../models/Appraisal");
@@ -230,6 +251,12 @@ router.get("/dashboard", hrAuth, async (req, res) => {
     const appraisals = await Appraisal.find().populate("employeeId").sort({ createdAt: -1 });
     const pendingResignations = await Employee.find({ resignationStatus: "Pending" });
 
+    const Announcement = require("../models/Announcement");
+    const Notification = require("../models/Notification");
+    const fifteenDaysAgo = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000);
+    const latestAnnouncements = await Announcement.find({ date: { $gte: fifteenDaysAgo } }).sort({ date: -1 }).limit(5);
+    const latestNotifications = await Notification.find({ date: { $gte: fifteenDaysAgo } }).sort({ date: -1 }).limit(5);
+
     if (req.query.format === 'json' || req.headers.accept?.includes('application/json')) {
       return res.json({
         totalEmployees,
@@ -238,9 +265,12 @@ router.get("/dashboard", hrAuth, async (req, res) => {
         inProgress,
         absent,
         todayAttendance,
+        absentEmployees,
         projects,
         appraisals,
-        pendingResignations
+        pendingResignations,
+        latestAnnouncements,
+        latestNotifications
       });
     }
 
@@ -251,9 +281,12 @@ router.get("/dashboard", hrAuth, async (req, res) => {
       inProgress,
       absent,
       todayAttendance,
+      absentEmployees,
       projects,
       appraisals,
-      pendingResignations
+      pendingResignations,
+      latestAnnouncements,
+      latestNotifications
     });
 
   } catch (err) {
@@ -266,6 +299,64 @@ router.get("/dashboard", hrAuth, async (req, res) => {
 });
 
 /* ==========================
+   HR LIVE ATTENDANCE TRACKING CONSOLE
+========================== */
+router.get("/live-attendance", hrAuth, async (req, res) => {
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const totalEmployees = await Employee.countDocuments({ status: "Active" });
+
+    const todayAttendance = await Attendance.find({ date: today })
+      .populate("employeeId")
+      .populate("shiftId")
+      .sort({ punchIn: -1 });
+
+    const present = todayAttendance.length;
+    const completed = todayAttendance.filter(a => a.punchOut).length;
+    const inProgress = todayAttendance.filter(a => !a.punchOut).length;
+    const absent = Math.max(totalEmployees - present, 0);
+
+    const punchedEmployeeIds = todayAttendance.map(a => a.employeeId?._id?.toString()).filter(Boolean);
+    const absentEmployees = await Employee.find({
+      status: "Active",
+      _id: { $nin: punchedEmployeeIds }
+    }).select("firstName lastName employeeCode department designation profilePic email").sort({ firstName: 1 });
+
+    const CompanySettings = require("../models/CompanySettings");
+    const companySettings = await CompanySettings.findOne();
+
+    if (req.query.format === 'json' || req.headers.accept?.includes('application/json')) {
+      return res.json({
+        date: today,
+        totalEmployees,
+        present,
+        completed,
+        inProgress,
+        absent,
+        todayAttendance,
+        absentEmployees,
+        companySettings
+      });
+    }
+
+    res.render("hr/live-attendance", {
+      date: today,
+      totalEmployees,
+      present,
+      completed,
+      inProgress,
+      absent,
+      todayAttendance,
+      absentEmployees,
+      companySettings
+    });
+  } catch (err) {
+    console.error("Live attendance error:", err);
+    res.status(500).send("Error loading live attendance tracking console.");
+  }
+});
+
+/* ==========================
    ATTENDANCE HISTORY
 ========================== */
 
@@ -274,10 +365,23 @@ router.get("/dashboard", hrAuth, async (req, res) => {
    HR LEAVE MANAGEMENT
 ========================== */
 
-// View all leave requests
+// View all leave requests (Pending stay active; Approved/Rejected stay for 15 days)
 router.get("/leaves", hrAuth, async (req, res) => {
   try {
-    const leaves = await Leave.find()
+    const fifteenDaysAgo = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000);
+
+    const leaves = await Leave.find({
+      $or: [
+        { status: "PENDING" },
+        {
+          status: { $in: ["APPROVED", "REJECTED"] },
+          $or: [
+            { actionAt: { $gte: fifteenDaysAgo } },
+            { appliedAt: { $gte: fifteenDaysAgo } }
+          ]
+        }
+      ]
+    })
       .populate("employeeId")
       .sort({ appliedAt: -1 });
 
@@ -395,9 +499,11 @@ router.post("/leave-action/:id", hrAuth, async (req, res) => {
       }
     }
 
-    // Update leave status and HR remark
+    // Update leave status, HR remark, and timestamp
     leave.status = status;
     leave.hrRemark = hrRemark;
+    leave.actionAt = new Date();
+    leave.actionBy = req.session.username || req.session.employeeId || 'HR';
     if (status === "REJECTED") {
       leave.rejectionReason = req.body.rejectionReason || hrRemark;
     }
@@ -727,6 +833,82 @@ router.post('/toggle-status/:employeeId', hrAuth, async (req, res) => {
   }
 });
 
+// HR permanently deletes employee (Only if Inactive or Resigned)
+router.post('/delete-employee/:employeeId', hrAuth, async (req, res) => {
+  const isJson = req.query.format === 'json' || req.headers.accept?.includes('application/json') || req.body.format === 'json';
+  try {
+    const employee = await Employee.findById(req.params.employeeId);
+    if (!employee) {
+      if (isJson) return res.status(404).json({ error: 'Employee not found' });
+      return res.redirect('/hr/users?error=employee_not_found');
+    }
+
+    // Prevent HR from deleting their own account
+    if (employee._id.toString() === req.session.employeeId?.toString()) {
+      if (isJson) return res.status(400).json({ error: 'Cannot delete your own account' });
+      return res.redirect('/hr/users?error=cannot_delete_self');
+    }
+
+    // Enforce condition: Must be Inactive or Resigned
+    if (employee.status !== 'Inactive' && employee.status !== 'Resigned') {
+      const errorMsg = 'Active employees cannot be permanently deleted. Please deactivate or terminate the employee first.';
+      if (isJson) return res.status(400).json({ error: errorMsg });
+      return res.redirect('/hr/users?error=' + encodeURIComponent(errorMsg));
+    }
+
+    const employeeId = employee._id;
+    const employeeName = `${employee.firstName} ${employee.lastName}`;
+
+    // Clean up all related tenant records
+    const Attendance = require("../models/Attendence");
+    const Leave = require("../models/Leave");
+    const Payslip = require("../models/Payslip");
+    const Document = require("../models/Documents");
+    const EmployeeChecklist = require("../models/EmployeeChecklist");
+    const Task = require("../models/Task");
+    const Timesheet = require("../models/Timesheet");
+    const Expense = require("../models/Expense");
+    const Trip = require("../models/Trip");
+    const Regularization = require("../models/Regularization");
+
+    // 1. Delete associated user login account(s)
+    const users = await User.find({ employeeId });
+    const userIds = users.map(u => u._id);
+    await User.deleteMany({ employeeId });
+
+    // 2. Delete employee documents
+    if (userIds.length > 0) {
+      await Document.deleteMany({ user: { $in: userIds } });
+    }
+
+    // 3. Delete attendance, leaves, payslips, checklists, tasks, timesheets, expenses
+    await Attendance.deleteMany({ employeeId });
+    await Leave.deleteMany({ employeeId });
+    await Payslip.deleteMany({ employee: employeeId });
+    await EmployeeChecklist.deleteMany({ employeeId });
+    await Task.deleteMany({ assignedTo: employeeId });
+    await Timesheet.deleteMany({ employeeId });
+    await Expense.deleteMany({ employeeId });
+    await Trip.deleteMany({ employeeId });
+    await Regularization.deleteMany({ employeeId });
+
+    // 4. Finally delete the employee record
+    await Employee.findByIdAndDelete(employeeId);
+
+    console.log(`[HR Permanent Deletion] Successfully deleted employee ${employeeName} (${employee.employeeCode}) and all linked records.`);
+
+    if (isJson) {
+      return res.json({ success: true, message: `Employee ${employeeName} permanently deleted` });
+    }
+    res.redirect('/hr/users?deleted=true');
+
+  } catch (err) {
+    console.error("Error permanently deleting employee:", err);
+    if (isJson) return res.status(500).json({ error: "Failed to delete employee: " + err.message });
+    res.redirect('/hr/users?error=' + encodeURIComponent(err.message));
+  }
+});
+
 /* ==========================
    HR IN-APP BILLING PORTAL
    ========================== */
@@ -848,7 +1030,7 @@ router.post("/resignation/:employeeId/action", hrAuth, async (req, res) => {
         try {
           await sendEmail({
             to: employee.email,
-            subject: 'Resignation Accepted - RSR Aviation',
+            subject: 'Resignation Accepted - HRMS',
             html: `<p>Dear ${employee.firstName},</p><p>Your resignation has been accepted by the management. HR will contact you for the exit process.</p>`
           });
         } catch (emailErr) {
@@ -900,6 +1082,203 @@ router.post("/resignation/:employeeId/action", hrAuth, async (req, res) => {
     console.error(err);
     if (isJson) return res.status(500).json({ error: 'Error processing resignation' });
     res.status(500).send('Error processing resignation');
+  }
+});
+
+/* ==========================
+   HR CHANGE PASSWORD
+========================== */
+
+// POST /hr/change-password - HR changes their own login password
+router.post('/change-password', hrAuth, async (req, res) => {
+  const isJson = req.query.format === 'json' || req.headers.accept?.includes('application/json') || req.body.format === 'json';
+  try {
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      const msg = 'All password fields are required.';
+      if (isJson) return res.status(400).json({ error: msg });
+      return res.redirect('/hr/settings?pwError=' + encodeURIComponent(msg));
+    }
+
+    if (newPassword !== confirmPassword) {
+      const msg = 'New password and confirmation do not match.';
+      if (isJson) return res.status(400).json({ error: msg });
+      return res.redirect('/hr/settings?pwError=' + encodeURIComponent(msg));
+    }
+
+    if (newPassword.length < 6) {
+      const msg = 'New password must be at least 6 characters long.';
+      if (isJson) return res.status(400).json({ error: msg });
+      return res.redirect('/hr/settings?pwError=' + encodeURIComponent(msg));
+    }
+
+    // System admin (fake userId) cannot change password via this route
+    if (req.session.userId === '000000000000000000000000') {
+      const msg = 'System admin password is managed via environment variables.';
+      if (isJson) return res.status(400).json({ error: msg });
+      return res.redirect('/hr/settings?pwError=' + encodeURIComponent(msg));
+    }
+
+    const user = await User.findById(req.session.userId);
+    if (!user) {
+      const msg = 'User account not found.';
+      if (isJson) return res.status(404).json({ error: msg });
+      return res.redirect('/hr/settings?pwError=' + encodeURIComponent(msg));
+    }
+
+    const isMatch = await user.comparePassword(currentPassword);
+    if (!isMatch) {
+      const msg = 'Current password is incorrect.';
+      if (isJson) return res.status(401).json({ error: msg });
+      return res.redirect('/hr/settings?pwError=' + encodeURIComponent(msg));
+    }
+
+    user.password = newPassword; // Pre-save hook will hash it
+    await user.save();
+
+    console.log(`[HR] Password changed for userId: ${req.session.userId}`);
+    if (isJson) return res.json({ success: true, message: 'Password updated successfully.' });
+    res.redirect('/hr/settings?pwSuccess=true');
+  } catch (err) {
+    console.error('Error changing HR password:', err);
+    if (isJson) return res.status(500).json({ error: 'Failed to change password: ' + err.message });
+    res.redirect('/hr/settings?pwError=' + encodeURIComponent(err.message));
+  }
+});
+
+/* ==========================
+   COMPANY & PAYSLIP SETTINGS
+========================== */
+
+// GET /hr/settings - View company, geofence, and payslip settings
+router.get("/settings", hrAuth, async (req, res) => {
+  const isJson = req.query.format === 'json' || req.headers.accept?.includes('application/json');
+  try {
+    let settings = await CompanySettings.findOne();
+    if (!settings) {
+      let defaultName = "My Company";
+      if (req.session.tenantId && req.session.tenantId !== 'default') {
+        const tenant = await Tenant.findOne({ tenantId: req.session.tenantId });
+        if (tenant && tenant.companyName) {
+          defaultName = tenant.companyName;
+        }
+      }
+      settings = await CompanySettings.create({
+        companyName: defaultName
+      });
+    }
+
+    if (isJson) {
+      return res.json({ success: true, settings });
+    }
+
+    res.render("hr/settings", {
+      settings,
+      success: req.query.success === 'true',
+      error: req.query.error || null,
+      pwSuccess: req.query.pwSuccess === 'true',
+      pwError: req.query.pwError || null
+    });
+  } catch (err) {
+    console.error("Error loading HR settings:", err);
+    if (isJson) return res.status(500).json({ error: "Failed to load settings" });
+    res.redirect("/hr/dashboard?error=settings_load_failed");
+  }
+});
+
+// POST /hr/settings - Update company, geofence, and payslip structure settings
+router.post("/settings", hrAuth, logoUpload.single("logo"), async (req, res) => {
+  const isJson = req.query.format === 'json' || req.headers.accept?.includes('application/json') || req.body.format === 'json';
+
+  // CSRF validation for multipart/form-data (handled here after multer has parsed body)
+  if (!isJson) {
+    const token = req.body?._csrf || req.query?._csrf || req.headers['x-csrf-token'] || req.headers['csrf-token'];
+    if (token && req.session?.csrfToken && token === req.session.csrfToken) {
+      // Valid CSRF
+    } else if (process.env.NODE_ENV !== 'production' && req.session?.userId) {
+      // Allow authenticated user in development
+    } else if (!token || token !== req.session?.csrfToken) {
+      console.warn(`[CSRF Blocked - Multipart] POST /hr/settings`);
+      return res.status(403).send('Forbidden: Invalid CSRF Token');
+    }
+  }
+
+  try {
+    const {
+      companyName, tagline, contactEmail, contactPhone, website,
+      address, city, state, pincode, country,
+      cin, panNumber, gstNumber,
+      officeLat, officeLng, officeRadius, officeLocationName, geofenceEnforced,
+      currencySymbol, pfPercentage, ptAmount, tdsDefaultPercent,
+      payslipNote, signatoryName, signatoryDesignation
+    } = req.body;
+
+    const updateData = {
+      companyName: companyName ? companyName.trim() : 'HRMS Company',
+      tagline: tagline || '',
+      contactEmail: contactEmail || '',
+      contactPhone: contactPhone || '',
+      website: website || '',
+      address: address || '',
+      city: city || '',
+      state: state || '',
+      pincode: pincode || '',
+      country: country || 'India',
+      cin: cin || '',
+      panNumber: panNumber || '',
+      gstNumber: gstNumber || '',
+      officeLat: Number(officeLat) || 19.0597397,
+      officeLng: Number(officeLng) || 73.1189947,
+      officeRadius: Number(officeRadius) || 200,
+      officeLocationName: officeLocationName || 'Headquarters',
+      geofenceEnforced: geofenceEnforced === 'true' || geofenceEnforced === true || geofenceEnforced === 'on',
+      currencySymbol: currencySymbol || '₹',
+      pfPercentage: Number(pfPercentage) || 0,
+      ptAmount: Number(ptAmount) || 0,
+      tdsDefaultPercent: Number(tdsDefaultPercent) || 0,
+      payslipNote: payslipNote || 'This is a computer generated salary statement and does not require a physical signature.',
+      signatoryName: signatoryName || 'Authorized Signatory',
+      signatoryDesignation: signatoryDesignation || 'HR Operations',
+      updatedAt: new Date()
+    };
+
+    // If new logo file was uploaded, convert to base64 Data URI
+    if (req.file) {
+      const mime = req.file.mimetype;
+      const b64 = req.file.buffer.toString('base64');
+      updateData.logoUrl = `data:${mime};base64,${b64}`;
+    } else if (req.body.existingLogoUrl) {
+      updateData.logoUrl = req.body.existingLogoUrl;
+    }
+
+    const updatedSettings = await CompanySettings.findOneAndUpdate(
+      {},
+      { $set: updateData },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+
+    // Sync companyName to master Tenant registry if tenantId exists
+    if (req.session.tenantId && req.session.tenantId !== 'default' && updateData.companyName) {
+      try {
+        await Tenant.updateOne(
+          { tenantId: req.session.tenantId },
+          { $set: { companyName: updateData.companyName } }
+        );
+      } catch (tenantSyncErr) {
+        console.error("Failed to sync company name to master tenant record:", tenantSyncErr);
+      }
+    }
+
+    if (isJson) {
+      return res.json({ success: true, message: "Settings updated successfully", settings: updatedSettings });
+    }
+
+    res.redirect("/hr/settings?success=true");
+  } catch (err) {
+    console.error("Error saving HR settings:", err);
+    if (isJson) return res.status(500).json({ error: "Failed to save settings: " + err.message });
+    res.redirect("/hr/settings?error=" + encodeURIComponent(err.message));
   }
 });
 

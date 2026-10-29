@@ -165,16 +165,67 @@
 
     <header class="page-header">
       <div class="container">
-        <p class="text-primary fw-bold small mb-1" style="letter-spacing: 0.1em;">ADMINISTRATION</p>
-        <h1 class="fw-bold mb-0">User Directory</h1>
-        <p class="text-muted mt-2">Manage employee accounts and system access credentials.</p>
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+          <div>
+            <p class="text-primary fw-bold small mb-1" style="letter-spacing: 0.1em;">ADMINISTRATION</p>
+            <h1 class="fw-bold mb-0">User Directory</h1>
+            <p class="text-muted mt-2 mb-0">Manage employee accounts and system access credentials.</p>
+          </div>
+          <div>
+            <a href="/employee/add" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm">
+              <i class="fa-solid fa-user-plus me-2"></i>Add New Employee
+            </a>
+          </div>
+        </div>
       </div>
     </header>
 
     <div class="container pb-5">
       <div class="directory-container">
+        <!-- Search and Filter Bar -->
+        <div class="p-4 border-bottom bg-light d-flex flex-wrap align-items-center justify-content-between gap-3">
+          <div class="position-relative flex-grow-1" style="max-width: 480px;">
+            <input type="text" id="directorySearchInput" class="form-control rounded-pill ps-4 pe-5"
+              placeholder="Search by employee name, username (@user), department...">
+            <i class="fa-solid fa-magnifying-glass position-absolute text-muted"
+              style="left: 14px; top: 12px; font-size: 0.85rem;"></i>
+            <button type="button" id="clearSearchBtn" class="btn btn-sm btn-link position-absolute text-muted text-decoration-none"
+              style="right: 12px; top: 6px; display: none;">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            <select id="statusFilterSelect" class="form-select form-select-sm rounded-pill px-3" style="width: auto;">
+              <option value="all">All Status</option>
+              <option value="active">Active Only</option>
+              <option value="inactive">Inactive</option>
+            </select>
+
+            <select id="departmentFilterSelect" class="form-select form-select-sm rounded-pill px-3" style="width: auto;">
+              <option value="all">All Departments</option>
+              <% 
+                const uniqueDepts = [];
+                if (users && users.length > 0) {
+                  users.forEach(u => {
+                    const dept = u.employeeId && u.employeeId.department;
+                    if (dept && !uniqueDepts.includes(dept)) uniqueDepts.push(dept);
+                  });
+                }
+                uniqueDepts.sort().forEach(d => {
+              %>
+                <option value="<%= d.toLowerCase() %>"><%= d %></option>
+              <% }); %>
+            </select>
+
+            <span id="directoryCountBadge" class="badge bg-primary rounded-pill px-3 py-2 fw-bold" style="font-size: 0.8rem;">
+              <%= users ? users.length : 0 %> Users
+            </span>
+          </div>
+        </div>
+
         <div class="table-responsive">
-          <table class="table align-middle">
+          <table class="table align-middle mb-0">
             <thead>
               <tr>
                 <th>Employee Name</th>
@@ -187,22 +238,31 @@
             </thead>
             <tbody>
               <% if (users && users.length> 0) { %>
-                <% users.forEach(function(user) { %>
-                  <tr>
+                <% users.forEach(function(user) { 
+                    const emp = user.employeeId || {};
+                    const fullName = (emp.firstName || '') + ' ' + (emp.lastName || '');
+                    const username = user.username || '';
+                    const dept = emp.department || '';
+                    const status = emp.status || 'No Record';
+                %>
+                  <tr class="user-row"
+                    data-name="<%= fullName.toLowerCase() %>"
+                    data-username="<%= username.toLowerCase() %>"
+                    data-dept="<%= dept.toLowerCase() %>"
+                    data-status="<%= status.toLowerCase() %>"
+                  >
                     <td>
                       <div class="d-flex align-items-center">
                         <div class="avatar-circle">
-                          <%= (user.employeeId && user.employeeId.firstName) ?
-                            user.employeeId.firstName.charAt(0).toUpperCase() : 'U' %>
+                          <%= (emp.firstName) ? emp.firstName.charAt(0).toUpperCase() : 'U' %>
                         </div>
                         <div>
                           <div class="fw-bold text-dark">
-                            <% if (user.employeeId && user.employeeId.firstName) { %>
-                              <%= user.employeeId.firstName %>
-                                <%= user.employeeId.lastName %>
-                                  <% } else { %>
-                                    <span class="text-muted fw-normal italic">Profile Pending</span>
-                                    <% } %>
+                            <% if (emp.firstName) { %>
+                              <%= emp.firstName %> <%= emp.lastName %>
+                            <% } else { %>
+                              <span class="text-muted fw-normal italic">Profile Pending</span>
+                            <% } %>
                           </div>
                         </div>
                       </div>
@@ -211,61 +271,55 @@
                       <code class="text-primary fw-bold" style="font-size: 0.85rem;">@<%= user.username %></code>
                     </td>
                     <td>
-                      <% if (user.employeeId && user.employeeId.department) { %>
+                      <% if (emp.department) { %>
                         <span class="dept-badge">
-                          <%= user.employeeId.department %>
+                          <%= emp.department %>
                         </span>
-                        <% } else { %>
-                          <span class="text-muted small">Unassigned</span>
-                          <% } %>
+                      <% } else { %>
+                        <span class="text-muted small">Unassigned</span>
+                      <% } %>
                     </td>
                     <td>
                       <% if (user.employeeId) { %>
-                        <span class="status-badge <%= user.employeeId.status === 'Active' ? 'status-active' : 'status-inactive' %>">
-                          <%= user.employeeId.status %>
+                        <span class="status-badge <%= emp.status === 'Active' ? 'status-active' : 'status-inactive' %>">
+                          <%= emp.status %>
                         </span>
-                        <% } else { %>
-                          <span class="status-badge status-inactive">No Record</span>
-                          <% } %>
+                      <% } else { %>
+                        <span class="status-badge status-inactive">No Record</span>
+                      <% } %>
                     </td>
                     <td>
-                      <span class="fw-bold text-dark">₹<%= (user.employeeId && user.employeeId.salary) ?
-                          user.employeeId.salary.toLocaleString() : '0' %></span>
+                      <span class="fw-bold text-dark">₹<%= (emp.salary) ? emp.salary.toLocaleString() : '0' %></span>
                     </td>
                     <td class="text-end">
                       <% if (user.employeeId) { %>
-                        <a href="/employee/edit/<%= user.employeeId._id %>" class="btn btn-profile shadow-sm me-1">
+                        <a href="/employee/edit/<%= emp._id %>" class="btn btn-profile shadow-sm me-1">
                           <i class="fa-solid fa-pen"></i> Edit
                         </a>
-                        <% } else { %>
-                          <button class="btn btn-profile shadow-sm me-1" disabled title="No Employee Record Linked">
-                            <i class="fa-solid fa-pen"></i> Edit
-                          </button>
-                          <% } %>
-                            <a href="/hr/profile/<%= user._id %>" class="btn btn-profile shadow-sm">
-                              <i class="fa-regular fa-id-card me-2"></i>Manage Profile
-                            </a>
-
-                            <% if (user.employeeId) { %>
-                              <form action="/hr/toggle-status/<%= user.employeeId._id %>" method="POST"
-                                style="display:inline;"
-                                onsubmit="return confirm('Are you sure you want to <%= user.employeeId.status === 'Active' ? 'TERMINATE access for' : 'RESTORE access for' %> this user?')">
-                                <button type="submit"
-                                  class="btn btn-profile shadow-sm ms-1 <%= user.employeeId.status === 'Active' ? 'btn-terminate' : 'btn-restore' %>">
-                                  <i class="fa-solid <%= user.employeeId.status === 'Active' ? 'fa-user-slash' : 'fa-user-check' %>"></i>
-                                  <%= user.employeeId.status==='Active' ? 'Terminate' : 'Restore' %>
-                                </button>
-                              </form>
-                              <% } %>
-
+                      <% } else { %>
+                        <button class="btn btn-profile shadow-sm me-1" disabled title="No Employee Record Linked">
+                          <i class="fa-solid fa-pen"></i> Edit
+                        </button>
+                      <% } %>
+                      <a href="/hr/profile/<%= user._id %>" class="btn btn-profile shadow-sm">
+                        <i class="fa-regular fa-id-card me-2"></i>Manage Profile
+                      </a>
                     </td>
                   </tr>
-                  <% }) %>
-                    <% } else { %>
-                      <tr>
-                        <td colspan="4" class="text-center py-5 text-muted small">No users found in the system.</td>
-                      </tr>
-                      <% } %>
+                <% }) %>
+
+                <!-- No Results Row -->
+                <tr id="noResultsRow" style="display: none;">
+                  <td colspan="6" class="text-center py-5 text-muted">
+                    <i class="fa-solid fa-user-slash fa-2x mb-3 text-secondary d-block"></i>
+                    No matching users found for your search query.
+                  </td>
+                </tr>
+              <% } else { %>
+                <tr>
+                  <td colspan="6" class="text-center py-5 text-muted small">No users found in the system.</td>
+                </tr>
+              <% } %>
             </tbody>
           </table>
         </div>
@@ -277,6 +331,70 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Instant Search and Filter Script -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('directorySearchInput');
+        const clearBtn = document.getElementById('clearSearchBtn');
+        const statusFilter = document.getElementById('statusFilterSelect');
+        const deptFilter = document.getElementById('departmentFilterSelect');
+        const countBadge = document.getElementById('directoryCountBadge');
+        const rows = document.querySelectorAll('.user-row');
+        const noResultsRow = document.getElementById('noResultsRow');
+
+        function runSearch() {
+          const query = searchInput.value.toLowerCase().trim();
+          const selectedStatus = statusFilter.value.toLowerCase();
+          const selectedDept = deptFilter.value.toLowerCase();
+
+          if (query.length > 0) {
+            clearBtn.style.display = 'block';
+          } else {
+            clearBtn.style.display = 'none';
+          }
+
+          let visibleCount = 0;
+
+          rows.forEach(row => {
+            const name = row.dataset.name || '';
+            const username = row.dataset.username || '';
+            const dept = row.dataset.dept || '';
+            const status = row.dataset.status || '';
+
+            const matchesQuery = !query || name.includes(query) || username.includes(query) || dept.includes(query);
+            const matchesStatus = (selectedStatus === 'all') || (status === selectedStatus);
+            const matchesDept = (selectedDept === 'all') || (dept === selectedDept);
+
+            if (matchesQuery && matchesStatus && matchesDept) {
+              row.style.display = '';
+              visibleCount++;
+            } else {
+              row.style.display = 'none';
+            }
+          });
+
+          if (noResultsRow) {
+            noResultsRow.style.display = (visibleCount === 0 && rows.length > 0) ? '' : 'none';
+          }
+
+          if (countBadge) {
+            countBadge.innerText = `${visibleCount} User${visibleCount === 1 ? '' : 's'}`;
+          }
+        }
+
+        if (searchInput) searchInput.addEventListener('input', runSearch);
+        if (statusFilter) statusFilter.addEventListener('change', runSearch);
+        if (deptFilter) deptFilter.addEventListener('change', runSearch);
+
+        if (clearBtn) {
+          clearBtn.addEventListener('click', function() {
+            searchInput.value = '';
+            runSearch();
+            searchInput.focus();
+          });
+        }
+      });
+    </script>
 </body>
 
 </html>

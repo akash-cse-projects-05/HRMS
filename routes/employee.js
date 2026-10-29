@@ -148,17 +148,83 @@ router.get('/profile', async (req, res) => {
 
 
 
+const multer = require('multer');
+const photoUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
+});
+
 router.get('/photo/:id', async (req, res) => {
   try {
     const employee = await Employee.findById(req.params.id);
     if (!employee || !employee.profilePhoto || !employee.profilePhoto.data) {
       return res.status(404).send('No photo found');
     }
-    res.set('Content-Type', employee.profilePhoto.contentType);
+    res.set('Content-Type', employee.profilePhoto.contentType || 'image/jpeg');
     res.send(employee.profilePhoto.data);
   } catch (err) {
     console.error(err);
     res.status(500).send('Error fetching photo');
+  }
+});
+
+// POST: Upload or Update Profile Photo
+router.post('/profile/photo', photoUpload.single('photo'), async (req, res) => {
+  const isJson = req.query.format === 'json' || req.headers.accept?.includes('application/json') || req.body.format === 'json';
+  try {
+    const employeeId = req.session.employeeId;
+    if (!employeeId) {
+      if (isJson) return res.status(401).json({ error: 'Unauthorized' });
+      return res.redirect('/auth/login');
+    }
+
+    if (!req.file) {
+      if (isJson) return res.status(400).json({ error: 'Please select an image file to upload.' });
+      return res.redirect('/employee/profile?error=Please+select+an+image');
+    }
+
+    const employee = await Employee.findById(employeeId);
+    if (!employee) {
+      if (isJson) return res.status(404).json({ error: 'Employee not found' });
+      return res.redirect('/employee/profile?error=Employee+not+found');
+    }
+
+    employee.profilePhoto = {
+      data: req.file.buffer,
+      contentType: req.file.mimetype || 'image/jpeg'
+    };
+    await employee.save();
+
+    if (isJson) {
+      return res.json({ success: true, message: 'Profile photo updated successfully', photoUrl: `/employee/photo/${employee._id}` });
+    }
+    res.redirect('/employee/profile?success=Profile+photo+updated+successfully');
+  } catch (err) {
+    console.error('Profile photo upload error:', err);
+    if (isJson) return res.status(500).json({ error: 'Failed to update photo: ' + err.message });
+    res.redirect('/employee/profile?error=' + encodeURIComponent(err.message));
+  }
+});
+
+// POST: Remove Profile Photo
+router.post('/profile/photo/remove', async (req, res) => {
+  const isJson = req.query.format === 'json' || req.headers.accept?.includes('application/json') || req.body.format === 'json';
+  try {
+    const employeeId = req.session.employeeId;
+    if (!employeeId) {
+      if (isJson) return res.status(401).json({ error: 'Unauthorized' });
+      return res.redirect('/auth/login');
+    }
+    const employee = await Employee.findById(employeeId);
+    if (employee) {
+      employee.profilePhoto = undefined;
+      await employee.save();
+    }
+    if (isJson) return res.json({ success: true, message: 'Photo removed' });
+    res.redirect('/employee/profile?success=Photo+removed+successfully');
+  } catch (err) {
+    if (isJson) return res.status(500).json({ error: err.message });
+    res.redirect('/employee/profile?error=' + encodeURIComponent(err.message));
   }
 });
 
@@ -304,3 +370,11 @@ router.post('/revoke-resignation', async (req, res) => {
 });
 
 module.exports = router;
+
+
+
+ 
+
+
+
+

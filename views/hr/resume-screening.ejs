@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Resume Screener & Talent Analytics | HRMS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0052cc;
+      --primary-dark: #0747a6;
+      --bg: #f4f5f7;
+      --card-bg: #ffffff;
+      --border-color: #dfe1e6;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg);
+      color: #172b4d;
+      margin: 0;
+      padding-bottom: 3rem;
+      letter-spacing: -0.01em;
+    }
+    .navbar {
+      background: #ffffff !important;
+      border-bottom: 1px solid var(--border-color);
+      padding: 0.85rem 0;
+    }
+    .navbar-brand {
+      font-weight: 800;
+      color: var(--primary) !important;
+    }
+    .page-header {
+      padding: 35px 0 25px;
+      border-bottom: 1px solid var(--border-color);
+      background: #ffffff;
+    }
+    .kpi-card {
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 6px rgba(9, 30, 66, 0.04);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(9, 30, 66, 0.08);
+    }
+    .glass-card {
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.75rem;
+      box-shadow: 0 2px 8px rgba(9, 30, 66, 0.04);
+    }
+    .drop-zone {
+      border: 2px dashed #b3d4ff;
+      border-radius: 14px;
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      background: #f8fafc;
+      transition: all 0.2s ease-in-out;
+      cursor: pointer;
+    }
+    .drop-zone:hover {
+      border-color: var(--primary);
+      background: #f0f7ff;
+    }
+    .badge-strong { background-color: #dcfce7; color: #15803d; border: 1px solid #86efac; font-weight: 700; }
+    .badge-shortlist { background-color: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; font-weight: 700; }
+    .badge-hold { background-color: #fef9c3; color: #854d0e; border: 1px solid #fef08a; font-weight: 700; }
+    .badge-reject { background-color: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; font-weight: 700; }
+
+    .score-circle {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.15rem;
+    }
+    .skill-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin: 3px;
+    }
+    .skill-matched { background-color: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; }
+    .skill-missing { background-color: #f3f4f6; color: #9ca3af; text-decoration: line-through; border: 1px solid #e5e7eb; }
+    .search-box {
+      border-radius: 12px;
+      border: 1px solid #dfe1e6;
+      padding-left: 2.5rem;
+    }
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+    }
+
+    /* Modern AI Exam Bot Studio Theme */
+    .bot-studio-header {
+      background: linear-gradient(135deg, #050c1e 0%, #0c2340 50%, #0052cc 100%);
+      color: #ffffff;
+      padding: 1.5rem 1.75rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .bot-studio-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      color: #93c5fa;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+      flex-shrink: 0;
+    }
+    .topic-preset-card {
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 0.85rem 1rem;
+      background: #ffffff;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-align: left;
+      width: 100%;
+    }
+    .topic-preset-card:hover {
+      border-color: #0052cc;
+      background: #f0f7ff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 82, 204, 0.08);
+    }
+    .topic-preset-card.active {
+      border-color: #0052cc;
+      background: #eff6ff;
+      box-shadow: 0 0 0 2px rgba(0, 82, 204, 0.2);
+    }
+    .topic-preset-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .proctoring-banner {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 0.9rem 1.15rem;
+    }
+    .live-link-box {
+      background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+      border: 1.5px solid #bfdbfe;
+      border-radius: 14px;
+      padding: 1.25rem;
+    }
+    .toast-copy-notification {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 12px 20px;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      z-index: 99999;
+      font-size: 0.88rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: opacity 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <%- include('../partials/anti-cache') %>
+
+  <!-- Standard App Navbar -->
+  <nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container-fluid px-4 px-lg-5">
+      <a class="navbar-brand d-flex align-items-center" href="/hr/dashboard">
+        <i class="fa-solid fa-building-shield me-2 text-primary"></i>
+        <span>HRMS Control Center</span>
+      </a>
+      <div class="ms-auto d-flex align-items-center gap-2">
+        <a href="/hr/dashboard" class="btn btn-outline-dark btn-sm rounded-pill px-3">
+          <i class="fa-solid fa-arrow-left me-1"></i> HR Dashboard
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Standard Page Header -->
+  <div class="page-header mb-4">
+    <div class="container-fluid px-4 px-lg-5">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+          <span class="badge mb-2" style="background: rgba(0, 82, 204, 0.1); color: var(--primary); border: 1px solid rgba(0, 82, 204, 0.2); font-weight: 700; font-size: 0.72rem;">
+            <i class="fa-solid fa-robot me-1 text-primary"></i> TALENT INTELLIGENCE AI ENGINE
+          </span>
+          <h2 class="fw-bold mb-1" style="color: #091e42; letter-spacing: -0.02em;">AI Resume Screener & Candidate Terminal</h2>
+          <p class="text-muted mb-0" style="font-size: 0.88rem;">Automated resume parsing, semantic candidate scoring, gap detection, and interactive examination bots.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <button type="button" class="btn btn-primary btn-sm fw-bold px-3.5 py-2 rounded-pill shadow-sm d-flex align-items-center gap-2 text-white" 
+                  data-bs-toggle="modal" data-bs-target="#modalCreateInstantBot"
+                  style="background: linear-gradient(135deg, #0052cc 0%, #2563eb 100%); border: none;">
+            <i class="fa-solid fa-wand-magic-sparkles text-warning"></i>
+            <span>Create AI Exam Bot</span>
+            <span class="badge bg-white text-primary rounded-pill px-2 py-0.5" style="font-size: 0.68rem; font-weight: 800;">Studio</span>
+          </button>
+          <a href="/hr/dashboard" class="btn btn-outline-dark btn-sm fw-bold px-3 rounded-pill shadow-sm">
+            <i class="fa-solid fa-arrow-left me-1"></i> Dashboard
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid px-4 px-lg-5">
+
+    <!-- Flash Messages -->
+    <% if (typeof success_msg !== 'undefined' && success_msg) { %>
+      <div class="alert alert-success alert-dismissible fade show rounded-3 fw-semibold shadow-sm mb-4" role="alert">
+        <i class="fa-solid fa-circle-check me-2"></i><%= success_msg %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    <% } %>
+    <% if (typeof error_msg !== 'undefined' && error_msg) { %>
+      <div class="alert alert-danger alert-dismissible fade show rounded-3 fw-semibold shadow-sm mb-4" role="alert">
+        <i class="fa-solid fa-triangle-exclamation me-2"></i><%= error_msg %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    <% } %>
+
+    <!-- RECRUITMENT KPI METRICS BANNER -->
+    <% 
+      const list = candidates || [];
+      const totalCount = list.length;
+      const readyToCallList = list.filter(c => c.callImmediately || c.recommendation === 'STRONG_HIRE' || (c.matchScore >= 80));
+      const readyToCallCount = readyToCallList.length;
+      const shortlisted = list.filter(c => c.recommendation === 'SHORTLIST' && !c.callImmediately && c.matchScore < 80).length;
+      const avgScore = totalCount > 0 ? Math.round(list.reduce((acc, c) => acc + (c.matchScore || 0), 0) / totalCount) : 0;
+    %>
+    <!-- RECRUITMENT KPI METRICS BANNER -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-3 col-6">
+        <div class="kpi-card">
+          <span class="text-uppercase small fw-bold text-muted" style="font-size: 0.72rem;">Total Resumes Screened</span>
+          <h3 class="fw-extrabold text-dark mt-2 mb-0"><%= totalCount %></h3>
+          <span class="text-secondary small mt-2 d-block" style="font-size: 0.78rem;">Profiles parsed & stored</span>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="kpi-card" style="border-top: 3px solid #2563eb;">
+          <div class="d-flex justify-content-between align-items-start">
+            <span class="text-uppercase small fw-bold text-primary" style="font-size: 0.72rem;">Call Immediately (80%+)</span>
+            <span class="badge rounded-pill bg-primary text-white" style="font-size: 0.65rem;">Top Picks</span>
+          </div>
+          <h3 class="fw-extrabold text-primary mt-2 mb-0"><%= readyToCallCount %></h3>
+          <span class="text-muted small mt-2 d-block" style="font-size: 0.78rem;">Ready for direct phone call & offer</span>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="kpi-card">
+          <span class="text-uppercase small fw-bold text-muted" style="font-size: 0.72rem;">Shortlisted Candidates</span>
+          <h3 class="fw-extrabold text-dark mt-2 mb-0"><%= shortlisted %></h3>
+          <span class="text-secondary small mt-2 d-block" style="font-size: 0.78rem;">65% - 79% interview queue</span>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="kpi-card">
+          <span class="text-uppercase small fw-bold text-muted" style="font-size: 0.72rem;">Average Match Score</span>
+          <h3 class="fw-extrabold text-dark mt-2 mb-0"><%= avgScore %>%</h3>
+          <span class="text-secondary small mt-2 d-block" style="font-size: 0.78rem;">Overall pipeline competency</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- FULL PAGE 2-COLUMN SPLIT STUDIO -->
+    <div class="row g-4">
+      
+      <!-- LEFT PANEL: Bulk Screener Form -->
+      <div class="col-lg-5 col-12">
+        <div class="glass-card h-100">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h5 class="fw-bold text-primary mb-0">
+              <i class="fa-solid fa-file-arrow-up me-2"></i>Bulk Resume Screening
+            </h5>
+            <span class="badge bg-light text-primary border fw-bold" style="font-size: 0.72rem;">
+              <i class="fa-solid fa-filter me-1"></i>Resume Validator Active
+            </span>
+          </div>
+
+          <div class="alert alert-primary py-2 px-3 small border-0 rounded-3 mb-3 d-flex align-items-center gap-2" style="background: #eff6ff; color: #1e40af; border-left: 4px solid #2563eb !important;">
+            <i class="fa-solid fa-circle-check fs-5 text-primary"></i>
+            <div>
+              <strong>Strict Resume Filtering:</strong> Dump all files at once. Non-resume documents (invoices, receipts, random notes) are automatically filtered out.
+            </div>
+          </div>
+
+          <form action="/hr/recruitment/screen" method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+              <label class="form-label fw-bold small text-muted text-uppercase">Target Position / Role</label>
+              <select name="targetRole" class="form-select fw-semibold" required>
+                <option value="SOFTWARE ENGINEER">Software Engineer / Developer</option>
+                <option value="FULL STACK DEVELOPER">Full Stack Developer</option>
+                <option value="SALES MANAGER">Sales Manager / Executive</option>
+                <option value="HR MANAGER">HR Manager / Executive</option>
+                <option value="ACCOUNTANT">Accountant / Finance</option>
+                <option value="LOGISTICS MANAGER">Logistics / Operations Manager</option>
+                <option value="MARKETING EXECUTIVE">Marketing Executive</option>
+                <option value="GENERAL">General Role</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold small text-muted text-uppercase">Department</label>
+              <select name="department" class="form-select fw-semibold">
+                <option value="IT">IT & Engineering</option>
+                <option value="SALES">Sales</option>
+                <option value="HR">HR</option>
+                <option value="ACCOUNTS">Accounts</option>
+                <option value="LOGISTICS">Logistics</option>
+                <option value="STORES">Stores</option>
+              </select>
+            </div>
+
+            <!-- Bulk File Upload -->
+            <div class="mb-3">
+              <label class="form-label fw-bold small text-muted text-uppercase">Dump All Resumes (PDF / DOCX / TXT)</label>
+              <div class="drop-zone" id="resumeDropZone" onclick="document.getElementById('fileInput').click()">
+                <i class="fa-solid fa-cloud-arrow-up text-primary fs-1 mb-2"></i>
+                <p class="fw-bold mb-1">Click or Drag & Drop Resumes Here</p>
+                <span class="text-muted small">Dump up to 50 resumes at once. PDFs, Word DOCX, and TXT are parsed cleanly.</span>
+                <input type="file" id="fileInput" name="resumeFiles" multiple accept=".pdf,.docx,.doc,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain" class="d-none">
+              </div>
+              <div id="fileCount" class="form-text mt-2 text-primary fw-bold"></div>
+              <div id="selectedFileList" class="small text-muted mt-1" style="max-height: 100px; overflow-y: auto;"></div>
+            </div>
+
+            <div class="text-center my-3 text-muted fw-bold small" style="font-size: 0.75rem; letter-spacing: 0.1em;">OR PASTE CANDIDATE RESUME TEXT</div>
+
+            <div class="mb-3">
+              <input type="text" name="candidateName" class="form-control mb-2" placeholder="Candidate Name (Optional)">
+              <textarea name="resumeText" class="form-control" rows="4" placeholder="Paste candidate resume text, skills, and work history here..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-3 shadow-sm">
+              <i class="fa-solid fa-microchip me-2"></i>Run AI Resume Scrutiny & Triage
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- RIGHT PANEL: Full-Width Ranked Candidate Leaderboard -->
+      <div class="col-lg-7 col-12">
+        <div class="glass-card h-100">
+          
+          <!-- READY TO CALL IMMEDIATELY HIGHLIGHT CARD -->
+          <% if (readyToCallList.length > 0) { %>
+            <div class="p-3 mb-4 rounded-3 border" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-color: #bfdbfe !important;">
+              <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="bg-primary text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                    <i class="fa-solid fa-phone-volume small"></i>
+                  </div>
+                  <div>
+                    <h6 class="fw-bold mb-0 text-primary">Ready for Immediate Call & Recruitment</h6>
+                    <span class="text-muted small" style="font-size: 0.76rem;">Highest match profiles (>80% score) with verified contact details</span>
+                  </div>
+                </div>
+                <span class="badge bg-primary text-white rounded-pill px-2.5 py-1 fw-bold">
+                  <%= readyToCallList.length %> Candidate(s)
+                </span>
+              </div>
+
+              <div class="row g-2 mt-1">
+                <% readyToCallList.slice(0, 4).forEach(c => { %>
+                  <div class="col-md-6 col-12">
+                    <div class="p-2.5 bg-white rounded-3 border h-100 d-flex flex-column justify-content-between shadow-xs">
+                      <div>
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                          <span class="fw-bold text-dark fs-6"><%= c.candidateName %></span>
+                          <span class="badge bg-primary text-white fw-bold"><%= c.matchScore %>% Match</span>
+                        </div>
+                        <div class="text-muted small mb-1" style="font-size: 0.78rem;">
+                          <span class="badge bg-light text-dark border me-1"><%= c.targetRole %></span>
+                          <span><i class="fa-solid fa-briefcase me-1"></i><%= c.yearsOfExperience %> Yrs Exp</span>
+                        </div>
+                        <div class="small text-secondary mb-2" style="font-size: 0.78rem;">
+                          <% if (c.phone) { %>
+                            <span class="me-2"><i class="fa-solid fa-phone me-1 text-primary"></i><strong><%= c.phone %></strong></span>
+                          <% } %>
+                          <% if (c.email) { %>
+                            <span class="d-block text-truncate"><i class="fa-solid fa-envelope me-1 text-primary"></i><%= c.email %></span>
+                          <% } %>
+                        </div>
+                      </div>
+
+                      <div class="d-flex align-items-center gap-1.5 pt-2 border-top mt-1">
+                        <% if (c.phone) { %>
+                          <a href="tel:<%= c.phone %>" class="btn btn-primary btn-sm rounded-pill fw-bold px-2.5 py-1" style="font-size: 0.72rem;" title="Call Candidate Immediately">
+                            <i class="fa-solid fa-phone me-1"></i>Call Now
+                          </a>
+                        <% } %>
+                        <% if (c.email) { %>
+                          <a href="mailto:<%= c.email %>?subject=Fast-Track%20Interview%20for%20<%= encodeURIComponent(c.targetRole) %>" class="btn btn-outline-primary btn-sm rounded-pill fw-bold px-2.5 py-1" style="font-size: 0.72rem;" title="Send Direct Email">
+                            <i class="fa-solid fa-envelope me-1"></i>Email
+                          </a>
+                        <% } %>
+                        <% if (c.status !== 'HIRED') { %>
+                          <form action="/hr/recruitment/<%= c._id %>/convert" method="POST" class="ms-auto" style="display:inline;">
+                            <button type="submit" class="btn btn-success btn-sm rounded-pill fw-bold px-2.5 py-1" style="font-size: 0.72rem;" title="1-Click Fast Track Onboard">
+                              <i class="fa-solid fa-user-plus me-1"></i>Recruit
+                            </button>
+                          </form>
+                        <% } else { %>
+                          <span class="badge bg-secondary ms-auto px-2 py-1 rounded-pill" style="font-size: 0.7rem;"><i class="fa-solid fa-check me-1"></i>Hired</span>
+                        <% } %>
+                      </div>
+                    </div>
+                  </div>
+                <% }) %>
+              </div>
+            </div>
+          <% } %>
+
+          <!-- Search & Filter Toolbar -->
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+            <div>
+              <h5 class="fw-bold mb-1"><i class="fa-solid fa-ranking-star text-primary me-2"></i>Candidate Talent Pipeline</h5>
+              <p class="text-muted small mb-0">Ranked by AI match score & skill taxonomy</p>
+            </div>
+            
+            <div class="position-relative" style="min-width: 240px;">
+              <i class="fa-solid fa-magnifying-glass search-icon"></i>
+              <input type="text" id="candidateSearch" class="form-control form-control-sm search-box" placeholder="Search candidate, skill, phone..." onkeyup="filterCandidates()">
+            </div>
+          </div>
+
+          <% if (!candidates || candidates.length === 0) { %>
+            <div class="text-center py-5 text-muted">
+              <i class="fa-solid fa-folder-open display-3 mb-3 text-secondary opacity-50"></i>
+              <p class="fw-bold mb-1">No candidate records scrutinised yet.</p>
+              <span class="small">Dump resumes into the upload zone on the left to analyze candidate match scores.</span>
+            </div>
+          <% } else { %>
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0" id="candidateTable">
+                <thead class="table-light">
+                  <tr class="text-uppercase small text-muted" style="font-size: 0.72rem; letter-spacing: 0.05em;">
+                    <th>Rank / Candidate</th>
+                    <th>Target Position</th>
+                    <th>AI Match</th>
+                    <th>AI Exam Bot Status</th>
+                    <th>Recruitment Action</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% candidates.forEach((c, idx) => { %>
+                    <tr class="candidate-row">
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <span class="fw-extrabold me-3 text-secondary fs-6">#<%= idx + 1 %></span>
+                          <div>
+                            <div class="fw-bold text-dark fs-6 candidate-name-text"><%= c.candidateName %></div>
+                            <div class="small text-muted" style="font-size: 0.78rem;">
+                              <% if (c.phone) { %>
+                                <a href="tel:<%= c.phone %>" class="text-decoration-none text-primary me-2"><i class="fa-solid fa-phone me-1"></i><%= c.phone %></a>
+                              <% } %>
+                              <% if (c.email) { %>
+                                <a href="mailto:<%= c.email %>" class="text-decoration-none text-muted"><i class="fa-solid fa-envelope me-1"></i><%= c.email %></a>
+                              <% } %>
+                              <% if (!c.phone && !c.email) { %>
+                                <span class="text-muted">No Contact Extracted</span>
+                              <% } %>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <span class="badge bg-light text-dark border fw-semibold"><%= c.targetRole %></span>
+                        <div class="text-muted small mt-0.5" style="font-size: 0.72rem;"><%= c.yearsOfExperience %> Yrs Exp</div>
+                      </td>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <div class="score-circle me-2 
+                            <%= c.matchScore >= 80 ? 'bg-primary text-white' : (c.matchScore >= 65 ? 'bg-info text-dark' : (c.matchScore >= 50 ? 'bg-light text-dark border' : 'bg-secondary text-white')) %>">
+                            <%= c.matchScore %>%
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <% if (c.interviewStatus === 'INVITED') { %>
+                          <div class="d-flex flex-column align-items-start gap-1">
+                            <span class="badge text-white px-2.5 py-1 rounded-pill fw-bold" style="background: linear-gradient(135deg, #0052cc 0%, #2563eb 100%); font-size: 0.72rem;">
+                              <i class="fa-solid fa-bolt text-warning me-1"></i>Exam Ready (<%= c.questionCount || (c.interviewQuestions ? c.interviewQuestions.length : 5) %>Q)
+                            </span>
+                            <div class="d-flex align-items-center gap-1">
+                              <a href="/interview/<%= c.interviewToken %>" target="_blank" class="btn btn-sm btn-outline-primary py-0 px-2 rounded-pill fw-bold" style="font-size: 0.72rem;" title="Test Drive Live Exam">
+                                <i class="fa-solid fa-arrow-up-right-from-square me-1"></i>Test Drive
+                              </a>
+                              <button type="button" class="btn btn-sm btn-light border py-0 px-2 rounded-pill fw-bold text-dark" style="font-size: 0.72rem;" onclick="copyInviteLink('<%= c.interviewToken %>')">
+                                <i class="fa-regular fa-copy me-1 text-primary"></i>Copy
+                              </button>
+                            </div>
+                          </div>
+                        <% } else if (c.interviewStatus === 'IN_PROGRESS') { %>
+                          <span class="badge bg-warning text-dark px-2.5 py-1.5 rounded-pill fw-bold"><i class="fa-solid fa-spinner fa-spin me-1"></i>In Exam Room</span>
+                        <% } else if (c.interviewStatus === 'COMPLETED') { %>
+                          <div class="d-flex flex-column align-items-start gap-1">
+                            <span class="badge bg-success text-white px-2.5 py-1 rounded-pill fw-bold"><i class="fa-solid fa-check-circle me-1"></i>Evaluated</span>
+                            <a href="/hr/recruitment/<%= c._id %>/report" class="btn btn-sm btn-outline-success py-0 px-2 rounded-pill fw-bold" style="font-size: 0.72rem;">
+                              <i class="fa-solid fa-chart-simple me-1"></i>Score: <%= c.aiAssessmentSummary?.overallScore || 0 %>%
+                            </a>
+                          </div>
+                        <% } else { %>
+                          <button type="button" class="btn btn-sm btn-outline-primary rounded-pill fw-bold px-2.5 py-1" style="font-size: 0.72rem;" data-bs-toggle="modal" data-bs-target="#modal-bot-<%= c._id %>">
+                            <i class="fa-solid fa-wand-magic-sparkles me-1 text-primary"></i>Setup Exam
+                          </button>
+                        <% } %>
+                      </td>
+                      <td>
+                        <% if (c.callImmediately || c.recommendation === 'STRONG_HIRE' || c.matchScore >= 80) { %>
+                          <span class="badge" style="background: #e0f2fe; color: #1d4ed8; border: 1px solid #93c5fd; font-weight: 800; font-size: 0.76rem; padding: 6px 12px; border-radius: 20px;">
+                            <i class="fa-solid fa-phone me-1"></i>Call Immediately
+                          </span>
+                        <% } else if (c.recommendation === 'SHORTLIST') { %>
+                          <span class="badge badge-shortlist px-3 py-2 rounded-pill"><i class="fa-solid fa-thumbs-up me-1"></i>Shortlist</span>
+                        <% } else if (c.recommendation === 'HOLD') { %>
+                          <span class="badge badge-hold px-3 py-2 rounded-pill"><i class="fa-solid fa-pause me-1"></i>Hold</span>
+                        <% } else { %>
+                          <span class="badge badge-reject px-3 py-2 rounded-pill"><i class="fa-solid fa-xmark me-1"></i>Reject</span>
+                        <% } %>
+                      </td>
+                      <td class="text-end">
+                        <% if (c.phone) { %>
+                          <a href="tel:<%= c.phone %>" class="btn btn-outline-primary btn-sm rounded-circle me-1" title="Call Candidate: <%= c.phone %>">
+                            <i class="fa-solid fa-phone"></i>
+                          </a>
+                        <% } %>
+                        <button type="button" class="btn btn-outline-primary btn-sm rounded-pill fw-bold px-2.5 me-1" 
+                                data-bs-toggle="modal" data-bs-target="#modal-bot-<%= c._id %>" title="AI Exam Studio">
+                          <i class="fa-solid fa-robot me-1"></i>Exam Bot
+                        </button>
+                        <button type="button" class="btn btn-outline-primary btn-sm rounded-circle me-1" 
+                                data-bs-toggle="modal" data-bs-target="#modal-<%= c._id %>" title="Inspect Full Report">
+                          <i class="fa-solid fa-eye"></i>
+                        </button>
+                        
+                        <% if (c.status !== 'HIRED') { %>
+                          <form action="/hr/recruitment/<%= c._id %>/convert" method="POST" style="display:inline;">
+                            <button type="submit" class="btn btn-success btn-sm fw-bold px-2.5 rounded-3" title="1-Click Convert to Employee">
+                              <i class="fa-solid fa-user-plus me-1"></i>Recruit
+                            </button>
+                          </form>
+                        <% } else { %>
+                          <span class="badge bg-secondary px-2.5 py-1.5 rounded-pill"><i class="fa-solid fa-check me-1"></i>Hired</span>
+                        <% } %>
+                      </td>
+                    </tr>
+
+                    <!-- CANDIDATE ANALYSIS REPORT MODAL -->
+                    <div class="modal fade" id="modal-<%= c._id %>" tabindex="-1">
+                      <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                          <div class="modal-header bg-primary text-white p-4">
+                            <div>
+                              <span class="badge bg-white text-primary fw-bold text-uppercase mb-1 px-2.5 py-1">AI SCRUTINY REPORT</span>
+                              <h4 class="modal-title fw-extrabold mb-0"><%= c.candidateName %></h4>
+                            </div>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                          </div>
+                          <div class="modal-body p-4">
+                            
+                            <div class="row align-items-center mb-4 p-3 bg-light rounded-3 border">
+                              <div class="col-md-3 text-center border-end">
+                                <h1 class="display-3 fw-extrabold mb-0 <%= c.matchScore >= 80 ? 'text-primary' : 'text-dark' %>">
+                                  <%= c.matchScore %>%
+                                </h1>
+                                <span class="fw-bold small text-muted">AI MATCH SCORE</span>
+                              </div>
+                              <div class="col-md-9 ps-md-4">
+                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-1">
+                                  <h5 class="fw-bold text-primary mb-0"><%= c.targetRole %></h5>
+                                  <% if (c.callImmediately || c.recommendation === 'STRONG_HIRE' || c.matchScore >= 80) { %>
+                                    <span class="badge" style="background: #e0f2fe; color: #1d4ed8; border: 1px solid #93c5fd; font-weight: 800; font-size: 0.76rem;">
+                                      <i class="fa-solid fa-phone me-1"></i>Ready for Immediate Call
+                                    </span>
+                                  <% } %>
+                                </div>
+                                <p class="text-muted small mb-2">
+                                  <i class="fa-solid fa-envelope me-1 text-primary"></i>
+                                  <% if (c.email) { %>
+                                    <a href="mailto:<%= c.email %>" class="text-decoration-none text-dark"><%= c.email %></a>
+                                  <% } else { %>
+                                    <span>N/A</span>
+                                  <% } %> &nbsp;|&nbsp;
+                                  <i class="fa-solid fa-phone me-1 text-primary"></i>
+                                  <% if (c.phone) { %>
+                                    <a href="tel:<%= c.phone %>" class="text-decoration-none fw-bold text-primary"><%= c.phone %></a>
+                                  <% } else { %>
+                                    <span>N/A</span>
+                                  <% } %> &nbsp;|&nbsp;
+                                  <i class="fa-solid fa-briefcase me-1 text-primary"></i>Experience: <%= c.yearsOfExperience %> Yrs
+                                </p>
+                                <div class="p-3 bg-white rounded-3 border small text-dark">
+                                  <strong>AI Executive Summary:</strong> <%= c.aiSummary %>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div class="mb-4">
+                              <h6 class="fw-bold text-success mb-2"><i class="fa-solid fa-circle-check me-2"></i>Matched Competencies (<%= c.extractedSkills ? c.extractedSkills.length : 0 %>)</h6>
+                              <% if (c.extractedSkills && c.extractedSkills.length > 0) { %>
+                                <% c.extractedSkills.forEach(s => { %>
+                                  <span class="skill-tag skill-matched"><i class="fa-solid fa-check me-1"></i><%= s %></span>
+                                <% }) %>
+                              <% } else { %>
+                                <span class="text-muted small">No specific matching skills extracted</span>
+                              <% } %>
+                            </div>
+
+                            <% if (c.missingSkills && c.missingSkills.length > 0) { %>
+                              <div class="mb-4">
+                                <h6 class="fw-bold text-secondary mb-2"><i class="fa-solid fa-circle-xmark me-2"></i>Missing Target Criteria</h6>
+                                <% c.missingSkills.forEach(s => { %>
+                                  <span class="skill-tag skill-missing"><%= s %></span>
+                                <% }) %>
+                              </div>
+                            <% } %>
+
+                            <% if (c.strengths && c.strengths.length > 0) { %>
+                              <div class="mb-3">
+                                <h6 class="fw-bold text-dark mb-2"><i class="fa-solid fa-star text-warning me-2"></i>Key Strengths</h6>
+                                <ul class="small mb-0 text-muted">
+                                  <% c.strengths.forEach(st => { %>
+                                    <li><%= st %></li>
+                                  <% }) %>
+                                </ul>
+                              </div>
+                            <% } %>
+                          </div>
+
+                          <div class="modal-footer bg-light p-3">
+                            <form action="/hr/recruitment/candidate/<%= c._id %>/status" method="POST" class="d-flex align-items-center gap-2 me-auto">
+                              <select name="status" class="form-select form-select-sm fw-bold">
+                                <option value="NEW" <%= c.status === 'NEW' ? 'selected' : '' %>>Pipeline: New</option>
+                                <option value="SHORTLISTED" <%= c.status === 'SHORTLISTED' ? 'selected' : '' %>>Pipeline: Shortlisted</option>
+                                <option value="INTERVIEWED" <%= c.status === 'INTERVIEWED' ? 'selected' : '' %>>Pipeline: Interviewed</option>
+                                <option value="REJECTED" <%= c.status === 'REJECTED' ? 'selected' : '' %>>Pipeline: Rejected</option>
+                              </select>
+                              <button type="submit" class="btn btn-outline-primary btn-sm fw-bold">Update</button>
+                            </form>
+
+                            <div class="d-flex align-items-center gap-2">
+                              <% if (c.phone) { %>
+                                <a href="tel:<%= c.phone %>" class="btn btn-primary btn-sm fw-bold px-3">
+                                  <i class="fa-solid fa-phone me-1"></i>Call <%= c.phone %>
+                                </a>
+                              <% } %>
+                              <% if (c.email) { %>
+                                <a href="mailto:<%= c.email %>" class="btn btn-outline-primary btn-sm fw-bold px-3">
+                                  <i class="fa-solid fa-envelope me-1"></i>Email
+                                </a>
+                              <% } %>
+
+                              <% if (c.status !== 'HIRED') { %>
+                                <form action="/hr/recruitment/<%= c._id %>/convert" method="POST" style="display:inline;">
+                                  <button type="submit" class="btn btn-success btn-sm fw-bold px-3.5 rounded-3">
+                                    <i class="fa-solid fa-user-plus me-1"></i>Recruit / Onboard
+                                  </button>
+                                </form>
+                              <% } %>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- CONFIGURE AI EXAM BOT MODAL FOR CANDIDATE -->
+                    <div class="modal fade" id="modal-bot-<%= c._id %>" tabindex="-1">
+                      <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                          <div class="bot-studio-header d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-3">
+                              <div class="bot-studio-icon">
+                                <i class="fa-solid fa-robot"></i>
+                              </div>
+                              <div>
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                  <span class="badge bg-white text-primary fw-extrabold px-2.5 py-1 rounded-pill" style="font-size: 0.68rem; letter-spacing: 0.04em;">
+                                    <i class="fa-solid fa-wand-magic-sparkles me-1"></i>AI EXAM BOT STUDIO
+                                  </span>
+                                  <span class="badge bg-primary-subtle text-white border border-light-subtle rounded-pill px-2.5 py-1" style="font-size: 0.68rem;">
+                                    Candidate: <%= c.candidateName %>
+                                  </span>
+                                </div>
+                                <h5 class="fw-extrabold text-white mb-0">Configure Candidate Examination Bot</h5>
+                              </div>
+                            </div>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                          </div>
+                          
+                          <form action="/hr/recruitment/<%= c._id %>/invite" method="POST">
+                            <div class="modal-body p-4 bg-light-subtle">
+                              <% if (c.interviewToken) { %>
+                                <div class="live-link-box mb-4">
+                                  <div class="d-flex align-items-start justify-content-between flex-wrap gap-2 mb-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                      <span class="badge bg-success text-white px-2.5 py-1 rounded-pill fw-bold">
+                                        <i class="fa-solid fa-circle-check me-1"></i>Active 24-Hour Exam Portal Link
+                                      </span>
+                                      <span class="text-muted small">Token: <code><%= c.interviewToken.substring(0, 10) %>...</code></span>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                      <a href="/interview/<%= c.interviewToken %>" target="_blank" class="btn btn-sm btn-primary rounded-pill px-3 fw-bold">
+                                        <i class="fa-solid fa-arrow-up-right-from-square me-1"></i>Test Drive Exam
+                                      </a>
+                                      <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold" onclick="copyInviteLink('<%= c.interviewToken %>')">
+                                        <i class="fa-solid fa-copy me-1"></i>Copy Link
+                                      </button>
+                                    </div>
+                                  </div>
+                                  <div class="p-2 bg-white rounded-3 border text-truncate">
+                                    <code class="small text-dark fw-bold" id="examLinkText_<%= c._id %>">/interview/<%= c.interviewToken %></code>
+                                  </div>
+                                  <span class="text-muted small mt-1.5 d-block" style="font-size: 0.76rem;">
+                                    <i class="fa-regular fa-clock me-1 text-primary"></i>Single-submission token with anti-cheat proctoring enabled.
+                                  </span>
+                                </div>
+                              <% } %>
+
+                              <!-- Candidate Snapshot Pill Row -->
+                              <div class="p-3 bg-white rounded-3 border mb-3 shadow-xs">
+                                <div class="row g-2 align-items-center">
+                                  <div class="col-sm-4">
+                                    <span class="small text-muted d-block" style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Candidate</span>
+                                    <strong class="text-dark"><%= c.candidateName %></strong>
+                                  </div>
+                                  <div class="col-sm-4">
+                                    <span class="small text-muted d-block" style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Target Role</span>
+                                    <span class="badge bg-light text-primary border fw-bold"><%= c.targetRole %></span>
+                                  </div>
+                                  <div class="col-sm-4">
+                                    <span class="small text-muted d-block" style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Pipeline Score</span>
+                                    <span class="fw-bold text-success"><i class="fa-solid fa-circle-check me-1"></i><%= c.matchScore %>% Match</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <!-- Subject Prompt -->
+                              <div class="mb-3">
+                                <label class="form-label fw-bold d-flex justify-content-between align-items-center">
+                                  <span><i class="fa-solid fa-wand-magic-sparkles text-primary me-1.5"></i>HR Prompt / Exam Subject <span class="text-danger">*</span></span>
+                                  <span class="text-muted small" style="font-size: 0.75rem;">AI generates questions matching this focus</span>
+                                </label>
+                                <input type="text" name="prompt" id="promptInput_<%= c._id %>" class="form-control form-control-lg fw-semibold" 
+                                       placeholder="e.g. electronics, or circuit design, microcontrollers and embedded firmware" 
+                                       value="<%= c.customBotPrompt || c.examTopic || c.targetRole || 'electronics' %>" required>
+                              </div>
+
+                              <!-- Quick Topic Cards -->
+                              <div class="mb-4">
+                                <span class="small text-muted fw-bold d-block mb-2 text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.05em;">Quick-Select Subject Presets:</span>
+                                <div class="row g-2">
+                                  <div class="col-md-6 col-12">
+                                    <div class="topic-preset-card" onclick="document.getElementById('promptInput_<%= c._id %>').value='electronics'; document.getElementById('qCount_<%= c._id %>').value='5';">
+                                      <div class="topic-preset-icon bg-warning-subtle text-warning">
+                                        <i class="fa-solid fa-bolt"></i>
+                                      </div>
+                                      <div>
+                                        <strong class="d-block text-dark small">Electronics & Circuits</strong>
+                                        <span class="text-muted" style="font-size: 0.74rem;">Semiconductors, I2C/SPI, PCB (5Q)</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="col-md-6 col-12">
+                                    <div class="topic-preset-card" onclick="document.getElementById('promptInput_<%= c._id %>').value='embedded systems, microcontrollers and RTOS'; document.getElementById('qCount_<%= c._id %>').value='5';">
+                                      <div class="topic-preset-icon bg-primary-subtle text-primary">
+                                        <i class="fa-solid fa-microchip"></i>
+                                      </div>
+                                      <div>
+                                        <strong class="d-block text-dark small">Embedded & Firmware</strong>
+                                        <span class="text-muted" style="font-size: 0.74rem;">C/C++, ARM, RTOS, drivers (5Q)</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="col-md-6 col-12">
+                                    <div class="topic-preset-card" onclick="document.getElementById('promptInput_<%= c._id %>').value='fullstack react, node.js, rest apis and database optimization'; document.getElementById('qCount_<%= c._id %>').value='5';">
+                                      <div class="topic-preset-icon bg-info-subtle text-info">
+                                        <i class="fa-solid fa-code"></i>
+                                      </div>
+                                      <div>
+                                        <strong class="d-block text-dark small">Full-Stack Web & Cloud</strong>
+                                        <span class="text-muted" style="font-size: 0.74rem;">React, Node, SQL/NoSQL (5Q)</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="col-md-6 col-12">
+                                    <div class="topic-preset-card" onclick="document.getElementById('promptInput_<%= c._id %>').value='statutory tax, gst, tds and balance sheet auditing'; document.getElementById('qCount_<%= c._id %>').value='5';">
+                                      <div class="topic-preset-icon bg-success-subtle text-success">
+                                        <i class="fa-solid fa-receipt"></i>
+                                      </div>
+                                      <div>
+                                        <strong class="d-block text-dark small">Finance, Tax & Audit</strong>
+                                        <span class="text-muted" style="font-size: 0.74rem;">GST, TDS, P&L, audits (5Q)</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                  <label class="form-label fw-bold small text-muted text-uppercase" style="font-size: 0.72rem;">Question Count & Duration</label>
+                                  <select name="questionCount" id="qCount_<%= c._id %>" class="form-select fw-semibold">
+                                    <option value="3" <%= c.questionCount === 3 ? 'selected' : '' %>>⚡ 3 Questions (Rapid 10-Min Screen)</option>
+                                    <option value="5" <%= (!c.questionCount || c.questionCount === 5) ? 'selected' : '' %>>⭐ 5 Questions (Recommended Standard)</option>
+                                    <option value="8" <%= c.questionCount === 8 ? 'selected' : '' %>>🔬 8 Questions (Deep Technical Assessment)</option>
+                                    <option value="10" <%= c.questionCount === 10 ? 'selected' : '' %>>🏆 10 Questions (Master Comprehensive)</option>
+                                  </select>
+                                </div>
+                                <div class="col-md-6">
+                                  <label class="form-label fw-bold small text-muted text-uppercase" style="font-size: 0.72rem;">Evaluation Rigor / Level</label>
+                                  <select name="difficulty" class="form-select fw-semibold">
+                                    <option value="JUNIOR" <%= c.difficultyLevel === 'JUNIOR' ? 'selected' : '' %>>🟢 Junior / Entry Level (1-2 yrs)</option>
+                                    <option value="MID" <%= (!c.difficultyLevel || c.difficultyLevel === 'MID') ? 'selected' : '' %>>🟡 Mid-Level Specialist (3-5 yrs)</option>
+                                    <option value="SENIOR" <%= c.difficultyLevel === 'SENIOR' ? 'selected' : '' %>>🔴 Senior / Lead Architect (6+ yrs)</option>
+                                  </select>
+                                </div>
+                              </div>
+
+                              <!-- Proctoring & AI Evaluation Guarantee Banner -->
+                              <div class="proctoring-banner">
+                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                                  <span class="fw-bold small text-dark"><i class="fa-solid fa-shield-halved text-primary me-1.5"></i>Built-in Proctoring & AI Criteria:</span>
+                                  <span class="badge bg-primary text-white" style="font-size: 0.65rem;">Hugging Face AI</span>
+                                </div>
+                                <div class="row g-2 text-muted small" style="font-size: 0.76rem;">
+                                  <div class="col-4"><i class="fa-solid fa-clock me-1 text-primary"></i>90-120s per question</div>
+                                  <div class="col-4"><i class="fa-solid fa-eye-slash me-1 text-danger"></i>Tab-switch audit</div>
+                                  <div class="col-4"><i class="fa-solid fa-chart-pie me-1 text-success"></i>Multi-metric scoring</div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div class="modal-footer bg-white border-top p-3 d-flex justify-content-between">
+                              <button type="button" class="btn btn-outline-secondary fw-bold rounded-pill px-3" data-bs-dismiss="modal">Cancel</button>
+                              <button type="submit" class="btn btn-primary fw-bold px-4 py-2 rounded-pill shadow-sm text-white" style="background: linear-gradient(135deg, #0052cc 0%, #2563eb 100%); border: none;">
+                                <i class="fa-solid fa-wand-magic-sparkles me-1.5 text-warning"></i>Generate AI Exam Bot & Link
+                              </button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          <% } %>
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- MODAL: CREATE INSTANT AI EXAM BOT (STANDALONE) -->
+  <div class="modal fade" id="modalCreateInstantBot" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="bot-studio-header d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center gap-3">
+            <div class="bot-studio-icon">
+              <i class="fa-solid fa-robot"></i>
+            </div>
+            <div>
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-white text-primary fw-extrabold px-2.5 py-1 rounded-pill" style="font-size: 0.68rem; letter-spacing: 0.04em;">
+                  <i class="fa-solid fa-wand-magic-sparkles me-1 text-primary"></i>AI EXAM BOT STUDIO
+                </span>
+                <span class="badge bg-primary-subtle text-white border border-light-subtle rounded-pill px-2.5 py-1" style="font-size: 0.68rem;">
+                  Instant 24-Hour Link
+                </span>
+              </div>
+              <h5 class="fw-extrabold text-white mb-0">Create Instant AI Recruitment Examination Bot</h5>
+            </div>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+
+        <form action="/hr/recruitment/create-exam-bot" method="POST">
+          <div class="modal-body p-4 bg-light-subtle">
+            <!-- Candidate Target Information -->
+            <div class="p-3 bg-white rounded-3 border mb-3 shadow-xs">
+              <span class="small text-muted fw-bold d-block mb-2 text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.05em;">
+                <i class="fa-solid fa-user-tag me-1 text-primary"></i>Candidate Information
+              </span>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label fw-bold small">Candidate Full Name <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="fa-solid fa-user text-muted"></i></span>
+                    <input type="text" name="candidateName" class="form-control" placeholder="e.g. Ramesh Kumar" required>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-bold small">Email or WhatsApp Phone</label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="fa-solid fa-paper-plane text-muted"></i></span>
+                    <input type="text" name="email" class="form-control" placeholder="ramesh@example.com or +91...">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Subject Prompt Input -->
+            <div class="mb-3">
+              <label class="form-label fw-bold d-flex justify-content-between align-items-center">
+                <span><i class="fa-solid fa-wand-magic-sparkles text-primary me-1.5"></i>Exam Subject / HR Bot Prompt <span class="text-danger">*</span></span>
+                <span class="text-muted small" style="font-size: 0.75rem;">AI dynamically creates question pool</span>
+              </label>
+              <input type="text" name="prompt" id="instantPromptInput" class="form-control form-control-lg fw-semibold" 
+                     placeholder="e.g. electronics, or circuit design, microcontrollers and embedded firmware" required>
+              <div class="form-text small mt-1 text-muted">
+                Specify any technical domain or job requirement (e.g. <em>"electronics"</em>, <em>"react node.js"</em>, <em>"embedded C"</em>, <em>"gst and balance sheet audit"</em>).
+              </div>
+            </div>
+
+            <!-- Quick Presets Cards -->
+            <div class="mb-4">
+              <span class="small text-muted fw-bold d-block mb-2 text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.05em;">
+                Quick-Select Domain Presets:
+              </span>
+              <div class="row g-2">
+                <div class="col-md-6 col-12">
+                  <div class="topic-preset-card" 
+                       onclick="document.getElementById('instantPromptInput').value='electronics, semiconductor physics, circuit design and PCB layout'; document.getElementById('instantQCount').value='5'; document.getElementById('instantRole').value='Electronics Engineer';">
+                    <div class="topic-preset-icon bg-warning-subtle text-warning">
+                      <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    <div>
+                      <strong class="d-block text-dark small">Electronics & Hardware</strong>
+                      <span class="text-muted" style="font-size: 0.74rem;">Circuits, PCB, I2C/SPI, Microcontrollers (5Q)</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6 col-12">
+                  <div class="topic-preset-card" 
+                       onclick="document.getElementById('instantPromptInput').value='embedded C, ARM Cortex, RTOS, device drivers and firmware'; document.getElementById('instantQCount').value='5'; document.getElementById('instantRole').value='Embedded Systems Engineer';">
+                    <div class="topic-preset-icon bg-primary-subtle text-primary">
+                      <i class="fa-solid fa-microchip"></i>
+                    </div>
+                    <div>
+                      <strong class="d-block text-dark small">Embedded & Firmware</strong>
+                      <span class="text-muted" style="font-size: 0.74rem;">C/C++, RTOS, Hardware Drivers, UART (5Q)</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6 col-12">
+                  <div class="topic-preset-card" 
+                       onclick="document.getElementById('instantPromptInput').value='fullstack react, node.js, database optimization and microservices'; document.getElementById('instantQCount').value='5'; document.getElementById('instantRole').value='Full Stack Developer';">
+                    <div class="topic-preset-icon bg-info-subtle text-info">
+                      <i class="fa-solid fa-code"></i>
+                    </div>
+                    <div>
+                      <strong class="d-block text-dark small">Full-Stack Web & Cloud</strong>
+                      <span class="text-muted" style="font-size: 0.74rem;">React, Node, REST APIs, Microservices (5Q)</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6 col-12">
+                  <div class="topic-preset-card" 
+                       onclick="document.getElementById('instantPromptInput').value='statutory tax, gst, tds, balance sheet auditing and corporate compliance'; document.getElementById('instantQCount').value='5'; document.getElementById('instantRole').value='Senior Accounts Manager';">
+                    <div class="topic-preset-icon bg-success-subtle text-success">
+                      <i class="fa-solid fa-receipt"></i>
+                    </div>
+                    <div>
+                      <strong class="d-block text-dark small">Finance, Tax & Audit</strong>
+                      <span class="text-muted" style="font-size: 0.74rem;">GST, TDS, P&L Audits, Statutory Filings (5Q)</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-4">
+                <label class="form-label fw-bold small text-muted text-uppercase" style="font-size: 0.72rem;">Target Designation</label>
+                <input type="text" name="targetRole" id="instantRole" class="form-control fw-semibold" placeholder="e.g. Electronics Engineer">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold small text-muted text-uppercase" style="font-size: 0.72rem;">Question Count</label>
+                <select name="questionCount" id="instantQCount" class="form-select fw-semibold">
+                  <option value="3">⚡ 3 Questions (10-Min Rapid)</option>
+                  <option value="5" selected>⭐ 5 Questions (Standard Recommended)</option>
+                  <option value="8">🔬 8 Questions (In-Depth Technical)</option>
+                  <option value="10">🏆 10 Questions (Comprehensive Master)</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-bold small text-muted text-uppercase" style="font-size: 0.72rem;">Difficulty Level</label>
+                <select name="difficulty" class="form-select fw-semibold">
+                  <option value="JUNIOR">🟢 Junior / Entry Level (1-2 yrs)</option>
+                  <option value="MID" selected>🟡 Mid-Level Specialist (3-5 yrs)</option>
+                  <option value="SENIOR">🔴 Senior / Lead Architect (6+ yrs)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Proctoring & AI Evaluation Guarantee Banner -->
+            <div class="proctoring-banner">
+              <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                <span class="fw-bold small text-dark"><i class="fa-solid fa-shield-halved text-primary me-1.5"></i>Built-in Proctoring & AI Criteria:</span>
+                <span class="badge bg-primary text-white" style="font-size: 0.65rem;">Hugging Face AI</span>
+              </div>
+              <div class="row g-2 text-muted small" style="font-size: 0.76rem;">
+                <div class="col-4"><i class="fa-solid fa-clock me-1 text-primary"></i>90-120s per question</div>
+                <div class="col-4"><i class="fa-solid fa-eye-slash me-1 text-danger"></i>Tab-switch tracking</div>
+                <div class="col-4"><i class="fa-solid fa-chart-pie me-1 text-success"></i>Multi-metric scoring</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer bg-white border-top p-3 d-flex justify-content-between">
+            <button type="button" class="btn btn-outline-secondary fw-bold rounded-pill px-3" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary fw-bold px-4 py-2.5 rounded-pill shadow-sm text-white" style="background: linear-gradient(135deg, #0052cc 0%, #2563eb 100%); border: none;">
+              <i class="fa-solid fa-wand-magic-sparkles me-1.5 text-warning"></i>Create AI Exam Bot & Generate 24h Link
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <footer class="text-center py-4 border-top bg-white mt-5">
+    <p class="text-muted small mb-0">© 2026 HRMS • Enterprise AI Resume Screener & Talent Intelligence</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const dropZone = document.getElementById('resumeDropZone');
+    const fileInput = document.getElementById('fileInput');
+    const countEl = document.getElementById('fileCount');
+    const listEl = document.getElementById('selectedFileList');
+
+    if (dropZone) {
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropZone.style.borderColor = '#0052cc';
+          dropZone.style.background = '#e0f2fe';
+        }, false);
+      });
+
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropZone.style.borderColor = '#b3d4ff';
+          dropZone.style.background = '#f8fafc';
+        }, false);
+      });
+
+      dropZone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        if (dt && dt.files && dt.files.length > 0) {
+          fileInput.files = dt.files;
+          updateFileList(dt.files);
+        }
+      });
+    }
+
+    if (fileInput) {
+      fileInput.addEventListener('change', function(e) {
+        updateFileList(e.target.files);
+      });
+    }
+
+    function updateFileList(files) {
+      if (files && files.length > 0) {
+        countEl.innerHTML = `<i class="fa-solid fa-circle-check me-1 text-primary"></i> ${files.length} resume file(s) selected for AI parsing`;
+        let html = '<ul class="list-unstyled mb-0 mt-1">';
+        for (let i = 0; i < Math.min(files.length, 5); i++) {
+          html += `<li><i class="fa-regular fa-file-lines me-1 text-primary"></i>${files[i].name} <span class="text-muted">(${(files[i].size / 1024).toFixed(1)} KB)</span></li>`;
+        }
+        if (files.length > 5) {
+          html += `<li class="text-primary fw-bold">+ and ${files.length - 5} more files</li>`;
+        }
+        html += '</ul>';
+        listEl.innerHTML = html;
+      } else {
+        countEl.innerText = '';
+        listEl.innerHTML = '';
+      }
+    }
+
+    function filterCandidates() {
+      const input = document.getElementById('candidateSearch').value.toLowerCase();
+      const rows = document.querySelectorAll('.candidate-row');
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(input) ? '' : 'none';
+      });
+    }
+
+    function copyInviteLink(token) {
+      if (!token) return;
+      const url = `${window.location.origin}/interview/${token}`;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(() => {
+          showToastNotification("✅ AI Exam Bot link copied to clipboard!");
+        }).catch(() => {
+          prompt("Copy this AI Exam Bot link:", url);
+        });
+      } else {
+        prompt("Copy this AI Exam Bot link:", url);
+      }
+    }
+
+    function showToastNotification(msg) {
+      let toast = document.getElementById('hrmsToastNotification');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'hrmsToastNotification';
+        toast.className = 'toast-copy-notification';
+        document.body.appendChild(toast);
+      }
+      toast.innerHTML = `<i class="fa-solid fa-circle-check text-success fs-5"></i> <span>${msg}</span>`;
+      toast.style.opacity = '1';
+      setTimeout(() => {
+        toast.style.opacity = '0';
+      }, 3500);
+    }
+  </script>
+</body>
+</html>

@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node app.js",
     "superadmin": "node superadmin-server.js",
+    "ai": "cd ai-service && ./.venv/bin/python app.py",
     "test": "node tests/run-all-tests.js"
   },
   "keywords": [],
@@ -23,9 +24,11 @@
     "express-rate-limit": "^8.5.2",
     "express-session": "^1.18.2",
     "helmet": "^8.2.0",
+    "mammoth": "^1.13.0",
     "mongoose": "^9.1.2",
     "multer": "^2.0.2",
     "nodemailer": "^7.0.12",
+    "pdf-parse": "^2.4.5",
     "razorpay": "^2.9.6",
     "resend": "^6.18.1"
   },

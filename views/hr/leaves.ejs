@@ -156,15 +156,53 @@
 
     <header class="page-header">
       <div class="container">
-        <p class="text-primary fw-bold small mb-1" style="letter-spacing: 0.1em;">PERSONNEL OPERATIONS</p>
-        <h1 class="fw-bold mb-0">Leave Approvals</h1>
-        <p class="text-muted mt-2">Review and authorize employee time-off requests across all departments.</p>
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+          <div>
+            <p class="text-primary fw-bold small mb-1" style="letter-spacing: 0.1em;">PERSONNEL OPERATIONS</p>
+            <h1 class="fw-bold mb-0">Leave Approvals</h1>
+            <p class="text-muted mt-2 mb-0">Review and authorize employee time-off requests across all departments.</p>
+          </div>
+          <div>
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-2 fw-bold shadow-sm" style="font-size: 0.8rem;">
+              <i class="fa-solid fa-clock-rotate-left me-1"></i> Retention: 15 Days for Approved & Rejected
+            </span>
+          </div>
+        </div>
       </div>
     </header>
 
     <div class="container pb-5">
+      <% 
+        const pendingCount = (leaves || []).filter(l => l.status === 'PENDING').length;
+        const approvedCount = (leaves || []).filter(l => l.status === 'APPROVED').length;
+        const rejectedCount = (leaves || []).filter(l => l.status === 'REJECTED').length;
+      %>
 
       <div class="data-container">
+        <!-- Search and Filter Tabs Bar -->
+        <div class="p-3 bg-light border-bottom d-flex flex-wrap align-items-center justify-content-between gap-3">
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            <button type="button" class="btn btn-sm btn-dark rounded-pill px-3 py-1 fw-bold leave-tab-btn active" data-filter="all">
+              All Recent (<%= leaves ? leaves.length : 0 %>)
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-warning rounded-pill px-3 py-1 fw-bold leave-tab-btn text-dark" data-filter="PENDING">
+              <i class="fa-solid fa-hourglass-half text-warning me-1"></i> Pending (<%= pendingCount %>)
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-success rounded-pill px-3 py-1 fw-bold leave-tab-btn" data-filter="APPROVED">
+              <i class="fa-solid fa-check text-success me-1"></i> Approved (<%= approvedCount %>)
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1 fw-bold leave-tab-btn" data-filter="REJECTED">
+              <i class="fa-solid fa-xmark text-danger me-1"></i> Rejected (<%= rejectedCount %>)
+            </button>
+          </div>
+
+          <div class="position-relative" style="min-width: 260px;">
+            <input type="text" id="leaveSearchInput" class="form-control form-control-sm rounded-pill ps-4"
+              placeholder="Search by employee name, code, type...">
+            <i class="fa-solid fa-magnifying-glass position-absolute text-muted" style="left: 12px; top: 9px; font-size: 0.75rem;"></i>
+          </div>
+        </div>
+
         <div class="table-responsive">
           <table class="table align-middle">
             <thead>
@@ -180,14 +218,21 @@
 
             <tbody>
               <% if (leaves && leaves.length> 0) { %>
-                <% leaves.forEach(leave=> { %>
-                  <tr>
+                <% leaves.forEach(leave=> { 
+                    const emp = leave.employeeId || {};
+                    const fullName = `${emp.firstName || ''} ${emp.lastName || ''}`.trim() || 'Employee';
+                %>
+                  <tr class="leave-row"
+                    data-status="<%= leave.status %>"
+                    data-name="<%= fullName.toLowerCase() %>"
+                    data-code="<%= (emp.employeeCode || '').toLowerCase() %>"
+                    data-type="<%= (leave.leaveType || '').toLowerCase() %>"
+                  >
                     <td>
                       <div class="fw-bold text-dark">
-                        <%= leave.employeeId.firstName %>
-                          <%= leave.employeeId.lastName %>
+                        <%= fullName %>
                       </div>
-                      <div class="text-muted small">ID: <%= leave.employeeId.employeeCode %>
+                      <div class="text-muted small">ID: <%= emp.employeeCode || '-' %>
                       </div>
                     </td>
 
@@ -215,12 +260,12 @@
                         class="badge-rsr <%= leave.status === 'PENDING' ? 'bg-pending' : leave.status === 'APPROVED' ? 'bg-approved' : 'bg-rejected' %>">
                         <%= leave.status %>
                       </span>
-                      <% if (leave.status==='REJECTED' && leave.rejectionReason) { %>
+                      <% if (leave.status==='REJECTED' && (leave.rejectionReason || leave.hrRemark)) { %>
                         <div class="text-danger small mt-2" style="font-size: 11px;">
                           <i class="fa-solid fa-circle-info me-1"></i>
-                          <%= leave.rejectionReason %>
+                          <%= leave.rejectionReason || leave.hrRemark %>
                         </div>
-                        <% } %>
+                      <% } %>
                     </td>
 
                     <td>
@@ -250,12 +295,20 @@
                     </td>
                   </tr>
                   <% }) %>
-                    <% } else { %>
-                      <tr>
-                        <td colspan="6" class="text-center py-5 text-muted small">No pending leave applications found.
-                        </td>
-                      </tr>
-                      <% } %>
+
+                  <!-- Empty Filter Row -->
+                  <tr id="noLeaveRow" style="display: none;">
+                    <td colspan="6" class="text-center py-5 text-muted small">
+                      No matching leave applications found in the 15-day active window.
+                    </td>
+                  </tr>
+                <% } else { %>
+                  <tr>
+                    <td colspan="6" class="text-center py-5 text-muted small">
+                      No pending or recent leave applications found in the last 15 days.
+                    </td>
+                  </tr>
+                <% } %>
             </tbody>
           </table>
         </div>
@@ -268,6 +321,64 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('leaveSearchInput');
+        const tabBtns = document.querySelectorAll('.leave-tab-btn');
+        const rows = document.querySelectorAll('.leave-row');
+        const noLeaveRow = document.getElementById('noLeaveRow');
+        let currentStatusFilter = 'all';
+
+        if (searchInput) searchInput.addEventListener('input', runLeaveFilter);
+
+        tabBtns.forEach(btn => {
+          btn.addEventListener('click', function() {
+            tabBtns.forEach(b => {
+              b.classList.remove('active', 'btn-dark', 'btn-warning', 'btn-success', 'btn-danger');
+              if (b.dataset.filter === 'PENDING') b.classList.add('btn-outline-warning', 'text-dark');
+              else if (b.dataset.filter === 'APPROVED') b.classList.add('btn-outline-success');
+              else if (b.dataset.filter === 'REJECTED') b.classList.add('btn-outline-danger');
+              else b.classList.add('btn-outline-dark');
+            });
+
+            this.classList.add('active');
+            if (this.dataset.filter === 'PENDING') this.classList.add('btn-warning');
+            else if (this.dataset.filter === 'APPROVED') this.classList.add('btn-success');
+            else if (this.dataset.filter === 'REJECTED') this.classList.add('btn-danger');
+            else this.classList.add('btn-dark');
+
+            currentStatusFilter = this.dataset.filter;
+            runLeaveFilter();
+          });
+        });
+
+        function runLeaveFilter() {
+          const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
+          let visible = 0;
+
+          rows.forEach(row => {
+            const status = row.dataset.status;
+            const name = row.dataset.name || '';
+            const code = row.dataset.code || '';
+            const type = row.dataset.type || '';
+
+            const matchesQuery = !query || name.includes(query) || code.includes(query) || type.includes(query);
+            const matchesStatus = (currentStatusFilter === 'all') || (status === currentStatusFilter);
+
+            if (matchesQuery && matchesStatus) {
+              row.style.display = '';
+              visible++;
+            } else {
+              row.style.display = 'none';
+            }
+          });
+
+          if (noLeaveRow) {
+            noLeaveRow.style.display = (visible === 0 && rows.length > 0) ? '' : 'none';
+          }
+        }
+      });
+    </script>
 </body>
 
 </html>

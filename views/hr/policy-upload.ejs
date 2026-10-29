@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Company Policy & Handbook Ingestion | HRMS</title>
+  
+  <!-- Google Fonts & Bootstrap -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #0052cc;
+      --primary-dark: #0747a6;
+      --hrms-cobalt: #2563eb;
+      --hrms-cyan: #06b6d4;
+      --hrms-text-dark: #0f172a;
+      --hrms-text-muted: #475569;
+      --hrms-border: #dfe1e6;
+      --hrms-bg-light: #f8fafc;
+      --btn-gradient: linear-gradient(135deg, #2563eb 0%, #0284c7 50%, #06b6d4 100%);
+      --btn-gradient-hover: linear-gradient(135deg, #1d4ed8 0%, #0369a1 50%, #0891b2 100%);
+    }
+
+    body {
+      background-color: var(--hrms-bg-light);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--hrms-text-dark);
+      letter-spacing: -0.01em;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .navbar {
+      background: #ffffff !important;
+      border-bottom: 1px solid var(--hrms-border);
+      padding: 0.85rem 0;
+    }
+
+    .brand-emblem {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      background: linear-gradient(135deg, var(--hrms-cobalt) 0%, var(--hrms-cyan) 100%);
+      border-radius: 9px;
+      color: #ffffff;
+      font-size: 0.95rem;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .page-header {
+      padding: 32px 0 24px;
+      border-bottom: 1px solid var(--hrms-border);
+      background: #ffffff;
+    }
+
+    .kpi-card {
+      background: white;
+      border: 1px solid var(--hrms-border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 6px rgba(9, 30, 66, 0.04);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(9, 30, 66, 0.08);
+    }
+
+    .glass-card {
+      background: white;
+      border: 1px solid var(--hrms-border);
+      border-radius: 16px;
+      padding: 1.75rem;
+      box-shadow: 0 2px 8px rgba(9, 30, 66, 0.04);
+    }
+
+    .pdf-drop-zone {
+      border: 2px dashed #93c5fd;
+      background: #f0f7ff;
+      border-radius: 14px;
+      padding: 35px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .pdf-drop-zone:hover, .pdf-drop-zone.dragover {
+      background: #e0f2fe;
+      border-color: var(--hrms-cobalt);
+      transform: translateY(-2px);
+    }
+
+    .query-pill {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #334155;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .query-pill:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+      border-color: #94a3b8;
+      transform: translateY(-1px);
+    }
+
+    .citation-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-left: 4px solid var(--hrms-cobalt);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-top: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+
+    .page-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .chunk-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      background: #f0fdf4;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .btn-gradient-custom {
+      background: var(--btn-gradient);
+      color: #fff !important;
+      border: none;
+      font-weight: 700;
+      transition: all 0.2s ease;
+    }
+
+    .btn-gradient-custom:hover {
+      background: var(--btn-gradient-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    }
+  </style>
+</head>
+<body>
+  <%- include('../partials/anti-cache') %>
+
+  <!-- Standard App Navbar -->
+  <nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container-fluid px-4 px-lg-5">
+      <a class="navbar-brand d-flex align-items-center fw-bold" href="/hr/dashboard" style="color: var(--primary);">
+        <span class="brand-emblem me-2"><i class="fa-solid fa-book-bookmark"></i></span>
+        <span>HRMS Control Center</span>
+      </a>
+      <div class="ms-auto d-flex align-items-center gap-2">
+        <button type="button" class="btn btn-sm btn-outline-primary fw-bold rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#uploadTextModal">
+          <i class="fa-solid fa-pen-to-square me-1"></i> Ingest Text SOP
+        </button>
+        <button type="button" class="btn btn-sm btn-gradient-custom rounded-pill px-3.5 shadow-sm" data-bs-toggle="modal" data-bs-target="#uploadPdfModal">
+          <i class="fa-solid fa-file-pdf me-1.5"></i> Upload PDF Handbook
+        </button>
+        <a href="/hr/dashboard" class="btn btn-outline-dark btn-sm rounded-pill px-3">
+          <i class="fa-solid fa-arrow-left me-1"></i> Dashboard
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Standard Page Header -->
+  <div class="page-header mb-4">
+    <div class="container-fluid px-4 px-lg-5">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+          <span class="badge mb-2" style="background: rgba(0, 82, 204, 0.08); color: var(--primary); border: 1px solid rgba(0, 82, 204, 0.2); font-weight: 700; font-size: 0.72rem;">
+            <i class="fa-solid fa-book-bookmark me-1 text-primary"></i> COMPANY POLICY ASSISTANT
+          </span>
+          <h2 class="fw-bold mb-1" style="color: #091e42; letter-spacing: -0.02em;">Company Policy Manuals & AI Assistant</h2>
+          <p class="text-muted mb-0" style="font-size: 0.88rem;">Upload your employee handbooks and policy documents. Employees can then ask questions and get instant, accurate answers.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid px-4 px-lg-5 pb-5">
+    
+    <!-- Flash Messages -->
+    <% if (typeof success_msg !== 'undefined' && success_msg) { %>
+      <div class="alert alert-success alert-dismissible fade show rounded-3 fw-semibold shadow-sm mb-4" role="alert">
+        <i class="fa-solid fa-circle-check me-2"></i><%= success_msg %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    <% } %>
+    <% if (typeof error_msg !== 'undefined' && error_msg) { %>
+      <div class="alert alert-danger alert-dismissible fade show rounded-3 fw-semibold shadow-sm mb-4" role="alert">
+        <i class="fa-solid fa-triangle-exclamation me-2"></i><%= error_msg %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    <% } %>
+
+    <!-- KPI METRICS BANNER -->
+    <%
+      const policyList = policies || [];
+      const totalDocs = policyList.length;
+      const totalPages = policyList.reduce((acc, p) => acc + (p.pageCount || 1), 0);
+      const totalChunks = policyList.reduce((acc, p) => acc + (p.chunksCount || 1), 0);
+    %>
+    <div class="row g-3 mb-4">
+      <div class="col-md-3 col-6">
+        <div class="kpi-card">
+          <span class="text-uppercase small fw-bold text-muted" style="font-size: 0.72rem;">Ingested Manuals</span>
+          <h3 class="fw-extrabold text-dark mt-2 mb-0"><%= totalDocs %></h3>
+          <span class="text-secondary small mt-2 d-block" style="font-size: 0.78rem;">Active documents in catalog</span>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="kpi-card" style="border-top: 3px solid var(--hrms-cobalt);">
+          <span class="text-uppercase small fw-bold text-primary" style="font-size: 0.72rem;">Indexed Pages</span>
+          <h3 class="fw-extrabold text-primary mt-2 mb-0"><%= totalPages %></h3>
+          <span class="text-muted small mt-2 d-block" style="font-size: 0.78rem;">Total PDF pages processed</span>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="kpi-card">
+          <span class="text-uppercase small fw-bold text-muted" style="font-size: 0.72rem;">Sections Learned</span>
+          <h3 class="fw-extrabold text-dark mt-2 mb-0"><%= totalChunks %></h3>
+          <span class="text-secondary small mt-2 d-block" style="font-size: 0.78rem;">Policy sections the AI can answer from</span>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="kpi-card">
+          <span class="text-uppercase small fw-bold text-muted" style="font-size: 0.72rem;">Policy Assistant</span>
+          <h3 class="fw-extrabold text-dark mt-2 mb-0" style="font-size: 1.4rem;">
+            <i class="fa-solid fa-circle-check text-primary fs-5 me-1"></i> Ready
+          </h3>
+          <span class="text-secondary small mt-2 d-block" style="font-size: 0.78rem;">Ready to answer employee questions</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 1: Interactive AI Policy Query Tester -->
+    <div class="glass-card mb-4">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+        <div>
+          <h5 class="fw-bold text-primary mb-1">
+            <i class="fa-solid fa-comments me-2"></i>Ask the Policy Assistant
+          </h5>
+          <p class="text-muted small mb-0">Type any question about company policies, leave rules, or travel allowances — and get a clear, plain-English answer.</p>
+        </div>
+        <span class="badge" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; font-weight: 700; padding: 6px 12px; border-radius: 20px;">
+          <i class="fa-solid fa-circle-check me-1 text-primary"></i>Assistant Online
+        </span>
+      </div>
+
+
+      <div class="d-flex gap-2">
+        <input type="text" id="ragTestInput" class="form-control form-control-lg fw-semibold" placeholder="Ask any question about company policies, leave entitlements, travel rules, or handbook guidelines..." style="font-size: 0.95rem;">
+        <button type="button" id="ragTestBtn" class="btn btn-primary fw-bold px-4 rounded-3 text-nowrap">
+          <i class="fa-solid fa-paper-plane me-1.5"></i> Ask Question
+        </button>
+      </div>
+
+      <div id="ragTestResult" class="mt-3 p-3 bg-light rounded-3 border" style="display: none;">
+        <div id="ragAnswer" class="small text-dark" style="line-height: 1.65; font-size: 0.92rem;"></div>
+        <div id="ragCitationsContainer"></div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: Active Policies Table -->
+    <div class="glass-card">
+      <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+        <div>
+          <h5 class="fw-bold mb-1">
+            <i class="fa-solid fa-file-circle-check text-primary me-2"></i>Uploaded Policy Documents (<%= policyList.length %>)
+          </h5>
+          <p class="text-muted small mb-0">These documents are used by the Policy Assistant to answer employee questions.</p>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr class="text-uppercase small text-muted" style="font-size: 0.72rem; letter-spacing: 0.05em;">
+              <th>Document Title</th>
+              <th>Format</th>
+              <th>Scope / Pages</th>
+              <th>Sections</th>
+              <th>Category</th>
+              <th>Uploaded Date</th>
+              <th>Status</th>
+              <th class="text-end">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (policyList.length === 0) { %>
+              <tr>
+                <td colspan="8" class="text-center py-5 text-muted">
+                  <i class="fa-solid fa-folder-open display-4 text-secondary opacity-50 mb-3 d-block"></i>
+                  <p class="fw-bold mb-1">No custom policy handbooks uploaded yet.</p>
+                  <span class="small">Click <strong>"Upload PDF Handbook"</strong> above to ingest multi-page records (up to 50 pages).</span>
+                </td>
+              </tr>
+            <% } %>
+            <% policyList.forEach(p => { %>
+              <tr>
+                <td>
+                  <strong class="text-dark"><%= p.title %></strong>
+                  <% if (p.fileName) { %>
+                    <br><small class="text-muted"><i class="fa-solid fa-file-pdf text-danger me-1"></i><%= p.fileName %></small>
+                  <% } %>
+                </td>
+                <td>
+                  <% if (p.fileName && p.fileName.endsWith('.pdf')) { %>
+                    <span class="badge" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;"><i class="fa-solid fa-file-pdf me-1 text-danger"></i>PDF Manual</span>
+                  <% } else { %>
+                    <span class="badge" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;"><i class="fa-solid fa-file-lines me-1"></i>Text Clause</span>
+                  <% } %>
+                </td>
+                <td>
+                  <span class="page-badge">
+                    <i class="fa-regular fa-file"></i> <%= p.pageCount || 1 %> <%= (p.pageCount > 1) ? 'Pages' : 'Page' %>
+                  </span>
+                </td>
+                <td>
+                  <span class="chunk-badge">
+                    <i class="fa-solid fa-list-ul"></i> <%= p.chunksCount || 1 %> Section<%= (p.chunksCount || 1) > 1 ? 's' : '' %>
+                  </span>
+                </td>
+                <td><span class="badge bg-light text-dark border fw-semibold"><%= p.category %></span></td>
+                <td class="small text-muted"><%= new Date(p.createdAt).toLocaleDateString() %></td>
+                <td>
+                  <span class="badge" style="background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0;">
+                    <i class="fa-solid fa-check me-1"></i>Indexed
+                  </span>
+                </td>
+                <td class="text-end">
+                  <form action="/hr/policies/<%= p._id %>/delete" method="POST" onsubmit="return confirm('Remove this policy document from the Assistant?');" style="display: inline;">
+                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" title="Delete Policy">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MODAL 1: UPLOAD PDF POLICY HANDBOOK (Supports 50+ Pages) -->
+  <div class="modal fade" id="uploadPdfModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="modal-header bg-primary text-white p-4">
+          <div class="d-flex align-items-center gap-2">
+            <div class="bg-white text-primary p-2.5 rounded-3">
+              <i class="fa-solid fa-file-pdf fs-4 text-danger"></i>
+            </div>
+            <div>
+              <span class="badge bg-white text-primary fw-bold text-uppercase mb-1 px-2.5 py-1">UPLOAD DOCUMENT</span>
+              <h5 class="modal-title fw-extrabold mb-0">Upload Policy Handbook (PDF)</h5>
+            </div>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+
+        <form id="pdfUploadForm" action="/hr/policies/upload-pdf" method="POST" enctype="multipart/form-data">
+          <div class="modal-body p-4">
+            
+            <div class="mb-3">
+              <label class="form-label fw-bold small text-muted text-uppercase">Document Title *</label>
+              <input type="text" name="title" id="pdfTitleInput" class="form-control form-control-lg fw-semibold" placeholder="e.g. Employee Handbook 2026" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold small text-muted text-uppercase">Category</label>
+              <select name="category" class="form-select fw-semibold">
+                <option value="Employee Handbook" selected>Employee Handbook (Master)</option>
+                <option value="Leave & Attendance">Leave & Attendance Policy</option>
+                <option value="Travel & Expense">Travel, Per-Diem & Expense SOP</option>
+                <option value="Health & Medical">Health, Insurance & Medical Benefits</option>
+                <option value="Code of Conduct">Code of Conduct & Ethics</option>
+                <option value="IT & Data Security">IT, Device & Security Guidelines</option>
+                <option value="General Guidelines">General Operations Guidelines</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold small text-muted text-uppercase">Select PDF File (Up to 50+ Pages)</label>
+              <div class="pdf-drop-zone" id="pdfDropZone" onclick="document.getElementById('pdfFileInput').click()">
+                <i class="fa-solid fa-cloud-arrow-up text-primary fs-1 mb-2"></i>
+                <h6 class="fw-bold mb-1" id="pdfDropTitle">Click or Drag & Drop PDF Manual Here</h6>
+                <p class="text-muted small mb-0" id="pdfDropSub">Supports comprehensive manuals up to 50+ pages (Max 25MB)</p>
+                <input type="file" name="pdfFile" id="pdfFileInput" accept="application/pdf" class="d-none" onchange="handleFileSelected(this)" required>
+              </div>
+            </div>
+
+            <div class="p-3 bg-light rounded-3 border d-flex align-items-center gap-2 small text-muted">
+              <i class="fa-solid fa-circle-info text-primary fs-5"></i>
+              <div>
+                <strong>How it works:</strong>
+                The AI reads all pages of your document so employees can ask questions and get accurate answers instantly.
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer bg-light p-3">
+            <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" id="submitPdfBtn" class="btn btn-primary fw-bold px-4 rounded-3 shadow-sm">
+              <i class="fa-solid fa-upload me-1"></i> Upload & Teach the Assistant
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: INGEST TEXT SOP CLAUSE -->
+  <div class="modal fade" id="uploadTextModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="modal-header bg-primary text-white p-4">
+          <div class="d-flex align-items-center gap-2">
+            <div class="bg-white text-primary p-2.5 rounded-3">
+              <i class="fa-solid fa-file-lines fs-4 text-primary"></i>
+            </div>
+            <div>
+              <span class="badge bg-white text-primary fw-bold text-uppercase mb-1 px-2.5 py-1">ADD POLICY TEXT</span>
+              <h5 class="modal-title fw-extrabold mb-0">Add a Policy Rule or Clause</h5>
+            </div>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+
+        <form action="/hr/policies/upload" method="POST">
+          <div class="modal-body p-4">
+            <div class="mb-3">
+              <label class="form-label fw-bold small text-muted text-uppercase">Policy Title *</label>
+              <input type="text" name="title" class="form-control form-control-lg fw-semibold" placeholder="e.g. Leave & Attendance Policy 2026" required>
+            </div>
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-bold small text-muted text-uppercase">Category</label>
+                <select name="category" class="form-select fw-semibold">
+                  <option value="Leave & Attendance">Leave & Attendance</option>
+                  <option value="Travel & Expense">Travel & Expense</option>
+                  <option value="Security & IT">Security & IT</option>
+                  <option value="Code of Conduct">Code of Conduct</option>
+                  <option value="Health & Benefits">Health & Benefits</option>
+                  <option value="General" selected>General</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold small text-muted text-uppercase">Section Identifier</label>
+                <input type="text" name="section" class="form-control" placeholder="e.g. Section 3.2 - Casual Leave">
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold small text-muted text-uppercase">Policy Content / Guidelines *</label>
+              <textarea name="content" rows="6" class="form-control" placeholder="Paste the exact guidelines, eligibility rules, and approval procedures..." required></textarea>
+            </div>
+          </div>
+          <div class="modal-footer bg-light p-3">
+            <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary fw-bold px-4 rounded-3 shadow-sm">
+              <i class="fa-solid fa-floppy-disk me-1"></i> Save Policy
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <footer class="text-center py-4 border-top bg-white mt-auto">
+    <p class="text-muted small mb-0">© 2026 HRMS • Company Policy Assistant</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function handleFileSelected(input) {
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+        document.getElementById('pdfDropTitle').innerText = file.name;
+        document.getElementById('pdfDropSub').innerHTML = `<strong class="text-primary">${sizeMb} MB</strong> &bull; Ready to upload`;
+        
+        // Auto-fill title if empty
+        const titleInput = document.getElementById('pdfTitleInput');
+        if (!titleInput.value) {
+          titleInput.value = file.name.replace(/\.[^/.]+$/, '').replace(/[_-]/g, ' ');
+        }
+      }
+    }
+
+    // Drag and drop handlers
+    const dropZone = document.getElementById('pdfDropZone');
+    if (dropZone) {
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          dropZone.classList.add('dragover');
+        }, false);
+      });
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          dropZone.classList.remove('dragover');
+        }, false);
+      });
+      dropZone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files && files.length) {
+          document.getElementById('pdfFileInput').files = files;
+          handleFileSelected(document.getElementById('pdfFileInput'));
+        }
+      });
+    }
+
+    // Form submission loading state
+    document.getElementById('pdfUploadForm').addEventListener('submit', function() {
+      const btn = document.getElementById('submitPdfBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Uploading & reading document...';
+    });
+
+    // Interactive Query Tester
+    async function runPresetQuery(q) {
+      document.getElementById('ragTestInput').value = q;
+      document.getElementById('ragTestBtn').click();
+    }
+
+    document.getElementById('ragTestInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('ragTestBtn').click();
+      }
+    });
+
+    function formatMarkdownText(txt) {
+      if (!txt) return '';
+      return txt
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/^>\s*(.*?)$/gm, '<blockquote class="border-start border-3 border-primary ps-3 my-2 text-muted fst-italic bg-white p-2 rounded-2">$1</blockquote>')
+        .replace(/\n\n/g, '<div class="my-2"></div>')
+        .replace(/\n/g, '<br>');
+    }
+
+    document.getElementById('ragTestBtn').addEventListener('click', async () => {
+      const q = document.getElementById('ragTestInput').value.trim();
+      if (!q) return;
+      const resBox = document.getElementById('ragTestResult');
+      const ansBox = document.getElementById('ragAnswer');
+      const citContainer = document.getElementById('ragCitationsContainer');
+
+      ansBox.innerHTML = '<div class="text-muted"><i class="fa-solid fa-spinner fa-spin me-2 text-primary"></i>Looking through your company policies...</div>';
+      citContainer.innerHTML = '';
+      resBox.style.display = 'block';
+
+      try {
+        const res = await fetch('/api/policy/query', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: q })
+        });
+        const data = await res.json();
+        ansBox.innerHTML = formatMarkdownText(data.answer || '');
+
+        if (data.citations && data.citations.length) {
+          let html = '<div class="mt-3 fw-bold small text-muted text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.05em;"><i class="fa-solid fa-bookmark me-1 text-primary"></i> Found in these documents:</div>';
+          data.citations.forEach((c) => {
+            html += `
+              <div class="citation-card">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="fw-bold small text-primary">
+                    <i class="fa-solid fa-file-pdf text-danger me-1"></i> ${c.title || 'Handbook'} 
+                    <span class="page-badge ms-2"><i class="fa-regular fa-file"></i> Page ${c.page || 1}</span>
+                    <span class="text-muted small ms-1">(${c.section || 'Clause'})</span>
+                  </span>
+                  <span class="badge" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; font-size: 0.7rem;">
+                    ${Math.round(c.confidence || (c.score ? c.score * 100 : 75))}% Match
+                  </span>
+                </div>
+                <div class="small text-secondary fst-italic">
+                  "${c.snippet}"
+                </div>
+              </div>
+            `;
+          });
+          citContainer.innerHTML = html;
+        }
+      } catch (err) {
+        ansBox.innerHTML = '<span class="text-danger">Could not reach the Policy Assistant right now. Please try again in a moment.</span>';
+      }
+    });
+  </script>
+</body>
+</html>

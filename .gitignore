@@ -14,3 +14,12 @@ views/superadmin/
 
 Videos/
 MOBILE-APPLICATION/
+
+HRMS/production_deployment_monetization_guide.md
+HRMS/project_overview_and_aws_guide.md
+
+# AI Service Python Environment & Model Cache
+ai-service/.venv/
+ai-service/models_cache/
+ai-service/__pycache__/
+*.pyc

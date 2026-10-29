@@ -4,14 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>Field Monitor | HRMS</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- MapLibre GL CSS & JS for OpenStreetMap 3D Interactive Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
+    <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 
     <style>
         :root {
@@ -353,35 +355,73 @@
         const TRIP_ID = "<%= trip._id %>";
         const DEST_LAT = <%= trip.destinationCoordinates ?trip.destinationCoordinates.lat: 'null' %>;
         const DEST_LNG = <%= trip.destinationCoordinates ?trip.destinationCoordinates.lng: 'null' %>;
-        const FULL_PATH = <% - JSON.stringify(trip.locations || []) %>;
+        const FULL_PATH = <%- JSON.stringify(trip.locations || []) %>;
 
-        let map, userMarker, pathPolyline;
+        let map, userMarker;
+        let routeCoordinates = [];
         let currentPos = null;
 
-        // INIT MAP
+        // INIT MAP (OpenStreetMap 3D with MapLibre GL)
         function initMap() {
-            map = L.map('map', { zoomControl: false }).setView([20.5937, 78.9629], 5);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(map);
+            map = new maplibregl.Map({
+                container: 'map',
+                style: 'https://tiles.openfreemap.org/styles/liberty',
+                center: [78.9629, 20.5937],
+                zoom: 5,
+                pitch: 50, // 3D perspective with extruded buildings
+                bearing: -10,
+                maxPitch: 85,
+                dragRotate: true,
+                pitchWithRotate: true,
+                attributionControl: false
+            });
 
-            // Draw History
-            if (FULL_PATH.length > 0) {
-                const latlngs = FULL_PATH.map(l => [l.lat, l.lng]);
-                pathPolyline = L.polyline(latlngs, { color: '#0052cc', weight: 4 }).addTo(map);
-                map.fitBounds(pathPolyline.getBounds(), { padding: [20, 20] });
+            map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
+            map.addControl(new maplibregl.AttributionControl({
+                compact: true,
+                customAttribution: '<a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
+            }), 'bottom-right');
 
-                // Markers
-                FULL_PATH.forEach(l => {
-                    if (l.type === 'Activity') {
-                        L.marker([l.lat, l.lng], {
-                            icon: L.divIcon({ className: 'bg-warning text-dark rounded-circle d-flex justify-content-center align-items-center border border-white', html: '<i class="fa-solid fa-note-sticky" style="font-size:10px;"></i>', iconSize: [20, 20] })
-                        }).addTo(map).bindPopup(l.note);
+            map.on('load', () => {
+                // Initialize Route Layer
+                if (FULL_PATH.length > 0) {
+                    routeCoordinates = FULL_PATH.map(l => [l.lng, l.lat]);
+                }
+
+                map.addSource('trip-path', {
+                    type: 'geojson',
+                    data: {
+                        type: 'Feature',
+                        geometry: {
+                            type: 'LineString',
+                            coordinates: routeCoordinates
+                        }
                     }
                 });
-            } else {
-                pathPolyline = L.polyline([], { color: '#0052cc', weight: 4 }).addTo(map);
-            }
+
+                map.addLayer({
+                    id: 'trip-path-line',
+                    type: 'line',
+                    source: 'trip-path',
+                    layout: { 'line-join': 'round', 'line-cap': 'round' },
+                    paint: { 'line-color': '#0052cc', 'line-width': 5 }
+                });
+
+                // Add Activity Markers
+                FULL_PATH.forEach(l => {
+                    if (l.type === 'Activity') {
+                        new maplibregl.Marker({ color: '#f59e0b' })
+                            .setLngLat([l.lng, l.lat])
+                            .setPopup(new maplibregl.Popup({ offset: 25 }).setHTML(`<b>Activity Note:</b><br>${l.note || ''}`))
+                            .addTo(map);
+                    }
+                });
+
+                if (routeCoordinates.length > 0) {
+                    const bounds = routeCoordinates.reduce((b, coord) => b.extend(coord), new maplibregl.LngLatBounds(routeCoordinates[0], routeCoordinates[0]));
+                    map.fitBounds(bounds, { padding: 40, maxZoom: 16 });
+                }
+            });
         }
 
         // GEOLOCATION & TRACKING
@@ -402,11 +442,23 @@
 
                 // Map Update
                 if (!userMarker) {
-                    userMarker = L.marker([lat, lng], { zIndexOffset: 1000 }).addTo(map);
+                    userMarker = new maplibregl.Marker({ color: '#2563eb' })
+                        .setLngLat([lng, lat])
+                        .addTo(map);
                 } else {
-                    userMarker.setLatLng([lat, lng]);
+                    userMarker.setLngLat([lng, lat]);
                 }
-                pathPolyline.addLatLng([lat, lng]);
+
+                routeCoordinates.push([lng, lat]);
+                if (map.getSource('trip-path')) {
+                    map.getSource('trip-path').setData({
+                        type: 'Feature',
+                        geometry: {
+                            type: 'LineString',
+                            coordinates: routeCoordinates
+                        }
+                    });
+                }
 
                 // UI Update
                 document.getElementById('gpsStatus').innerText = "GPS: Active";
@@ -479,10 +531,12 @@
             if (res.ok) {
                 alert("Saved!");
                 actModal.hide();
-                // Add marker locally
-                L.marker([currentPos.lat, currentPos.lng], {
-                    icon: L.divIcon({ className: 'bg-warning text-dark rounded-circle d-flex justify-content-center align-items-center border border-white', html: '<i class="fa-solid fa-note-sticky" style="font-size:10px;"></i>', iconSize: [20, 20] })
-                }).addTo(map).bindPopup(note).openPopup();
+                // Add marker locally with 3D popup
+                new maplibregl.Marker({ color: '#f59e0b' })
+                    .setLngLat([currentPos.lng, currentPos.lat])
+                    .setPopup(new maplibregl.Popup({ offset: 25 }).setHTML(`<b>Activity Note:</b><br>${note}`))
+                    .addTo(map)
+                    .togglePopup();
             }
         }
 

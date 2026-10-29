@@ -1,0 +1,284 @@
+<!-- 24/7 Floating AI Policy Assistant Widget -->
+<div id="aiFloatingWidget" class="ai-floating-widget">
+  <!-- Trigger Button -->
+  <button id="aiWidgetBtn" class="ai-fab-btn" title="Ask HR Policy Bot">
+    <i class="fa-solid fa-robot"></i>
+    <span class="ai-fab-ping"></span>
+  </button>
+
+  <!-- Sliding Assistant Drawer -->
+  <div id="aiChatDrawer" class="ai-chat-drawer" style="display: none;">
+    <div class="ai-drawer-header">
+      <div class="ai-drawer-title">
+        <div class="ai-avatar"><i class="fa-solid fa-robot"></i></div>
+        <div>
+          <h4>HR Policy & Onboarding Copilot</h4>
+          <span class="ai-status">⚡ Online & Ready</span>
+        </div>
+      </div>
+      <button id="aiCloseBtn" class="ai-close-btn">&times;</button>
+    </div>
+
+    <!-- Conversation Feed -->
+    <div id="aiChatFeed" class="ai-chat-feed">
+      <div class="ai-msg bot-msg">
+        <div class="msg-text">
+          Hello! I am your 24/7 Company Policy Copilot. Ask me any question regarding leaves, travel allowances, WFH rules, or onboarding procedures!
+        </div>
+      </div>
+    </div>
+
+    <!-- Input Box -->
+    <form id="aiPromptForm" onsubmit="handleAIPolicySubmit(event)" class="ai-input-form">
+      <input type="text" id="aiQueryInput" placeholder="Ask a company policy question..." required autocomplete="off">
+      <button type="submit" class="ai-send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+    </form>
+  </div>
+</div>
+
+<style>
+.ai-floating-widget {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  z-index: 9999;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.ai-fab-btn {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #fff;
+  border: none;
+  box-shadow: 0 8px 24px rgba(37,99,235,0.4);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.ai-fab-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 12px 28px rgba(37,99,235,0.5);
+}
+.ai-fab-ping {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #10b981;
+  border: 2px solid #fff;
+}
+.ai-chat-drawer {
+  position: absolute;
+  bottom: 70px;
+  right: 0;
+  width: 380px;
+  height: 520px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 20px 45px rgba(15,23,42,0.2);
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.ai-drawer-header {
+  padding: 14px 18px;
+  background: #0f172a;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.ai-drawer-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ai-drawer-title h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+.ai-status {
+  font-size: 10px;
+  color: #38bdf8;
+}
+.ai-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #60a5fa;
+  font-size: 14px;
+}
+.ai-close-btn {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 20px;
+  cursor: pointer;
+}
+.ai-chips-bar {
+  display: flex;
+  gap: 6px;
+  padding: 8px 12px;
+  overflow-x: auto;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+.ai-chip {
+  padding: 4px 10px;
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 20px;
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+  color: #334155;
+}
+.ai-chip:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+.ai-chat-feed {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ai-msg {
+  max-width: 85%;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.bot-msg {
+  align-self: flex-start;
+}
+.bot-msg .msg-text {
+  background: #f1f5f9;
+  color: #1e293b;
+  padding: 10px 14px;
+  border-radius: 12px 12px 12px 2px;
+}
+.user-msg {
+  align-self: flex-end;
+}
+.user-msg .msg-text {
+  background: #2563eb;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 12px 12px 2px 12px;
+}
+.ai-input-form {
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid #e2e8f0;
+  background: #fff;
+}
+.ai-input-form input {
+  flex: 1;
+  border: 1px solid #cbd5e1;
+  border-radius: 20px;
+  padding: 8px 14px;
+  font-size: 13px;
+  outline: none;
+}
+.ai-send-btn {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  margin-left: 8px;
+  cursor: pointer;
+}
+</style>
+
+<script>
+(function() {
+  const fab = document.getElementById('aiWidgetBtn');
+  const drawer = document.getElementById('aiChatDrawer');
+  const close = document.getElementById('aiCloseBtn');
+  const feed = document.getElementById('aiChatFeed');
+  const input = document.getElementById('aiQueryInput');
+
+  if (!fab || !drawer) return;
+
+  fab.addEventListener('click', () => {
+    drawer.style.display = drawer.style.display === 'none' ? 'flex' : 'none';
+    if (drawer.style.display === 'flex') input.focus();
+  });
+
+  close.addEventListener('click', () => {
+    drawer.style.display = 'none';
+  });
+
+  window.askQuickPrompt = function(promptText) {
+    input.value = promptText;
+    document.getElementById('aiPromptForm').dispatchEvent(new Event('submit'));
+  };
+
+  window.handleAIPolicySubmit = async function(e) {
+    e.preventDefault();
+    const query = input.value.trim();
+    if (!query) return;
+
+    // Append user message
+    const userDiv = document.createElement('div');
+    userDiv.className = 'ai-msg user-msg';
+    userDiv.innerHTML = `<div class="msg-text">${query}</div>`;
+    feed.appendChild(userDiv);
+    input.value = '';
+    feed.scrollTop = feed.scrollHeight;
+
+    // Loading bot message
+    const botDiv = document.createElement('div');
+    botDiv.className = 'ai-msg bot-msg';
+    botDiv.innerHTML = `<div class="msg-text"><i class="fa-solid fa-spinner fa-spin"></i> Searching company handbooks...</div>`;
+    feed.appendChild(botDiv);
+    feed.scrollTop = feed.scrollHeight;
+
+    try {
+      const res = await fetch('/api/policy/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query })
+      });
+      const data = await res.json();
+      let formattedAns = (data.answer || '')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n/g, '<br>');
+
+      let citationsHtml = '';
+      if (data.citations && data.citations.length > 0) {
+        citationsHtml = '<div style="margin-top: 8px; padding-top: 6px; border-top: 1px solid #e2e8f0; display: flex; flex-wrap: wrap; gap: 4px;">' +
+          data.citations.map(c => `
+            <span style="font-size: 10px; background: #e0f2fe; color: #0369a1; padding: 2px 7px; border-radius: 6px; font-weight: 600; display: inline-flex; align-items: center; gap: 3px;">
+              <i class="fa-regular fa-file-pdf"></i> Page ${c.page || 1} <span style="opacity: 0.7;">(${Math.round(c.confidence || (c.score ? c.score * 100 : 75))}%)</span>
+            </span>
+          `).join('') +
+        '</div>';
+      }
+
+      botDiv.innerHTML = `<div class="msg-text">${formattedAns}${citationsHtml}</div>`;
+    } catch (err) {
+      botDiv.innerHTML = `<div class="msg-text" style="color: #ef4444;">Could not connect to AI service. Please try again.</div>`;
+    }
+    feed.scrollTop = feed.scrollHeight;
+  };
+})();
+</script>

@@ -3,7 +3,7 @@ const router = express.Router();
 const Attendance = require("../models/Attendence");
 const Roster = require("../models/Roster");
 const Shift = require("../models/Shift");
-
+const CompanySettings = require("../models/CompanySettings");
 
 // ================= GET ATTENDANCE PAGE =================
 router.get("/", async (req, res) => {
@@ -21,12 +21,15 @@ router.get("/", async (req, res) => {
       date: today
     });
 
+    const companySettings = await CompanySettings.findOne();
+
     if (isJson) {
-      return res.json({ attendance: attendance || null });
+      return res.json({ attendance: attendance || null, companySettings: companySettings || null });
     }
 
     res.render("attendance/today", {
-      attendance: attendance || null
+      attendance: attendance || null,
+      companySettings: companySettings || null
     });
 
   } catch (err) {
@@ -42,10 +45,12 @@ router.post("/punch-in", async (req, res) => {
     const { lat, lng, address } = req.body;
     const today = new Date().toISOString().slice(0, 10);
 
-    // OFFICE COORDINATES (RSR Aviation Head Office)
-    const OFFICE_LAT = 19.05973973209058;
-    const OFFICE_LNG = 73.11899471349244;
-    const ALLOWED_RADIUS_METERS = 200;
+    // Fetch dynamic office coordinates from company settings
+    const companySettings = await CompanySettings.findOne();
+    const officeLat = (companySettings && companySettings.officeLat) || 19.0597397;
+    const officeLng = (companySettings && companySettings.officeLng) || 73.1189947;
+    const allowedRadius = (companySettings && companySettings.officeRadius) || 200;
+    const isEnforced = companySettings && companySettings.geofenceEnforced;
 
     // Haversine Formula for Distance Calculation
     function getDistanceInMeters(lat1, lon1, lat2, lon2) {
@@ -77,13 +82,12 @@ router.post("/punch-in", async (req, res) => {
       return res.json({ success: false, message: "Location data missing." });
     }
 
-    const distance = getDistanceInMeters(lat, lng, OFFICE_LAT, OFFICE_LNG);
-    console.log(`Punch-In Attempt. Dist: ${distance.toFixed(2)}m`);
+    const distance = getDistanceInMeters(lat, lng, officeLat, officeLng);
+    console.log(`Punch-In Attempt. Dist: ${distance.toFixed(2)}m (Allowed: ${allowedRadius}m, Enforced: ${isEnforced})`);
 
-    // We no longer block the punch-in based on distance, allowing remote/outside radius punches
-    // if (distance > ALLOWED_RADIUS_METERS) {
-    //   return res.json({ success: false, message: `You are ${Math.round(distance)}m away from office. Must be within ${ALLOWED_RADIUS_METERS}m.` });
-    // }
+    if (isEnforced && distance > allowedRadius) {
+      return res.json({ success: false, message: `You are ${Math.round(distance)}m away from the office. You must be within ${allowedRadius}m to punch in.` });
+    }
 
     const todayDate = new Date();
     todayDate.setHours(0,0,0,0);

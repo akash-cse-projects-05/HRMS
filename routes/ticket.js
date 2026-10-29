@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Ticket = require("../models/Ticket");
 const Employee = require("../models/Employee");
+const Notification = require("../models/Notification");
 
 // GET: Employee Support Tickets Dashboard & Create Page
 router.get("/", async (req, res) => {
@@ -45,7 +46,7 @@ router.post("/create", async (req, res) => {
 
     const ticket = await Ticket.create({
       employeeId: employee._id,
-      employeeName: `${employee.firstName} ${employee.lastName}`,
+      employeeName: `${employee.firstName || ''} ${employee.lastName || ''}`.trim() || employee.name || 'Employee',
       targetDepartment,
       category,
       subject,
@@ -53,6 +54,15 @@ router.post("/create", async (req, res) => {
       priority: priority || "Medium",
       status: "Open"
     });
+
+    try {
+      await Notification.create({
+        title: `New [${priority || 'Medium'}] Ticket for ${targetDepartment}`,
+        message: `${employee.firstName || employee.name || 'Staff'} raised ticket: "${subject}"`
+      });
+    } catch (notifErr) {
+      console.warn("Could not dispatch ticket notification:", notifErr.message);
+    }
 
     if (isJson) {
       return res.json({ success: true, message: "Ticket created successfully", ticket });
@@ -116,6 +126,17 @@ router.post("/:id/update", async (req, res) => {
     }
 
     await ticket.save();
+
+    try {
+      if (status || resolutionNotes) {
+        await Notification.create({
+          title: `Ticket Updated [${ticket.status}]`,
+          message: `Ticket "${ticket.subject}" for ${ticket.targetDepartment} was updated to ${ticket.status}.${resolutionNotes ? ' Resolution: ' + resolutionNotes : ''}`
+        });
+      }
+    } catch (notifErr) {
+      console.warn("Could not dispatch ticket update notification:", notifErr.message);
+    }
 
     if (isJson) {
       return res.json({ success: true, message: "Ticket updated", ticket });

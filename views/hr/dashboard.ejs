@@ -162,115 +162,73 @@
       color: #0ca678;
     }
 
-    /* --- 3D PERSPECTIVE MOCKUP CARD WIDGET --- */
-    .mockup-container {
-      perspective: 1400px;
-      max-width: 100%;
-      margin: 0 auto;
+    /* --- UNIFIED ATTENDANCE & TELEMETRY CARD (Deel Inspired) --- */
+    .deel-card {
+      background: #ffffff;
+      border: 1px solid var(--rsr-border);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(9, 30, 66, 0.04);
+      height: 100%;
     }
 
-    .mockup-card {
-      background: rgba(10, 25, 47, 0.95);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 24px;
-      padding: 1.8rem;
-      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.25);
-      text-align: left;
-      transform: rotateY(-8deg) rotateX(4deg) rotateZ(0.8deg);
-      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .mockup-card:hover {
-      transform: rotateY(0deg) rotateX(0deg) rotateZ(0deg) translateY(-6px);
-      border-color: rgba(6, 182, 212, 0.5);
-      box-shadow: 0 35px 70px rgba(6, 182, 212, 0.35);
-    }
-
-    .mockup-header {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding-bottom: 1rem;
-      margin-bottom: 1.25rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .mockup-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: #ef4444;
-    }
-
-    .mockup-dot:nth-child(2) {
-      background: #f59e0b;
-    }
-
-    .mockup-dot:nth-child(3) {
-      background: #10b981;
-    }
-
-    .mockup-item {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 14px;
-      padding: 1rem 1.4rem;
+    .telemetry-item-clean {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 12px 18px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 1rem;
-      transition: background 0.3s;
+      margin-bottom: 10px;
+      transition: background 0.2s ease;
     }
 
-    .mockup-item:hover {
-      background: rgba(255, 255, 255, 0.08);
+    .telemetry-item-clean:hover {
+      background: #f1f5f9;
     }
 
-    .mockup-item:last-child {
+    .telemetry-item-clean:last-child {
       margin-bottom: 0;
     }
 
-    .mockup-item strong {
-      color: #f8fafc;
-      font-size: 0.95rem;
+    .telemetry-item-clean strong {
+      color: #0f172a;
+      font-size: 0.92rem;
       font-weight: 700;
     }
 
-    .mockup-item p {
+    .telemetry-item-clean p {
       margin: 0;
-      color: #94a3b8;
-      font-size: 0.7rem;
+      color: #64748b;
+      font-size: 0.72rem;
       text-transform: uppercase;
-      font-weight: 800;
-      letter-spacing: 0.08em;
+      font-weight: 700;
+      letter-spacing: 0.05em;
     }
 
-    .mockup-item span {
+    .telemetry-status-pill {
       font-size: 0.75rem;
-      font-weight: 800;
-      padding: 0.3rem 0.85rem;
-      border-radius: 8px;
-      letter-spacing: 0.03em;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 20px;
+      letter-spacing: 0.02em;
     }
 
-    .status-badge-cyan {
-      color: #22d3ee;
-      background: rgba(6, 182, 212, 0.15);
-      border: 1px solid rgba(6, 182, 212, 0.25);
+    /* Metric Sub-Boxes within Unified Card */
+    .metric-subbox {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 16px;
+      transition: all 0.2s ease;
     }
 
-    .status-badge-blue {
-      color: #38bdf8;
-      background: rgba(56, 189, 248, 0.15);
-      border: 1px solid rgba(56, 189, 248, 0.25);
-    }
-
-    .status-badge-emerald {
-      color: #34d399;
-      background: rgba(52, 211, 153, 0.15);
-      border: 1px solid rgba(52, 211, 153, 0.25);
+    .metric-subbox:hover {
+      background: #ffffff;
+      border-color: #b3d4ff;
+      box-shadow: 0 4px 12px rgba(0, 82, 204, 0.08);
+      transform: translateY(-2px);
     }
 
     /* --- SIDEBAR STYLE DECK --- */
@@ -299,471 +257,346 @@
 <body>
   <%- include('../partials/anti-cache') %>
 
-  <div class="d-flex" id="wrapper">
-    <!-- Sidebar -->
-    <div class="bg-dark text-white border-end" id="sidebar-wrapper" style="width: 280px; min-height: 100vh; background-color: #091e42 !important; flex-shrink: 0;">
-      <div class="sidebar-heading border-bottom p-4">
-        <span class="fs-5 fw-bold text-white"><i class="fa-solid fa-paper-plane me-2 text-primary"></i> HRMS Portal</span>
-      </div>
-      <div class="list-group list-group-flush p-3">
-        <div class="text-uppercase text-muted fw-bold small mb-2 ps-3" style="font-size: 0.7rem; letter-spacing: 0.05em;">Overview</div>
-        <a href="/hr/dashboard" class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1 active-sidebar-link">
-          <i class="fa-solid fa-gauge me-2"></i> HR Commander
-        </a>
-        <a href="/hr/analytics" class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-3">
-          <i class="fa-solid fa-chart-line me-2"></i> Analytics & Reports
-        </a>
-
-        <div class="text-uppercase text-muted fw-bold small mb-2 ps-3" style="font-size: 0.7rem; letter-spacing: 0.05em;">Core Administration</div>
-        <a href="/hr/users" class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1">
-          <i class="fa-solid fa-users-gear me-2"></i> Manage User Profiles
-        </a>
-        <a href="/employee/add" class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1">
-          <i class="fa-solid fa-user-plus me-2"></i> Recruitment Add
-        </a>
-        <a href="/hr/checklists" class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1">
-          <i class="fa-solid fa-list-check me-2"></i> Checklist Pipelines
-        </a>
-        <a href="/payslip/hr/payslips" class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-3">
-          <i class="fa-solid fa-money-check-dollar"></i> Manage Payslips
-        </a>
-
-        <div class="text-uppercase text-muted fw-bold small mb-2 ps-3" style="font-size: 0.7rem; letter-spacing: 0.05em;">Operations</div>
-        <a href="/hr/shifts" class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1">
-          <i class="fa-solid fa-clock me-2"></i> Shift Configurations
-        </a>
-        <a href="/hr/roster" class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1">
-          <i class="fa-solid fa-calendar-days"></i> Roster Calendar
-        </a>
-        <a href="/hr/timesheets" class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1">
-          <i class="fa-solid fa-business-time"></i> Project Timesheets
-        </a>
-        <a href="/hr/leaves" class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1">
-          <i class="fa-solid fa-calendar-check me-2"></i> Leaves Management
-        </a>
-        <a href="/hr/attendance-history" class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1">
-          <i class="fa-solid fa-clock-rotate-left me-2"></i> Attendance History
-        </a>
-        <a href="/regularization/hr" class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1">
-          <i class="fa-solid fa-square-check me-2"></i> Regularizations
-        </a>
-        <a href="/expense/hr/dashboard" class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1">
-          <i class="fa-solid fa-map-location-dot me-2"></i> Expenses Tracking
-        </a>
-        <a href="/trip/hr/dashboard" class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-3">
-          <i class="fa-solid fa-earth-americas me-2"></i> Trip Management
-        </a>
-
-        <div class="text-uppercase text-muted fw-bold small mb-2 ps-3" style="font-size: 0.7rem; letter-spacing: 0.05em;">Talent & System</div>
-        <a href="/hr/appraisals" class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1">
-          <i class="fa-solid fa-star me-2"></i> Performance PMS
-        </a>
-        <a href="/notice-board" class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1">
-          <i class="fa-solid fa-bullhorn me-2"></i> Notice Board
-        </a>
-        <a href="/notice-board/new" class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1">
-          <i class="fa-solid fa-plus-circle me-2"></i> Create Announcement
-        </a>
-        <a href="/hr/billing" class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-3">
-          <i class="fa-solid fa-credit-card"></i> Billing Settings
-        </a>
-        <a href="/logout" class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-danger ps-3">
-          <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
-        </a>
-      </div>
-    </div>
-
-    <!-- Page Content Wrapper -->
-    <div id="page-content-wrapper" class="w-100 overflow-auto" style="min-height: 100vh; background-color: #f7f9fc;">
-      <!-- Top header bar -->
-      <header class="py-3 px-4 bg-white border-bottom d-flex align-items-center justify-content-between">
-        <span class="fw-bold text-muted" style="font-size: 0.8rem;">HR CONTROL CENTER</span>
-        <div class="d-flex align-items-center gap-3">
-          <span class="small fw-semibold text-uppercase text-primary">
-            <%= new Date().toDateString() %>
-          </span>
-          <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
-            <i class="fa-solid fa-key me-1"></i> Password
-          </button>
+    <div class="d-flex" id="wrapper">
+      <!-- Sidebar -->
+      <div class="bg-dark text-white border-end" id="sidebar-wrapper"
+        style="width: 280px; min-height: 100vh; background-color: #091e42 !important; flex-shrink: 0;">
+        <div class="sidebar-heading border-bottom p-4">
+          <span class="fs-5 fw-bold text-white"><i class="fa-solid fa-paper-plane me-2 text-primary"></i> HRMS
+            Portal</span>
         </div>
-      </header>
+        <div class="list-group list-group-flush p-3">
+          <div class="text-uppercase text-muted fw-bold small mb-2 ps-3"
+            style="font-size: 0.7rem; letter-spacing: 0.05em;">Overview</div>
+          <a href="/hr/dashboard"
+            class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1 active-sidebar-link">
+            <i class="fa-solid fa-gauge me-2"></i> HR Commander
+          </a>
+          <a href="/hr/live-attendance"
+            class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1">
+            <i class="fa-solid fa-fingerprint me-2 text-info"></i> Live Today Attendance
+          </a>
+          <a href="/hr/analytics"
+            class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-3">
+            <i class="fa-solid fa-chart-line me-2"></i> Analytics & Reports
+          </a>
 
-      <div class="page-header py-4 px-5 bg-white border-bottom mb-4">
-        <h2 class="fw-bold mb-1">HR Commander</h2>
-        <p class="text-muted mb-0">Today's Employees attendance and operational metrics.</p>
+          <div class="text-uppercase text-muted fw-bold small mb-2 ps-3"
+            style="font-size: 0.7rem; letter-spacing: 0.05em;">Core Administration</div>
+          <a href="/hr/users"
+            class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1">
+            <i class="fa-solid fa-users-gear me-2"></i> Manage User Profiles
+          </a>
+          <a href="/employee/add"
+            class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1">
+            <i class="fa-solid fa-user-plus me-2"></i> Recruitment Add
+          </a>
+          <a href="/hr/checklists"
+            class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1">
+            <i class="fa-solid fa-list-check me-2"></i> Checklist Pipelines
+          </a>
+          <a href="/payslip/hr/payslips"
+            class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-3">
+            <i class="fa-solid fa-money-check-dollar"></i> Manage Payslips
+          </a>
+
+          <div class="text-uppercase text-muted fw-bold small mb-2 ps-3"
+            style="font-size: 0.7rem; letter-spacing: 0.05em;">Operations</div>
+          <a href="/hr/shifts"
+            class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1">
+            <i class="fa-solid fa-clock me-2"></i> Shift Configurations
+          </a>
+          <a href="/hr/roster"
+            class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1">
+            <i class="fa-solid fa-calendar-days"></i> Roster Calendar
+          </a>
+          <a href="/hr/timesheets"
+            class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1">
+            <i class="fa-solid fa-business-time"></i> Project Timesheets
+          </a>
+          <a href="/hr/leaves"
+            class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1">
+            <i class="fa-solid fa-calendar-check me-2"></i> Leaves Management
+          </a>
+          <a href="/hr/attendance-history"
+            class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1">
+            <i class="fa-solid fa-clock-rotate-left me-2"></i> Attendance History
+          </a>
+          <a href="/regularization/hr"
+            class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1">
+            <i class="fa-solid fa-square-check me-2"></i> Regularizations
+          </a>
+          <a href="/expense/hr/dashboard"
+            class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1">
+            <i class="fa-solid fa-map-location-dot me-2"></i> Expenses Tracking
+          </a>
+          <a href="/trip/hr/dashboard"
+            class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1">
+            <i class="fa-solid fa-earth-americas me-2"></i> Trip Management
+          </a>
+          <a href="/department"
+            class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-3">
+            <i class="fa-solid fa-building me-2 text-info"></i> Department Hub
+          </a>
+
+          <div class="text-uppercase text-muted fw-bold small mb-2 ps-3"
+            style="font-size: 0.7rem; letter-spacing: 0.05em;">Talent & System</div>
+          <a href="/hr/appraisals"
+            class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1">
+            <i class="fa-solid fa-star me-2"></i> Performance PMS
+          </a>
+          <a href="/notice-board"
+            class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1">
+            <i class="fa-solid fa-bullhorn me-2"></i> Notice Board
+          </a>
+          <a href="/notice-board/new"
+            class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1">
+            <i class="fa-solid fa-plus-circle me-2"></i> Create Announcement
+          </a>
+          <a href="/hr/settings"
+            class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-1">
+            <i class="fa-solid fa-gear me-2 text-warning"></i> Company Settings & AI
+          </a>
+          <a href="/hr/billing"
+            class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-white ps-3 mb-3">
+            <i class="fa-solid fa-credit-card"></i> Billing Settings
+          </a>
+          <a href="/logout"
+            class="list-group-item list-group-item-action list-group-item-dark bg-transparent border-0 text-danger ps-3">
+            <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
+          </a>
+        </div>
       </div>
 
-    <div class="container pb-5">
+      <!-- Page Content Wrapper -->
+      <div id="page-content-wrapper" class="w-100 overflow-auto" style="min-height: 100vh; background-color: #f7f9fc;">
+        <!-- Top header bar -->
+        <header class="py-3 px-4 bg-white border-bottom d-flex align-items-center justify-content-between">
+          <span class="fw-bold text-muted" style="font-size: 0.8rem;">HR CONTROL CENTER</span>
+          <div class="d-flex align-items-center gap-3">
+            <span class="small fw-semibold text-uppercase text-primary">
+              <%= new Date().toDateString() %>
+            </span>
+            <a href="/hr/settings" class="btn btn-sm btn-primary rounded-pill px-3 shadow-sm">
+              <i class="fa-solid fa-gear me-1"></i> Company Settings
+            </a>
+            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" data-bs-toggle="modal"
+              data-bs-target="#changePasswordModal">
+              <i class="fa-solid fa-key me-1"></i> Password
+            </button>
+          </div>
+        </header>
 
-      <!-- Live Attendance Telemetry (Top Section) -->
-      <% const records = Array.isArray(todayAttendance) ? todayAttendance : []; 
-         const presentCount = records.length; 
-         const completedCount = records.filter(r => r.punchOut).length;
-         const inProgressCount = records.filter(r => !r.punchOut).length;
-         const activeAppraisalsCount = Array.isArray(appraisals) ? appraisals.filter(a => a.status !== 'Completed').length : 0;
-      %>
+        <div class="page-header py-4 px-5 bg-white border-bottom mb-4">
+          <h2 class="fw-bold mb-1">HR Commander</h2>
+          <p class="text-muted mb-0">Today's Employees attendance and operational metrics.</p>
+        </div>
 
-      <div class="row g-4 mb-5 align-items-center">
-        <!-- Left Side: Operational KPI Cards -->
-        <div class="col-lg-7">
-          <div class="row g-3">
-            <div class="col-md-6 col-12">
-              <div class="card border p-4 shadow-sm h-100 rounded-3">
-                <div class="d-flex justify-content-between align-items-start">
+        <div class="container pb-5">
+
+          <!-- Live Attendance Telemetry & Operations (Top Section) -->
+          <% const records=Array.isArray(todayAttendance) ? todayAttendance : []; const presentCount=records.length;
+            const completedCount=records.filter(r=> r.punchOut).length;
+            const inProgressCount = records.filter(r => !r.punchOut).length;
+            const presenceRate = totalEmployees > 0 ? Math.round((presentCount / totalEmployees) * 100) : 0;
+            %>
+
+            <div class="row g-4 mb-4">
+              <!-- 1. TODAY'S WORKFORCE ATTENDANCE CARD -->
+              <div class="col-lg-7 col-12">
+                <div class="deel-card h-100 d-flex flex-column justify-content-between">
                   <div>
-                    <span class="text-uppercase small fw-bold text-muted" style="font-size: 0.75rem;">Company Strength</span>
-                    <h3 class="fw-extrabold text-dark mt-2 mb-0"><%= totalEmployees %></h3>
-                  </div>
-                  <div class="badge bg-primary bg-opacity-10 text-primary p-3 rounded-3">
-                    <i class="fa-solid fa-users fa-lg"></i>
-                  </div>
-                </div>
-                <div class="text-secondary small mt-3" style="font-size: 0.8rem;">Active personnel in directory</div>
-              </div>
-            </div>
-
-            <div class="col-md-6 col-12">
-              <div class="card border p-4 shadow-sm h-100 rounded-3">
-                <div class="d-flex justify-content-between align-items-start">
-                  <div>
-                    <span class="text-uppercase small fw-bold text-muted" style="font-size: 0.75rem;">Absent Today</span>
-                    <h3 class="fw-extrabold text-danger mt-2 mb-0"><%= absent %></h3>
-                  </div>
-                  <div class="badge bg-danger bg-opacity-10 text-danger p-3 rounded-3">
-                    <i class="fa-solid fa-user-minus fa-lg"></i>
-                  </div>
-                </div>
-                <div class="text-secondary small mt-3" style="font-size: 0.8rem;">Employees not punched in today</div>
-              </div>
-            </div>
-
-            <div class="col-md-6 col-12">
-              <div class="card border p-4 shadow-sm h-100 rounded-3">
-                <div class="d-flex justify-content-between align-items-start">
-                  <div>
-                    <span class="text-uppercase small fw-bold text-muted" style="font-size: 0.75rem;">Active OKR Reviews</span>
-                    <h3 class="fw-extrabold text-warning mt-2 mb-0"><%= activeAppraisalsCount %></h3>
-                  </div>
-                  <div class="badge bg-warning bg-opacity-10 text-warning p-3 rounded-3">
-                    <i class="fa-solid fa-star-half-stroke fa-lg"></i>
-                  </div>
-                </div>
-                <div class="text-secondary small mt-3" style="font-size: 0.8rem;">Appraisals requiring validation</div>
-              </div>
-            </div>
-
-            <div class="col-md-6 col-12">
-              <div class="card border p-4 shadow-sm h-100 rounded-3">
-                <div class="d-flex justify-content-between align-items-start">
-                  <div>
-                    <span class="text-uppercase small fw-bold text-muted" style="font-size: 0.75rem;">Operational Projects</span>
-                    <h3 class="fw-extrabold text-success mt-2 mb-0"><%= typeof projects !== 'undefined' ? projects.length : 0 %></h3>
-                  </div>
-                  <div class="badge bg-success bg-opacity-10 text-success p-3 rounded-3">
-                    <i class="fa-solid fa-folder-open fa-lg"></i>
-                  </div>
-                </div>
-                <div class="text-secondary small mt-3" style="font-size: 0.8rem;">Active client delivery tracks</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Right Side: 3D Telemetry Mockup Card -->
-        <div class="col-lg-5 col-12">
-          <div class="mockup-container">
-            <div class="mockup-card">
-              <div class="mockup-header">
-                <div class="mockup-dot"></div>
-                <div class="mockup-dot"></div>
-                <div class="mockup-dot"></div>
-              </div>
-              <div class="mb-4">
-                <h4 style="color: #ffffff; font-size: 1.1rem; margin-bottom: 0.2rem; font-weight: 700; margin-top: 0; letter-spacing: -0.01em;">Live Attendance Telemetry</h4>
-                <p style="color: #64748b; font-size: 0.75rem; margin: 0;">RSR Real-time workforce check-ins</p>
-              </div>
-
-              <div class="mockup-item">
-                <div>
-                  <p>Company size</p>
-                  <strong>Total Directory Headcount</strong>
-                </div>
-                <span class="status-badge-cyan"><%= totalEmployees %> Active</span>
-              </div>
-
-              <div class="mockup-item">
-                <div>
-                  <p>Shift checking active</p>
-                  <strong>Punched In Today</strong>
-                </div>
-                <span class="status-badge-blue"><%= presentCount %> Present</span>
-              </div>
-
-              <div class="mockup-item">
-                <div>
-                  <p>Completed shift punch-out</p>
-                  <strong>Logouts Executed</strong>
-                </div>
-                <span class="status-badge-emerald"><%= completedCount %> Completed</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Change Password Modal -->
-      <div class="modal fade" id="changePasswordModal" tabindex="-1">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <form action="/hr/change-my-password" method="POST">
-              <div class="modal-header">
-                <h5 class="modal-title fw-bold">Change My Password</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-              </div>
-              <div class="modal-body">
-                <div class="mb-3">
-                  <label class="form-label">New Password</label>
-                  <input type="password" name="newPassword" class="form-control" placeholder="Minimum 6 characters"
-                    required minlength="6">
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Confirm New Password</label>
-                  <input type="password" name="confirmPassword" class="form-control" required minlength="6">
-                </div>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn btn-primary fw-bold">Update Password</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-
-      <!-- Pending Resignation Requests (New HR Action Table) -->
-      <div class="data-card mb-5">
-        <div class="p-4 border-bottom d-flex justify-content-between align-items-center bg-white">
-          <h5 class="fw-bold mb-0 text-danger"><i class="fa-solid fa-user-xmark me-2"></i> Pending Resignation Requests</h5>
-          <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-10">Requires Action</span>
-        </div>
-
-        <div class="table-responsive">
-          <table class="table align-middle mb-0">
-            <thead>
-              <tr>
-                <th>Employee Name</th>
-                <th>Employee Code</th>
-                <th>Role / Department</th>
-                <th>Reason</th>
-                <th>Date Applied</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% if (typeof pendingResignations === 'undefined' || pendingResignations.length === 0) { %>
-                <tr>
-                  <td colspan="6" class="text-center text-muted py-5">
-                    <i class="fa-solid fa-circle-check mb-3 d-block fs-1 text-success"></i>
-                    No pending resignation requests.
-                  </td>
-                </tr>
-              <% } else { %>
-                <% pendingResignations.forEach(emp => { %>
-                  <tr>
-                    <td>
-                      <div class="fw-bold text-dark">
-                        <%= emp.firstName %> <%= emp.lastName %>
-                      </div>
-                      <div class="text-muted small" style="font-size: 11px;">
-                        <%= emp.email %>
-                      </div>
-                    </td>
-                    <td class="fw-bold text-muted small"><%= emp.employeeCode %></td>
-                    <td>
-                      <div class="small fw-semibold text-dark"><%= emp.designation %></div>
-                      <div class="text-muted small" style="font-size: 11px;"><%= emp.department %></div>
-                    </td>
-                    <td class="small text-muted" style="max-width: 250px; white-space: normal;">
-                      "<%= emp.resignationReason || 'Not specified' %>"
-                    </td>
-                    <td class="small fw-semibold">
-                      <%= emp.resignationDate ? new Date(emp.resignationDate).toLocaleDateString() : 'N/A' %>
-                    </td>
-                    <td>
-                      <div class="d-flex gap-2">
-                        <form action="/hr/resignation/<%= emp._id %>/action" method="POST" onsubmit="return confirm('Are you sure you want to ACCEPT the resignation of <%= emp.firstName %>? This will mark them as Resigned in the database.');">
-                          <input type="hidden" name="action" value="approve">
-                          <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 fw-bold">Accept</button>
-                        </form>
-                        <form action="/hr/resignation/<%= emp._id %>/action" method="POST" onsubmit="return confirm('Are you sure you want to REJECT the resignation of <%= emp.firstName %>?');">
-                          <input type="hidden" name="action" value="reject">
-                          <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold">Reject</button>
-                        </form>
-                      </div>
-                    </td>
-                  </tr>
-                <% }) %>
-              <% } %>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="data-card">
-        <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
-          <h5 class="fw-bold mb-0">Live Attendance Log</h5>
-            <span class="badge bg-light text-dark border"><i class="fa-solid fa-circle text-success me-1"
-                style="font-size: 8px;"></i> Real-time</span>
-          </div>
-
-
-
-          <div class="table-responsive">
-            <table class="table align-middle">
-              <thead>
-                <tr>
-                  <th>Personnel Name</th>
-                  <th>Employee Code</th>
-                  <th>Punch In</th>
-                  <th>Punch Out</th>
-                  <th>Duty Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% if (records.length===0) { %>
-                  <tr>
-                    <td colspan="5" class="text-center text-muted py-5">
-                      <i class="fa-solid fa-fingerprint mb-3 d-block fs-1 text-primary"></i>
-                      No attendance records detected for today's shift.
-                    </td>
-                  </tr>
-                  <% } %>
-
-                    <% records.forEach(r=> { %>
-                      <tr>
-                        <td>
-                          <div class="fw-bold text-dark">
-                            <%= r.employeeId?.firstName || "-" %>
-                              <%= r.employeeId?.lastName || "" %>
-                          </div>
-                          <div class="text-muted small" style="font-size: 11px;">
-                            <%= r.employeeId?.department || "General" %>
-                          </div>
-                        </td>
-                        <td class="fw-bold text-muted small">
-                          <%= r.employeeId?.employeeCode || "-" %>
-                        </td>
-                        <td class="small fw-semibold"><i class="fa-solid fa-clock-rotate-left me-2 text-muted"></i>
-                          <%= r.punchIn ? r.punchIn.toLocaleTimeString([], {hour: '2-digit' , minute:'2-digit'}) : "-"
-                            %>
-                        </td>
-                        <td class="small fw-semibold"><i class="fa-solid fa-clock-rotate-left me-2 text-muted"></i>
-                          <%= r.punchOut ? r.punchOut.toLocaleTimeString([], {hour: '2-digit' , minute:'2-digit'}) : "-"
-                            %>
-                        </td>
-                        <td>
-                          <% if (!r.punchOut) { %>
-                            <span class="badge-rsr bg-progress"><i class="fa-solid fa-spinner fa-spin me-1"></i> IN
-                              PROGRESS</span>
-                            <% } else { %>
-                              <span class="badge-rsr bg-completed"><i class="fa-solid fa-check-double me-1"></i>
-                                COMPLETED</span>
-                              <% } %>
-                        </td>
-                      </tr>
-                      <% }) %>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Phase 3/4 Goals & Deadlines Segment -->
-        <div class="row g-4 mt-2 mb-5">
-          <!-- Project Deadlines -->
-          <div class="col-lg-6 col-12">
-            <div class="card h-100 shadow-sm border" style="border-radius:16px; overflow:hidden; background:#fff;">
-              <div class="card-header d-flex justify-content-between align-items-center bg-transparent py-3" style="border-bottom: 1px solid var(--border-color);">
-                <span class="fw-bold"><i class="fa-solid fa-business-time text-success me-2"></i> Project Deadlines & Status</span>
-                <a href="/hr/timesheets" class="btn btn-sm btn-outline-success border rounded-pill px-3">Manage Projects</a>
-              </div>
-              <div class="card-body p-4">
-                <% if (typeof projects !== 'undefined' && projects && projects.length > 0) { %>
-                  <div class="list-group list-group-flush gap-2">
-                    <% projects.slice(0, 5).forEach(p => { %>
-                      <div class="list-group-item px-0 border-0 d-flex justify-content-between align-items-start bg-transparent">
-                        <div>
-                          <strong class="text-dark d-block small"><%= p.name %></strong>
-                          <span class="text-muted small" style="font-size: 11px;"><%= p.client %></span>
-                        </div>
-                        <div class="text-end">
-                          <span class="badge <%= p.deadline ? 'bg-danger bg-opacity-10 text-danger' : 'bg-secondary bg-opacity-10 text-secondary' %> small d-block mb-1">
-                            <%= p.deadline ? new Date(p.deadline).toLocaleDateString() : 'No Deadline' %>
+                    <!-- Header with Live Pulse & Presence Percentage -->
+                    <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 mb-3 border-bottom">
+                      <div>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                          <span
+                            class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 fw-bold"
+                            style="font-size: 0.72rem; letter-spacing: 0.04em;">
+                            <i class="fa-solid fa-circle text-success me-1" style="font-size: 7px;"></i> LIVE ATTENDANCE
                           </span>
-                          <span class="badge bg-success bg-opacity-10 text-success small"><%= p.status %></span>
+                          <span class="text-muted small">Real-time shift tracking</span>
+                        </div>
+                        <h3 class="fw-bold text-dark mb-0" style="letter-spacing: -0.02em;">Today's Workforce Attendance
+                        </h3>
+                      </div>
+                      <div class="d-flex align-items-center gap-2 mt-2 mt-sm-0">
+                        <span
+                          class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill fw-bold"
+                          style="font-size: 0.85rem;">
+                          <i class="fa-solid fa-chart-line me-1"></i>
+                          <%= presenceRate %>% Presence Rate
+                        </span>
+                      </div>
+                    </div>
+
+                    <!-- 4 Metric Sub-Boxes (Deel Style) -->
+                    <div class="row g-3">
+                      <div class="col-sm-6 col-12">
+                        <div class="metric-subbox">
+                          <span class="text-uppercase small fw-bold text-muted"
+                            style="font-size: 0.7rem;">Total Employees</span>
+                          <h3 class="fw-extrabold text-dark mt-1 mb-0">
+                            <%= totalEmployees %>
+                          </h3>
+                          <small class="text-secondary" style="font-size: 0.75rem;">Headcount</small>
                         </div>
                       </div>
-                    <% }) %>
-                  </div>
-                <% } else { %>
-                  <div class="text-center text-muted py-4">
-                    <i class="fa-solid fa-diagram-project fa-2x mb-2 text-secondary"></i>
-                    <p class="mb-0 small">No active projects configured.</p>
-                  </div>
-                <% } %>
-              </div>
-            </div>
-          </div>
-
-          <!-- PMS & Appraisals -->
-          <div class="col-lg-6 col-12">
-            <div class="card h-100 shadow-sm border" style="border-radius:16px; overflow:hidden; background:#fff;">
-              <div class="card-header d-flex justify-content-between align-items-center bg-transparent py-3" style="border-bottom: 1px solid var(--border-color);">
-                <span class="fw-bold"><i class="fa-solid fa-star text-primary me-2"></i> Active Performance Appraisals</span>
-                <a href="/hr/appraisals" class="btn btn-sm btn-outline-primary border rounded-pill px-3">PMS Cycles</a>
-              </div>
-              <div class="card-body p-4">
-                <% if (typeof appraisals !== 'undefined' && appraisals && appraisals.length > 0) { %>
-                  <div class="list-group list-group-flush gap-2">
-                    <% appraisals.slice(0, 5).forEach(app => { %>
-                      <div class="list-group-item px-0 border-0 d-flex justify-content-between align-items-start bg-transparent">
-                        <div>
-                          <strong class="text-dark d-block small">
-                            <%= app.employeeId ? (app.employeeId.firstName + ' ' + app.employeeId.lastName) : 'Unknown' %>
-                          </strong>
-                          <span class="text-muted small" style="font-size: 11px;"><%= app.cycleName %></span>
+                      <div class="col-sm-6 col-12">
+                        <div class="metric-subbox">
+                          <span class="text-uppercase small fw-bold text-muted" style="font-size: 0.7rem;">Present
+                            Today</span>
+                          <h3 class="fw-extrabold text-primary mt-1 mb-0">
+                            <%= presentCount %>
+                          </h3>
+                          <small class="text-primary" style="font-size: 0.75rem;">Checked In (<%= presenceRate %>
+                              %)</small>
                         </div>
-                        <div class="text-end">
-                          <span class="badge <%= app.status === 'Completed' ? 'bg-success bg-opacity-10 text-success' : 'bg-warning bg-opacity-10 text-warning' %> small d-block mb-1">
-                            <%= app.status %>
+                      </div>
+                      <div class="col-sm-6 col-12">
+                        <div class="metric-subbox">
+                          <span class="text-uppercase small fw-bold text-muted" style="font-size: 0.7rem;">On Shift
+                            Now</span>
+                          <h3 class="fw-extrabold text-success mt-1 mb-0">
+                            <%= inProgressCount %>
+                          </h3>
+                          <small class="text-success" style="font-size: 0.75rem;">Active on Floor</small>
+                        </div>
+                      </div>
+                      <div class="col-sm-6 col-12">
+                        <div class="metric-subbox">
+                          <span class="text-uppercase small fw-bold text-muted" style="font-size: 0.7rem;">Absent
+                            Today</span>
+                          <h3 class="fw-extrabold text-danger mt-1 mb-0">
+                            <%= absent %>
+                          </h3>
+                          <small class="text-danger" style="font-size: 0.75rem;">Not Punched</small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2. LATEST MESSAGES & NOTIFICATIONS CARD -->
+              <div class="col-lg-5 col-12">
+                <div class="deel-card h-100 d-flex flex-column justify-content-between">
+                  <div>
+                    <div class="d-flex justify-content-between align-items-center pb-3 mb-3 border-bottom">
+                      <div>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                          <span
+                            class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1 fw-bold"
+                            style="font-size: 0.72rem; letter-spacing: 0.04em;">
+                            <i class="fa-solid fa-bullhorn me-1"></i> NOTIFICATIONS
                           </span>
-                          <% if (app.status === 'Completed') { %>
-                            <span class="text-muted small" style="font-size: 10px;">Self: <%= app.selfRating %>★ | Mgr: <%= app.managerRating %>★</span>
-                          <% } %>
                         </div>
+                        <h3 class="fw-bold text-dark mb-0" style="letter-spacing: -0.02em;">Latest Messages</h3>
                       </div>
-                    <% }) %>
+                      <a href="/notice-board" class="small fw-bold text-primary text-decoration-none">
+                        Notice Board <i class="fa-solid fa-arrow-right ms-1"></i>
+                      </a>
+                    </div>
+
+                    <!-- Messages List -->
+                    <% const messagesList=(typeof latestAnnouncements !=='undefined' && latestAnnouncements &&
+                      latestAnnouncements.length> 0)
+                      ? latestAnnouncements
+                      : ((typeof latestNotifications !== 'undefined' && latestNotifications) ? latestNotifications :
+                      []);
+                      %>
+
+                      <div class="d-flex flex-column gap-2 mb-2">
+                        <% if (messagesList.length===0) { %>
+                          <div class="text-center py-4 text-muted">
+                            <i class="fa-solid fa-envelope-open-text fa-2x mb-2 text-secondary"></i>
+                            <p class="small mb-0">No new messages or announcements.</p>
+                          </div>
+                          <% } else { %>
+                            <% messagesList.slice(0, 4).forEach(msg=> { %>
+                              <div class="p-3 rounded-3 border bg-light d-flex align-items-start gap-3"
+                                style="transition: background 0.2s;">
+                                <div class="rounded-circle p-2 bg-primary bg-opacity-10 text-primary flex-shrink-0"
+                                  style="width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem;">
+                                  <i class="fa-solid fa-bell"></i>
+                                </div>
+                                <div class="w-100 overflow-hidden">
+                                  <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <strong class="text-dark small text-truncate d-block" style="max-width: 190px;">
+                                      <%= msg.title || 'Company Notice' %>
+                                    </strong>
+                                    <span class="text-muted" style="font-size: 0.7rem;">
+                                      <%= msg.date ? new Date(msg.date).toLocaleDateString([], {month: 'short' ,
+                                        day: 'numeric' }) : '' %>
+                                    </span>
+                                  </div>
+                                  <p class="text-muted small mb-0 text-truncate" style="font-size: 0.75rem;">
+                                    <%= msg.message || '' %>
+                                  </p>
+                                  <% if (msg.department) { %>
+                                    <span
+                                      class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-2 py-0.5 mt-1"
+                                      style="font-size: 0.65rem;">
+                                      <%= msg.department %>
+                                    </span>
+                                    <% } %>
+                                </div>
+                              </div>
+                              <% }) %>
+                                <% } %>
+                      </div>
                   </div>
-                <% } else { %>
-                  <div class="text-center text-muted py-4">
-                    <i class="fa-solid fa-trophy fa-2x mb-2 text-secondary"></i>
-                    <p class="mb-0 small">No appraisal reviews initiated.</p>
+
+                  <div class="pt-3 mt-2 border-top d-flex justify-content-between align-items-center">
+                    <span class="text-muted small" style="font-size: 0.75rem;">
+                      <i class="fa-solid fa-check-circle text-success me-1"></i> Live broadcasts synced
+                    </span>
+                    <a href="/notice-board/new" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 fw-bold"
+                      style="font-size: 0.75rem;">
+                      <i class="fa-solid fa-plus me-1"></i> New Notice
+                    </a>
                   </div>
-                <% } %>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
 
-    </div>
+            <!-- Change Password Modal -->
+            <div class="modal fade" id="changePasswordModal" tabindex="-1">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <form action="/hr/change-my-password" method="POST">
+                    <div class="modal-header">
+                      <h5 class="modal-title fw-bold">Change My Password</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                      <div class="mb-3">
+                        <label class="form-label">New Password</label>
+                        <input type="password" name="newPassword" class="form-control"
+                          placeholder="Minimum 6 characters" required minlength="6">
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label">Confirm New Password</label>
+                        <input type="password" name="confirmPassword" class="form-control" required minlength="6">
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                      <button type="submit" class="btn btn-primary fw-bold">Update Password</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
 
-    <footer class="text-center py-5">
-      <p class="text-muted small">© 2026 HRMS • HRMS Control Terminal</p>
-    </footer>
+            <footer class="text-center py-5">
+              <p class="text-muted small">© 2026 HRMS • HRMS Control Terminal</p>
+            </footer>
 
-    </div> <!-- Close page-content-wrapper -->
-  </div> <!-- Close wrapper -->
+        </div> <!-- Close page-content-wrapper -->
+      </div> <!-- Close wrapper -->
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

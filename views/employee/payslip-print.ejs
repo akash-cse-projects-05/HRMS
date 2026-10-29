@@ -173,13 +173,34 @@
         <!-- Header -->
         <div class="header-section">
             <div class="company-logo">
-                <img src="/images/rsr.jpg" alt="HRMS Logo">
+                <% if (typeof companySettings !== 'undefined' && companySettings && companySettings.logoUrl) { %>
+                    <img src="<%= companySettings.logoUrl %>" alt="Company Logo" style="max-height: 70px; max-width: 180px; object-fit: contain;">
+                <% } else { %>
+                    <div class="fs-4 fw-bold text-primary text-uppercase">
+                        <%= (typeof companySettings !== 'undefined' && companySettings && companySettings.companyName) ? companySettings.companyName : 'HRMS' %>
+                    </div>
+                <% } %>
             </div>
             <div class="company-details">
-                <div class="company-name">HRMS Services Pvt. Ltd.</div>
-                <div>Unit No-B-67,68 Platinum Spring, Plot 6, G-20 to G-24</div>
-                <div>Taloja MIDC, Navde, Panvel - 410208, Mumbai, India.</div>
-                <div class="mt-2"><strong>CIN:</strong> U12345MH2023PTC123456</div>
+                <div class="company-name">
+                    <%= (typeof companySettings !== 'undefined' && companySettings && companySettings.companyName) ? companySettings.companyName : 'HRMS Company' %>
+                </div>
+                <% if (typeof companySettings !== 'undefined' && companySettings && companySettings.address) { %>
+                    <div><%= companySettings.address %></div>
+                <% } %>
+                <% const cityStateZip = (typeof companySettings !== 'undefined' && companySettings) ? [companySettings.city, companySettings.state, companySettings.pincode, companySettings.country].filter(Boolean).join(', ') : ''; %>
+                <% if (cityStateZip) { %>
+                    <div><%= cityStateZip %></div>
+                <% } %>
+                <% if (typeof companySettings !== 'undefined' && companySettings && companySettings.contactEmail) { %>
+                    <div><strong>Email:</strong> <%= companySettings.contactEmail %></div>
+                <% } %>
+                <% if (typeof companySettings !== 'undefined' && companySettings && companySettings.cin) { %>
+                    <div class="mt-1"><strong>CIN:</strong> <%= companySettings.cin %></div>
+                <% } %>
+                <% if (typeof companySettings !== 'undefined' && companySettings && companySettings.panNumber) { %>
+                    <div><strong>PAN:</strong> <%= companySettings.panNumber %></div>
+                <% } %>
             </div>
         </div>
 
@@ -224,7 +245,7 @@
                 <div class="detail-row">
                     <div class="detail-label">Location:</div>
                     <div class="detail-val">
-                        <%= employee.workLocation || 'Hyderabad' %>
+                        <%= employee.workLocation || 'Office' %>
                     </div>
                 </div>
                 <div class="detail-row">
@@ -423,11 +444,18 @@
 
             <div class="net-pay-section">
                 <div class="fs-5 fw-bold">NET SALARY PAYABLE</div>
-                <div class="fs-4 fw-bold">₹ <%= fmt(netPay) %>
+                <div class="fs-4 fw-bold"><%= (typeof companySettings !== 'undefined' && companySettings && companySettings.currencySymbol) ? companySettings.currencySymbol : '₹' %> <%= fmt(netPay) %>
                 </div>
             </div>
-            <div class="mt-2 text-muted small text-end">
-                * This is a computer generated slip.
+
+            <div class="mt-4 pt-3 d-flex justify-content-between align-items-end">
+                <div class="text-muted small" style="max-width: 60%;">
+                    * <%= (typeof companySettings !== 'undefined' && companySettings && companySettings.payslipNote) ? companySettings.payslipNote : 'This is a computer generated slip.' %>
+                </div>
+                <div class="text-center" style="min-width: 180px; border-top: 1px solid #333; padding-top: 6px;">
+                    <div class="fw-bold" style="font-size: 0.9rem;"><%= (typeof companySettings !== 'undefined' && companySettings && companySettings.signatoryName) ? companySettings.signatoryName : 'Authorized Signatory' %></div>
+                    <div class="text-muted small"><%= (typeof companySettings !== 'undefined' && companySettings && companySettings.signatoryDesignation) ? companySettings.signatoryDesignation : 'HR Operations' %></div>
+                </div>
             </div>
 
             <div class="print-btn-container">

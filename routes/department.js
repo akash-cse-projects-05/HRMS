@@ -76,26 +76,65 @@ router.get('/:department/leave', async (req, res) => {
   res.render('department/leave', { department, employee, employees, leaves });
 });
 
+// Root /department: Redirect to user's department or first available department
+router.get('/', async (req, res) => {
+  try {
+    let employee = null;
+    if (req.session.employeeId && req.session.employeeId !== '000000000000000000000000') {
+      employee = await Employee.findById(req.session.employeeId);
+    } else if (req.session.userId) {
+      employee = await Employee.findOne({ user: req.session.userId });
+    }
+
+    if (employee && employee.department) {
+      return res.redirect(`/department/${encodeURIComponent(employee.department)}`);
+    }
+
+    const allDepartments = (await Employee.distinct('department')).filter(Boolean);
+    if (allDepartments.length > 0) {
+      return res.redirect(`/department/${encodeURIComponent(allDepartments[0])}`);
+    }
+
+    return res.redirect('/department/GENERAL');
+  } catch (err) {
+    console.error('Error in /department root:', err);
+    res.redirect('/hr/dashboard');
+  }
+});
+
 // Department dashboard: show all employees in department
 router.get('/:department', async (req, res) => {
   const isJson = req.query.format === 'json' || req.headers.accept?.includes('application/json');
   const department = req.params.department;
   const userId = req.session.userId;
-  console.log('Dashboard access attempt. Session userId:', userId); // Debug log
+  console.log('Dashboard access attempt. Session userId:', userId, 'Department:', department);
 
   let employee = null;
-  if (req.session.employeeId) {
+  if (req.session.employeeId && req.session.employeeId !== '000000000000000000000000') {
     employee = await Employee.findById(req.session.employeeId);
-    console.log('Employee found for dashboard:', employee); // Debug log
-  } else {
-    console.log('No userId in session. Proceeding without employee.');
+  } else if (userId) {
+    employee = await Employee.findOne({ user: userId });
   }
 
   try {
-    const employees = await Employee.find({ department });
-    const tasks = await Task.find({ department });
-    const leaves = await Leave.find({ department });
-    const announcements = await Announcement.find({ department });
+    const fifteenDaysAgo = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000);
+    const deptRegex = new RegExp(`^${department}$`, 'i');
+
+    // Query employees in department
+    const employees = await Employee.find({ department: deptRegex });
+    const tasks = await Task.find({ department: deptRegex });
+    const leaves = await Leave.find({
+      department: deptRegex,
+      $or: [
+        { status: "PENDING" },
+        { actionAt: { $gte: fifteenDaysAgo } },
+        { appliedAt: { $gte: fifteenDaysAgo } }
+      ]
+    });
+    const announcements = await Announcement.find({ department: deptRegex, date: { $gte: fifteenDaysAgo } });
+    const allDepartments = (await Employee.distinct('department')).filter(Boolean);
+    const isHr = req.session.role === 'HR' || (employee && employee.role === 'HR');
+
     if (isJson) {
       return res.json({
         employee,
@@ -103,16 +142,19 @@ router.get('/:department', async (req, res) => {
         tasks,
         leaves,
         department,
+        allDepartments,
         announcements
       });
     }
     res.render('department/dashboard', {
       employee,
-      employees,
-      tasks,
-      leaves,
+      employees: employees || [],
+      tasks: tasks || [],
+      leaves: leaves || [],
       department,
-      announcements
+      allDepartments: allDepartments || [],
+      announcements: announcements || [],
+      isHr
     });
   } catch (err) {
     console.error('Error loading dashboard:', err);

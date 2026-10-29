@@ -619,6 +619,7 @@
         <% } %>
 
         <form id="registration-form" method="POST" action="/auth/register-company" class="needs-validation" novalidate>
+          <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
           
           <!-- Hidden Razorpay Fields -->
           <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">

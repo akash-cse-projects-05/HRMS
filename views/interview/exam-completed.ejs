@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assessment Status — HRMS AI Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/exam-portal.css">
+</head>
+<body class="exam-body completed-body">
+  <div class="completion-card">
+    <% if (error) { %>
+      <div class="completion-icon error-icon">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <h1 class="completion-title">Session Unavailable</h1>
+      <p class="completion-desc"><%= error %></p>
+      <div class="completion-actions">
+        <a href="/" class="btn btn-secondary"><i class="fa-solid fa-house"></i> Return to Homepage</a>
+      </div>
+    <% } else { %>
+      <div class="completion-icon success-icon">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+      <h1 class="completion-title">Assessment Submitted Successfully!</h1>
+      <p class="completion-desc">
+        Thank you, <strong><%= candidate ? candidate.candidateName : 'Candidate' %></strong>. 
+        Your responses have been securely received and processed by our AI evaluation engine.
+      </p>
+
+      <div class="status-summary-pill">
+        <div class="stat-col">
+          <span class="stat-label">Role Target</span>
+          <span class="stat-val"><%= candidate ? candidate.targetRole : 'N/A' %></span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-col">
+          <span class="stat-label">Status</span>
+          <span class="stat-val highlight-green">Under HR Review</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-col">
+          <span class="stat-label">Submitted On</span>
+          <span class="stat-val"><%= new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) %></span>
+        </div>
+      </div>
+
+      <p class="info-note">
+        <i class="fa-solid fa-envelope"></i> Our Talent Acquisition team has been notified. You will receive an email update regarding next steps within 2–3 business days.
+      </p>
+
+      <div class="completion-actions">
+        <button onclick="window.close();" class="btn btn-secondary">
+          <i class="fa-solid fa-xmark"></i> Close Assessment Window
+        </button>
+      </div>
+    <% } %>
+  </div>
+</body>
+</html>

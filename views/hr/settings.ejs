@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Company & Payroll Settings | HRMS</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <!-- MapLibre GL CSS for OpenFreeMap 3D Vector Maps -->
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
+
+  <style>
+    :root {
+      --rsr-blue: #0052cc;
+      --rsr-blue-hover: #0747a6;
+      --rsr-text: #172b4d;
+      --rsr-text-light: #626f86;
+      --rsr-border: #dfe1e6;
+      --rsr-bg: #f4f5f7;
+      --rsr-card: #ffffff;
+      --rsr-success: #00875a;
+    }
+
+    body {
+      background-color: var(--rsr-bg);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--rsr-text);
+      letter-spacing: -0.01em;
+    }
+
+    /* Navbar */
+    .navbar {
+      background: #091e42 !important;
+      padding: 0.8rem 0;
+    }
+
+    .navbar-brand {
+      font-weight: 800;
+      color: #ffffff !important;
+    }
+
+    /* Page Header */
+    .page-header {
+      padding: 40px 0 30px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--rsr-border);
+      margin-bottom: 30px;
+    }
+
+    /* Card Containers */
+    .settings-card {
+      background: #ffffff;
+      border: 1px solid var(--rsr-border);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(9, 30, 66, 0.04);
+      transition: box-shadow 0.2s;
+    }
+
+    .settings-card:hover {
+      box-shadow: 0 4px 16px rgba(9, 30, 66, 0.08);
+    }
+
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #091e42;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .card-subtitle {
+      font-size: 0.82rem;
+      color: var(--rsr-text-light);
+      margin-bottom: 22px;
+    }
+
+    /* Form Elements */
+    .form-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #44546f;
+      margin-bottom: 6px;
+    }
+
+    .form-control, .form-select {
+      border-radius: 10px;
+      border: 1px solid var(--rsr-border);
+      padding: 10px 14px;
+      font-size: 0.92rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .form-control:focus, .form-select:focus {
+      border-color: var(--rsr-blue);
+      box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.15);
+    }
+
+    /* Logo Upload & Preview */
+    .logo-preview-box {
+      width: 140px;
+      height: 140px;
+      border: 2px dashed #0c66e4;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f1f6fd;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .logo-preview-img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    /* Map Box */
+    #geoMap {
+      height: 340px;
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--rsr-border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Floating Save Bar */
+    .save-bar {
+      position: sticky;
+      bottom: 20px;
+      z-index: 1000;
+      background: rgba(9, 30, 66, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 16px 28px;
+      color: #ffffff;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Live Payslip Preview Mini Widget & Sticky Sidebar */
+    .payslip-preview-widget {
+      background: #ffffff;
+      border: 2px solid #091e42;
+      border-radius: 12px;
+      padding: 20px;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .preview-header {
+      border-bottom: 2px solid #000;
+      padding-bottom: 12px;
+      margin-bottom: 15px;
+    }
+
+    .payslip-sticky-card {
+      position: -webkit-sticky !important;
+      position: sticky !important;
+      top: 80px !important;
+      z-index: 100 !important;
+      max-height: calc(100vh - 100px);
+      overflow-y: auto;
+      scrollbar-width: thin;
+      box-shadow: 0 8px 30px rgba(9, 30, 66, 0.12) !important;
+      border: 1px solid #c1c7d0 !important;
+    }
+
+    /* Clean Corporate AI Services & Enterprise Portals (Matches Landing Excellence Grid) */
+    .ai-feature-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 1.75rem 1.5rem;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      text-decoration: none !important;
+      color: inherit !important;
+      position: relative;
+    }
+
+    .ai-feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 16px 32px rgba(37, 99, 235, 0.08);
+      border-color: #2563eb;
+    }
+
+    .ai-feature-card.active-portal {
+      border: 1.5px solid #2563eb;
+      box-shadow: 0 4px 16px rgba(37, 99, 235, 0.08);
+    }
+
+    .ai-feature-icon-wrapper {
+      width: 46px;
+      height: 46px;
+      background: rgba(37, 99, 235, 0.06);
+      color: #2563eb;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      margin-bottom: 1.25rem;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .ai-feature-card:hover .ai-feature-icon-wrapper {
+      background: #2563eb;
+      color: #ffffff;
+    }
+
+    .ai-feature-card h5 {
+      color: #0f172a;
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.5rem;
+    }
+
+    .ai-feature-card p {
+      color: #64748b;
+      font-size: 0.85rem;
+      line-height: 1.55;
+      margin-bottom: 0;
+      flex-grow: 1;
+    }
+  </style>
+</head>
+
+<body>
+  <%- include('../partials/anti-cache') %>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="/hr/dashboard">
+        <i class="fa-solid fa-building-shield me-2 text-primary"></i>
+        <span>HRMS Control Center</span>
+      </a>
+      <div class="ms-auto d-flex align-items-center gap-2">
+        <a href="/hr/dashboard" class="btn btn-outline-light btn-sm rounded-pill px-3">
+          <i class="fa-solid fa-arrow-left me-1"></i> HR Dashboard
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page Header -->
+  <header class="page-header">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <p class="text-primary fw-bold small mb-1" style="letter-spacing: 0.1em;">TENANT CONFIGURATION</p>
+          <h1 class="fw-bold mb-0">Company & Payroll Settings</h1>
+          <p class="text-muted mt-2 mb-0">Customize your company profile, geofenced office location, and default payslip structure rules.</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container pb-5">
+
+    <% if (typeof success !== 'undefined' && success) { %>
+      <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm border-0 d-flex align-items-center" role="alert">
+        <i class="fa-solid fa-circle-check fs-4 me-3 text-success"></i>
+        <div>
+          <strong>Settings Saved Successfully!</strong> Your updated company profile, geofence coordinates, and payslip structure are now live across the system.
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    <% } %>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="alert alert-danger alert-dismissible fade show rounded-4 shadow-sm border-0 d-flex align-items-center" role="alert">
+        <i class="fa-solid fa-triangle-exclamation fs-4 me-3 text-danger"></i>
+        <div>
+          <strong>Error Saving Settings:</strong> <%= error %>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    <% } %>
+
+    <% if (typeof pwSuccess !== 'undefined' && pwSuccess) { %>
+      <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm border-0 d-flex align-items-center" role="alert">
+        <i class="fa-solid fa-lock fs-4 me-3 text-success"></i>
+        <div>
+          <strong>Password Updated!</strong> Your HR login password has been changed successfully.
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    <% } %>
+
+    <% if (typeof pwError !== 'undefined' && pwError) { %>
+      <div class="alert alert-danger alert-dismissible fade show rounded-4 shadow-sm border-0 d-flex align-items-center" role="alert">
+        <i class="fa-solid fa-triangle-exclamation fs-4 me-3 text-danger"></i>
+        <div>
+          <strong>Password Change Failed:</strong> <%= pwError %>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    <% } %>
+
+    <!-- ⚡ AI & ENTERPRISE ADVANCED SUITE WORKSPACES -->
+    <div class="settings-card mb-4" style="border: 1px solid #e2e8f0; background: #ffffff; border-radius: 20px; padding: 2rem;">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4 pb-3 border-bottom">
+        <div>
+          <div class="card-title mb-1 text-primary">
+            <i class="fa-solid fa-microchip text-primary me-2"></i> AI Workspaces & Enterprise Portals
+          </div>
+          <div class="card-subtitle mb-0">Direct access to statutory compensation, company policy handbook, and workplace portals.</div>
+        </div>
+        <span class="badge" style="background: #e9f2ff; color: #0052cc; border: 1px solid #b3d4ff; font-size: 0.78rem; font-weight: 600; padding: 8px 16px; border-radius: 20px;">
+          <i class="fa-solid fa-circle-check text-success me-1"></i> Enterprise Suite Active
+        </span>
+      </div>
+
+      <div class="row g-4">
+        <!-- 1. AI Recruitment & Exam -->
+        <div class="col-lg-3 col-md-6 col-12">
+          <a href="/hr/recruitment" class="ai-feature-card">
+            <div class="ai-feature-icon-wrapper"><i class="fa-solid fa-robot"></i></div>
+            <h5 class="fw-bold">AI Recruitment Exam</h5>
+            <p class="text-muted small mb-0">Interactive candidate exam bot with custom prompts, auto-scoring, and proctoring.</p>
+          </a>
+        </div>
+
+        <!-- 2. Compensation & Statutory CTC -->
+        <div class="col-lg-3 col-md-6 col-12">
+          <a href="/hr/compensation" class="ai-feature-card">
+            <div class="ai-feature-icon-wrapper"><i class="fa-solid fa-calculator"></i></div>
+            <h5 class="fw-bold">Compensation & CTC</h5>
+            <p class="text-muted small mb-0">Indian statutory payroll compliance (PF 12%, ESI, Gratuity) and automated hike modeling.</p>
+          </a>
+        </div>
+
+        <!-- 3. Policy AI Handbook & RAG -->
+        <div class="col-lg-3 col-md-6 col-12">
+          <a href="/hr/policies" class="ai-feature-card">
+            <div class="ai-feature-icon-wrapper"><i class="fa-solid fa-book-bookmark"></i></div>
+            <h5 class="fw-bold">Policy Handbook</h5>
+            <p class="text-muted small mb-0">Company handbook questions and answers with direct citations.</p>
+          </a>
+        </div>
+
+
+
+        <!-- 8. Company Live Chat -->
+        <div class="col-lg-3 col-md-6 col-12">
+          <a href="/chat" class="ai-feature-card">
+            <div class="ai-feature-icon-wrapper"><i class="fa-solid fa-comments"></i></div>
+            <h5 class="fw-bold">Company Live Chat</h5>
+            <p class="text-muted small mb-0">Encrypted instant messaging channels, employee direct DMs, attachments, and status.</p>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <form action="/hr/settings" method="POST" enctype="multipart/form-data" id="settingsForm">
+      <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
+
+      <div class="row">
+        <!-- Main Form Column -->
+        <div class="col-lg-8">
+
+          <!-- 1. Company Profile & Branding -->
+          <div class="settings-card">
+            <div class="card-title">
+              <i class="fa-solid fa-building text-primary"></i> Company Profile & Branding
+            </div>
+            <div class="card-subtitle">These details will appear on employee salary slips, emails, and header templates.</div>
+
+            <div class="row g-3">
+              <div class="col-md-8">
+                <div class="mb-3">
+                  <label class="form-label">Registered Company Name *</label>
+                  <input type="text" name="companyName" id="inpCompanyName" class="form-control fw-bold" 
+                    value="<%= (settings && settings.companyName) ? settings.companyName : '' %>" placeholder="e.g. Acme Technologies Pvt. Ltd." required>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">Tagline / Subtitle</label>
+                  <input type="text" name="tagline" id="inpTagline" class="form-control" 
+                    value="<%= (settings && settings.tagline) ? settings.tagline : '' %>" placeholder="e.g. Innovation in Cloud HR">
+                </div>
+              </div>
+
+              <!-- Logo Upload -->
+              <div class="col-md-4 text-center">
+                <label class="form-label d-block text-center">Company Logo</label>
+                <div class="logo-preview-box mx-auto" onclick="document.getElementById('logoInput').click();" title="Click to upload new logo">
+                  <% if (settings && settings.logoUrl) { %>
+                    <img src="<%= settings.logoUrl %>" alt="Company Logo" class="logo-preview-img" id="logoPreview">
+                  <% } else { %>
+                    <div id="logoPlaceholder" class="text-center text-primary p-2">
+                      <i class="fa-solid fa-cloud-arrow-up fs-2 d-block mb-1"></i>
+                      <span class="small fw-bold">Upload Logo</span>
+                    </div>
+                    <img src="" alt="Company Logo" class="logo-preview-img d-none" id="logoPreview">
+                  <% } %>
+                </div>
+                <input type="file" name="logo" id="logoInput" accept="image/*" class="d-none" onchange="previewLogo(event)">
+                <input type="hidden" name="existingLogoUrl" value="<%= (settings && settings.logoUrl) ? settings.logoUrl : '' %>">
+                <small class="text-muted d-block mt-2" style="font-size: 0.72rem;">PNG, JPG, SVG (Max 2MB)</small>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label"><i class="fa-solid fa-envelope me-1 text-primary"></i> Official Company Email *</label>
+                <input type="email" name="contactEmail" id="inpContactEmail" class="form-control" 
+                  value="<%= (settings && settings.contactEmail) ? settings.contactEmail : '' %>" placeholder="e.g. hr@company.com" required>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Contact Phone</label>
+                <input type="text" name="contactPhone" class="form-control" 
+                  value="<%= (settings && settings.contactPhone) ? settings.contactPhone : '' %>" placeholder="+91 9876543210">
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Company Website</label>
+                <input type="url" name="website" class="form-control" 
+                  value="<%= (settings && settings.website) ? settings.website : '' %>" placeholder="https://company.com">
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Registered Office & Statutory Numbers -->
+          <div class="settings-card">
+            <div class="card-title">
+              <i class="fa-solid fa-location-dot text-danger"></i> Registered Office & Statutory Info
+            </div>
+            <div class="card-subtitle">Official address and tax/registration numbers printed on statutory salary slips.</div>
+
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label">Office Street Address *</label>
+                <input type="text" name="address" id="inpAddress" class="form-control" 
+                  value="<%= (settings && settings.address) ? settings.address : '' %>" placeholder="e.g. Unit 402, Signature Tower, Outer Ring Road" required>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">City *</label>
+                <input type="text" name="city" id="inpCity" class="form-control" 
+                  value="<%= (settings && settings.city) ? settings.city : '' %>" placeholder="e.g. Mumbai / Bengaluru" required>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">State / Province *</label>
+                <input type="text" name="state" id="inpState" class="form-control" 
+                  value="<%= (settings && settings.state) ? settings.state : '' %>" placeholder="e.g. Maharashtra" required>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">PIN / Postal Code *</label>
+                <input type="text" name="pincode" id="inpPincode" class="form-control" 
+                  value="<%= (settings && settings.pincode) ? settings.pincode : '' %>" placeholder="e.g. 400001" required>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Country</label>
+                <input type="text" name="country" class="form-control" 
+                  value="<%= (settings && settings.country) ? settings.country : 'India' %>" placeholder="India">
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Corporate Identification (CIN)</label>
+                <input type="text" name="cin" id="inpCin" class="form-control" 
+                  value="<%= (settings && settings.cin) ? settings.cin : '' %>" placeholder="e.g. U12345MH2024PTC123456">
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">PAN Number</label>
+                <input type="text" name="panNumber" class="form-control text-uppercase" 
+                  value="<%= (settings && settings.panNumber) ? settings.panNumber : '' %>" placeholder="AAACB1234F">
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Geofenced Office Location & Attendance Map -->
+          <div class="settings-card">
+            <div class="card-title">
+              <i class="fa-solid fa-map-location-dot text-success"></i> Geofenced Office Location & Attendance
+            </div>
+            <div class="card-subtitle">Define the exact GPS coordinates and allowed punch-in radius for geofenced attendance.</div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-4">
+                <label class="form-label">Office Latitude *</label>
+                <input type="number" step="any" name="officeLat" id="inpOfficeLat" class="form-control" 
+                  value="<%= (settings && settings.officeLat) ? settings.officeLat : 19.0597397 %>" required onchange="updateMapFromInputs()">
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Office Longitude *</label>
+                <input type="number" step="any" name="officeLng" id="inpOfficeLng" class="form-control" 
+                  value="<%= (settings && settings.officeLng) ? settings.officeLng : 73.1189947 %>" required onchange="updateMapFromInputs()">
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Allowed Radius (Meters) *</label>
+                <div class="input-group">
+                  <input type="number" name="officeRadius" id="inpOfficeRadius" class="form-control" 
+                    value="<%= (settings && settings.officeRadius) ? settings.officeRadius : 200 %>" min="10" max="5000" required onchange="updateMapFromInputs()">
+                  <span class="input-group-text">m</span>
+                </div>
+              </div>
+
+              <div class="col-12 d-flex gap-2">
+                <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3" onclick="detectCurrentLocation()">
+                  <i class="fa-solid fa-crosshairs me-1"></i> Detect My Current Location
+                </button>
+                <span class="text-muted small align-self-center">Or drag the pin on the map below to pinpoint your office.</span>
+              </div>
+            </div>
+
+            <!-- Location Search & OpenFreeMap 3D Vector Controls -->
+            <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+              <div class="input-group flex-grow-1">
+                <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                <input type="text" id="geoSearchBox" class="form-control border-start-0 ps-0" placeholder="Search city or office landmark (e.g. Bandra Kurla Complex, Mumbai)..." onkeydown="if(event.key==='Enter'){event.preventDefault(); searchOfficeAddress();}">
+                <button type="button" class="btn btn-outline-primary" onclick="searchOfficeAddress()">Search</button>
+              </div>
+              <div class="btn-group btn-group-sm">
+                <button type="button" id="btnToggle3D" class="btn btn-primary fw-bold" onclick="toggle3DPerspective()">
+                  <i class="fa-solid fa-cube me-1"></i> 3D Mode: ON
+                </button>
+                <button type="button" class="btn btn-outline-secondary" onclick="resetMapOrientation()" title="Reset Pitch & North Heading">
+                  <i class="fa-solid fa-compass"></i>
+                </button>
+              </div>
+            </div>
+            <div id="geoMap" class="mb-3 position-relative" style="height: 380px;"></div>
+
+            <div class="form-check form-switch p-2 bg-light rounded-3 border">
+              <input class="form-check-input ms-0 me-2" type="checkbox" name="geofenceEnforced" id="geofenceEnforced" 
+                <%= (settings && settings.geofenceEnforced) ? 'checked' : '' %>>
+              <label class="form-check-label fw-bold text-dark" for="geofenceEnforced">
+                Strict Geofence Enforcement (Block punch-in if employee is outside the allowed radius)
+              </label>
+            </div>
+          </div>
+
+          <!-- 4. Default Payslip & Payroll Rules -->
+          <div class="settings-card">
+            <div class="card-title">
+              <i class="fa-solid fa-money-bill-wave text-warning"></i> Payslip & Payroll Structure Defaults
+            </div>
+            <div class="card-subtitle">Set standard default percentage deductions, disclaimer notes, and signatory credentials for payslips.</div>
+
+            <div class="row g-3">
+              <div class="col-md-3">
+                <label class="form-label">Currency Symbol</label>
+                <input type="text" name="currencySymbol" class="form-control" 
+                  value="<%= (settings && settings.currencySymbol) ? settings.currencySymbol : '₹' %>" placeholder="₹">
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Default PF (%) on Basic</label>
+                <div class="input-group">
+                  <input type="number" step="0.1" name="pfPercentage" class="form-control" 
+                    value="<%= (settings && settings.pfPercentage) ? settings.pfPercentage : 0 %>" placeholder="12">
+                  <span class="input-group-text">%</span>
+                </div>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Default PT Amount (₹)</label>
+                <div class="input-group">
+                  <span class="input-group-text">₹</span>
+                  <input type="number" name="ptAmount" class="form-control" 
+                    value="<%= (settings && settings.ptAmount) ? settings.ptAmount : 0 %>" placeholder="200">
+                </div>
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label">Default TDS (%)</label>
+                <div class="input-group">
+                  <input type="number" step="0.1" name="tdsDefaultPercent" class="form-control" 
+                    value="<%= (settings && settings.tdsDefaultPercent) ? settings.tdsDefaultPercent : 0 %>" placeholder="0">
+                  <span class="input-group-text">%</span>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Signatory Name</label>
+                <input type="text" name="signatoryName" class="form-control" 
+                  value="<%= (settings && settings.signatoryName) ? settings.signatoryName : 'Authorized Signatory' %>" placeholder="e.g. Finance & HR Team">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Signatory Designation</label>
+                <input type="text" name="signatoryDesignation" class="form-control" 
+                  value="<%= (settings && settings.signatoryDesignation) ? settings.signatoryDesignation : 'HR Operations' %>" placeholder="e.g. Head of HR">
+              </div>
+
+              <div class="col-12">
+                <label class="form-label">Payslip Footer Disclaimer / Note</label>
+                <textarea name="payslipNote" class="form-control" rows="2" 
+                  placeholder="e.g. This is a computer generated document and does not require a physical signature."><%= (settings && settings.payslipNote) ? settings.payslipNote : 'This is a computer generated salary statement and does not require a physical signature.' %></textarea>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Preview Column (Fixed Sticky Payslip Header Live Preview) -->
+        <div class="col-lg-4" style="position: relative;">
+          <div class="settings-card payslip-sticky-card">
+            <div class="card-title d-flex justify-content-between align-items-center">
+              <div>
+                <i class="fa-solid fa-file-invoice text-primary me-2"></i> Payslip Live Preview
+              </div>
+              <span class="badge" style="background: rgba(37, 99, 235, 0.1); color: #0052cc; border: 1px solid rgba(37, 99, 235, 0.2); font-size: 0.72rem; font-weight: 700;">
+                <i class="fa-solid fa-lock me-1"></i> Fixed View
+              </span>
+            </div>
+            <div class="card-subtitle">Live auto-updating mockup of how your company header will render on employee salary statements.</div>
+
+            <div class="payslip-preview-widget shadow-sm">
+              <div class="preview-header d-flex justify-content-between align-items-start">
+                <div>
+                  <img id="mockupLogo" src="<%= (settings && settings.logoUrl) ? settings.logoUrl : '/images/rsr.jpg' %>" 
+                    alt="Company Logo" style="max-height: 48px; max-width: 110px; object-fit: contain;" 
+                    onerror="this.style.display='none'">
+                </div>
+                <div class="text-end" style="font-size: 0.82rem; line-height: 1.35;">
+                  <div class="fw-bold text-uppercase" id="mockupCompanyName" style="font-size: 0.95rem;">
+                    <%= (settings && settings.companyName) ? settings.companyName : 'HRMS Company Pvt. Ltd.' %>
+                  </div>
+                  <div id="mockupAddress" class="text-muted small">
+                    <%= (settings && settings.address) ? settings.address : 'Company Address Line' %>
+                  </div>
+                  <div id="mockupCityState" class="text-muted small">
+                    <%= (settings && settings.city) ? settings.city + ', ' + (settings.state || '') + ' ' + (settings.pincode || '') : 'City, State' %>
+                  </div>
+                  <div class="mt-1 small">
+                    <i class="fa-solid fa-envelope me-1 text-primary"></i> <span id="mockupEmail"><%= (settings && settings.contactEmail) ? settings.contactEmail : 'hr@company.com' %></span>
+                  </div>
+                  <div class="small">
+                    <strong>CIN:</strong> <span id="mockupCin"><%= (settings && settings.cin) ? settings.cin : 'U12345...' %></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="text-center py-2 bg-light border rounded small fw-bold text-uppercase mb-3">
+                Salary Statement (Mockup)
+              </div>
+
+              <div class="text-muted small" style="font-size: 0.75rem;">
+                <div class="d-flex justify-content-between mb-1">
+                  <span>Standard Currency:</span>
+                  <strong id="mockupCurrency"><%= (settings && settings.currencySymbol) ? settings.currencySymbol : '₹' %> (INR)</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-1">
+                  <span>Signatory:</span>
+                  <strong id="mockupSignatory"><%= (settings && settings.signatoryName) ? settings.signatoryName : 'Authorized Signatory' %></strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 p-3 bg-light rounded-3 border">
+              <div class="d-flex align-items-center gap-2 text-primary fw-bold small mb-1">
+                <i class="fa-solid fa-shield-check"></i> Tenant Isolated
+              </div>
+              <p class="text-muted small mb-0" style="font-size: 0.78rem;">
+                All company addresses, GPS coordinates, and payroll rules configured here apply exclusively to your company account.
+              </p>
+            </div>
+          </div>
+
+          <!-- Change Password Card is placed OUTSIDE the main form (below) to avoid nested forms -->
+
+        </div>
+      </div>
+
+      <!-- Sticky Save Bar -->
+      <div class="save-bar d-flex justify-content-between align-items-center mt-4">
+        <div>
+          <h6 class="fw-bold mb-0 text-white"><i class="fa-solid fa-floppy-disk me-2"></i> Save Changes</h6>
+          <small class="text-white-50">Apply company details and payslip rules across your tenant portal.</small>
+        </div>
+        <div class="d-flex gap-2">
+          <a href="/hr/dashboard" class="btn btn-outline-light rounded-pill px-4">Cancel</a>
+          <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold shadow">
+            <i class="fa-solid fa-check me-2"></i> Commit Settings
+          </button>
+        </div>
+      </div>
+
+    </form>
+
+  </div>
+
+  <!-- MapLibre GL JS for OpenFreeMap 3D Vector Maps -->
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Live Logo Preview
+    function previewLogo(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const preview = document.getElementById('logoPreview');
+          const placeholder = document.getElementById('logoPlaceholder');
+          const mockupLogo = document.getElementById('mockupLogo');
+
+          preview.src = e.target.result;
+          preview.classList.remove('d-none');
+          if (placeholder) placeholder.classList.add('d-none');
+
+          if (mockupLogo) {
+            mockupLogo.src = e.target.result;
+            mockupLogo.style.display = 'block';
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // Live Mockup Synchronizers
+    document.getElementById('inpCompanyName')?.addEventListener('input', function(e) {
+      const el = document.getElementById('mockupCompanyName');
+      if (el) el.innerText = e.target.value || 'Company Name';
+    });
+    document.getElementById('inpAddress')?.addEventListener('input', function(e) {
+      const el = document.getElementById('mockupAddress');
+      if (el) el.innerText = e.target.value || 'Office Address';
+    });
+    document.getElementById('inpCity')?.addEventListener('input', updateMockupLocation);
+    document.getElementById('inpState')?.addEventListener('input', updateMockupLocation);
+    document.getElementById('inpPincode')?.addEventListener('input', updateMockupLocation);
+    function updateMockupLocation() {
+      const city = document.getElementById('inpCity')?.value || '';
+      const state = document.getElementById('inpState')?.value || '';
+      const pin = document.getElementById('inpPincode')?.value || '';
+      const el = document.getElementById('mockupCityState');
+      if (el) el.innerText = `${city}, ${state} ${pin}`.trim() || 'City, State Pincode';
+    }
+    document.getElementById('inpCin')?.addEventListener('input', function(e) {
+      const el = document.getElementById('mockupCin');
+      if (el) el.innerText = e.target.value || 'N/A';
+    });
+    document.getElementById('inpContactEmail')?.addEventListener('input', function(e) {
+      const el = document.getElementById('mockupEmail');
+      if (el) el.innerText = e.target.value || 'hr@company.com';
+    });
+
+    // OpenFreeMap (Liberty 3D Style) with MapLibre GL JS
+    let map, marker;
+    let is3DMode = true;
+    const defaultLat = parseFloat(document.getElementById('inpOfficeLat').value) || 19.0597397;
+    const defaultLng = parseFloat(document.getElementById('inpOfficeLng').value) || 73.1189947;
+    const defaultRadius = parseFloat(document.getElementById('inpOfficeRadius').value) || 200;
+
+    // Helper: Generate GeoJSON Polygon coordinates for circle radius in meters
+    function createGeoJSONCircle(centerLng, centerLat, radiusMeters, points = 64) {
+      const km = radiusMeters / 1000;
+      const coords = [];
+      const distanceX = km / (111.320 * Math.cos((centerLat * Math.PI) / 180));
+      const distanceY = km / 110.574;
+
+      for (let i = 0; i < points; i++) {
+        const theta = (i / points) * (2 * Math.PI);
+        const x = distanceX * Math.cos(theta);
+        const y = distanceY * Math.sin(theta);
+        coords.push([centerLng + x, centerLat + y]);
+      }
+      coords.push(coords[0]); // Close polygon loop
+
+      return {
+        type: 'Feature',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [coords]
+        }
+      };
+    }
+
+    function initMap() {
+      if (map) return;
+
+      try {
+        // Initialize MapLibre GL map with OpenFreeMap Liberty (Full 3D Buildings & Vector)
+        map = new maplibregl.Map({
+          container: 'geoMap',
+          style: 'https://tiles.openfreemap.org/styles/liberty',
+          center: [defaultLng, defaultLat],
+          zoom: 16.5,
+          pitch: 62, // 3D Camera Tilt
+          bearing: -15, // Isometric perspective
+          maxPitch: 85,
+          dragRotate: true,
+          pitchWithRotate: true,
+          attributionControl: false
+        });
+
+        // 3D Navigation Controls with Compass & Pitch Drag
+        map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
+        map.addControl(new maplibregl.FullscreenControl(), 'top-right');
+        map.addControl(new maplibregl.AttributionControl({
+          compact: true,
+          customAttribution: '<a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
+        }), 'bottom-right');
+
+        // Draggable office marker
+        marker = new maplibregl.Marker({
+          draggable: true,
+          color: '#0052cc'
+        })
+          .setLngLat([defaultLng, defaultLat])
+          .setPopup(new maplibregl.Popup({ offset: 25 }).setHTML('<b>Office HQ Location</b><br>Drag pin or click map to reposition.'))
+          .addTo(map);
+
+        map.on('load', () => {
+          map.resize();
+
+          // 1. Add Geofence circle source and layers
+          map.addSource('geofence-circle', {
+            type: 'geojson',
+            data: createGeoJSONCircle(defaultLng, defaultLat, defaultRadius)
+          });
+
+          // Circle fill layer
+          map.addLayer({
+            id: 'geofence-circle-fill',
+            type: 'fill',
+            source: 'geofence-circle',
+            paint: {
+              'fill-color': '#0052cc',
+              'fill-opacity': 0.16
+            }
+          });
+
+          // Circle outline stroke layer
+          map.addLayer({
+            id: 'geofence-circle-stroke',
+            type: 'line',
+            source: 'geofence-circle',
+            paint: {
+              'line-color': '#0052cc',
+              'line-width': 2.5,
+              'line-dasharray': [2, 1]
+            }
+          });
+
+          // 2. High-Definition 3D Building Extrusions from OpenFreeMap Vector Source
+          const beforeLayer = map.getLayer('boundary_3') ? 'boundary_3' : undefined;
+          if (map.getLayer('building-3d')) {
+            map.removeLayer('building-3d');
+          }
+
+          map.addLayer({
+            id: 'building-3d',
+            type: 'fill-extrusion',
+            source: 'openmaptiles',
+            'source-layer': 'building',
+            minzoom: 13,
+            paint: {
+              'fill-extrusion-base': [
+                'case',
+                ['has', 'render_min_height'],
+                ['get', 'render_min_height'],
+                0
+              ],
+              'fill-extrusion-height': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                13, 0,
+                14.5, [
+                  'case',
+                  ['has', 'render_height'],
+                  ['max', ['get', 'render_height'], 12],
+                  16 // Default 16m height guarantee so every building in the district stands in 3D
+                ]
+              ],
+              'fill-extrusion-color': [
+                'interpolate',
+                ['linear'],
+                ['coalesce', ['get', 'render_height'], 16],
+                0, '#e2e8f0',
+                15, '#cbd5e1',
+                30, '#94a3b8',
+                60, '#3b82f6'
+              ],
+              'fill-extrusion-opacity': 0.95,
+              'fill-extrusion-vertical-gradient': true
+            }
+          }, beforeLayer);
+
+          // 3. Directional Sunlight Lighting for realistic building facade shadows
+          map.setLight({
+            anchor: 'viewport',
+            color: '#ffffff',
+            intensity: 0.65,
+            position: [1.15, 210, 30]
+          });
+        });
+
+        // Handle marker drag
+        marker.on('dragend', () => {
+          const lngLat = marker.getLngLat();
+          document.getElementById('inpOfficeLat').value = lngLat.lat.toFixed(7);
+          document.getElementById('inpOfficeLng').value = lngLat.lng.toFixed(7);
+          updateGeofenceCircle(lngLat.lng, lngLat.lat);
+        });
+
+        // Handle map click
+        map.on('click', (e) => {
+          marker.setLngLat(e.lngLat);
+          document.getElementById('inpOfficeLat').value = e.lngLat.lat.toFixed(7);
+          document.getElementById('inpOfficeLng').value = e.lngLat.lng.toFixed(7);
+          updateGeofenceCircle(e.lngLat.lng, e.lngLat.lat);
+        });
+
+        // Resize on layout updates
+        setTimeout(() => { if (map) map.resize(); }, 300);
+        setTimeout(() => { if (map) map.resize(); }, 1000);
+
+      } catch (err) {
+        console.error('Error initializing OpenFreeMap 3D:', err);
+      }
+    }
+
+    function toggle3DPerspective() {
+      is3DMode = !is3DMode;
+      const btn = document.getElementById('btnToggle3D');
+      if (map) {
+        map.easeTo({
+          pitch: is3DMode ? 62 : 0,
+          bearing: is3DMode ? -15 : 0,
+          duration: 900
+        });
+      }
+      if (btn) {
+        btn.className = is3DMode ? 'btn btn-primary fw-bold' : 'btn btn-outline-primary fw-bold';
+        btn.innerHTML = `<i class="fa-solid fa-cube me-1"></i> 3D Mode: ${is3DMode ? 'ON' : 'OFF'}`;
+      }
+    }
+
+    function resetMapOrientation() {
+      if (map) {
+        map.easeTo({ pitch: 62, bearing: -15, duration: 800 });
+      }
+    }
+
+    function updateGeofenceCircle(lng, lat) {
+      const radius = parseFloat(document.getElementById('inpOfficeRadius').value) || 200;
+      const source = map && map.getSource('geofence-circle');
+      if (source) {
+        source.setData(createGeoJSONCircle(lng, lat, radius));
+      }
+    }
+
+    function updateMapFromInputs() {
+      const lat = parseFloat(document.getElementById('inpOfficeLat').value);
+      const lng = parseFloat(document.getElementById('inpOfficeLng').value);
+      const radius = parseFloat(document.getElementById('inpOfficeRadius').value) || 200;
+
+      if (!isNaN(lat) && !isNaN(lng)) {
+        if (marker) marker.setLngLat([lng, lat]);
+        updateGeofenceCircle(lng, lat);
+        if (map) {
+          map.flyTo({
+            center: [lng, lat],
+            zoom: 16,
+            pitch: is3DMode ? 60 : 0,
+            essential: true
+          });
+        }
+      }
+    }
+
+    function detectCurrentLocation() {
+      if (!navigator.geolocation) {
+        alert("Geolocation is not supported by your browser.");
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          document.getElementById('inpOfficeLat').value = lat.toFixed(7);
+          document.getElementById('inpOfficeLng').value = lng.toFixed(7);
+          updateMapFromInputs();
+        },
+        err => {
+          alert("Could not fetch your location: " + err.message);
+        },
+        { enableHighAccuracy: true }
+      );
+    }
+
+    async function searchOfficeAddress() {
+      const input = document.getElementById('geoSearchBox');
+      const query = input ? input.value.trim() : '';
+      if (!query) {
+        alert("Please enter a city or location to search.");
+        return;
+      }
+      try {
+        const btn = document.querySelector('button[onclick="searchOfficeAddress()"]');
+        if (btn) btn.innerText = "Searching...";
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+        const data = await res.json();
+        if (btn) btn.innerText = "Search";
+        if (data && data.length > 0) {
+          const lat = parseFloat(data[0].lat);
+          const lng = parseFloat(data[0].lon);
+          document.getElementById('inpOfficeLat').value = lat.toFixed(7);
+          document.getElementById('inpOfficeLng').value = lng.toFixed(7);
+          updateMapFromInputs();
+        } else {
+          alert("Location not found. Please try a different query or nearby landmark.");
+        }
+      } catch (e) {
+        console.error("Geocoding failed", e);
+        const btn = document.querySelector('button[onclick="searchOfficeAddress()"]');
+        if (btn) btn.innerText = "Search";
+        alert("Could not complete search. Please check your internet connection.");
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initMap);
+  </script>
+
+  <%- include('../partials/ai-floating-assistant') %>
+</body>
+
+</html>

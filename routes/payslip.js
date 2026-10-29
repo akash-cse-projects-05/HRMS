@@ -2,6 +2,53 @@ const express = require('express');
 const router = express.Router();
 const Payslip = require('../models/Payslip');
 const Employee = require('../models/Employee');
+const CompanySettings = require('../models/CompanySettings');
+const Tenant = require('../models/master/Tenant');
+
+async function getActiveCompanySettings(session) {
+  try {
+    let settings = await CompanySettings.findOne();
+    if (!settings) {
+      let defaultName = 'HRMS Company';
+      if (session && session.tenantId && session.tenantId !== 'default') {
+        const tenant = await Tenant.findOne({ tenantId: session.tenantId });
+        if (tenant && tenant.companyName) {
+          defaultName = tenant.companyName;
+        }
+      }
+      settings = {
+        companyName: defaultName,
+        tagline: '',
+        address: '',
+        city: '',
+        state: '',
+        pincode: '',
+        country: 'India',
+        cin: '',
+        panNumber: '',
+        gstNumber: '',
+        contactEmail: '',
+        contactPhone: '',
+        website: '',
+        logoUrl: '',
+        currencySymbol: '₹',
+        pfPercentage: 0,
+        ptAmount: 0,
+        tdsDefaultPercent: 0,
+        payslipNote: 'This is a computer generated salary statement and does not require a physical signature.',
+        signatoryName: 'Authorized Signatory',
+        signatoryDesignation: 'HR Operations'
+      };
+    }
+    return settings;
+  } catch (e) {
+    return {
+      companyName: 'HRMS Company',
+      currencySymbol: '₹',
+      payslipNote: 'This is a computer generated salary statement and does not require a physical signature.'
+    };
+  }
+}
 
 // HR Authorization Middleware
 function hrAuth(req, res, next) {
@@ -212,7 +259,9 @@ router.get('/view/:payslipId', async (req, res) => {
       return res.status(403).send('Access denied. You can only view your own payslips.');
     }
 
-    res.render('employee/payslip-print', { payslip, employee });
+    const companySettings = await getActiveCompanySettings(req.session);
+
+    res.render('employee/payslip-print', { payslip, employee, companySettings });
   } catch (err) {
     res.status(500).send('Error downloading payslip');
   }
@@ -238,7 +287,9 @@ router.get('/download/:payslipId', async (req, res) => {
       return res.status(403).send('Access denied. You can only view your own payslips.');
     }
 
-    res.render('employee/payslip_download', { payslip, employee });
+    const companySettings = await getActiveCompanySettings(req.session);
+
+    res.render('employee/payslip_download', { payslip, employee, companySettings });
   } catch (err) {
     res.status(500).send('Error downloading payslip');
   }

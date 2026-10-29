@@ -1,0 +1,2522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aura HRMS Enterprise — Executive Decision & Adoption Deck</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --bg: #070b14;
+      --card-bg: rgba(17, 24, 39, 0.85);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-hover-border: rgba(59, 130, 246, 0.4);
+      --accent: #3b82f6;
+      --accent-glow: rgba(59, 130, 246, 0.25);
+      --cyan: #06b6d4;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --rose: #ef4444;
+      --purple: #8b5cf6;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-main);
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Ambient Glow Background */
+    .ambient-glow {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 1000px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, rgba(6, 182, 212, 0.05) 45%, transparent 70%);
+      filter: blur(100px);
+      z-index: 0;
+      pointer-events: none;
+      transition: background 0.5s ease;
+    }
+
+    /* Top Navigation Bar */
+    .deck-nav {
+      position: relative;
+      z-index: 20;
+      height: 64px;
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--card-border);
+      background: rgba(7, 11, 20, 0.85);
+      backdrop-filter: blur(16px);
+    }
+
+    .brand-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-icon {
+      width: 34px;
+      height: 34px;
+      background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 17px;
+      box-shadow: 0 4px 12px var(--accent-glow);
+    }
+
+    .brand-name {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--cyan);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-action {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .btn-action:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-action.active {
+      background: rgba(59, 130, 246, 0.2);
+      color: #60a5fa;
+      border-color: rgba(59, 130, 246, 0.5);
+    }
+
+    .btn-primary-action {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+    .btn-primary-action:hover {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: #fff;
+    }
+
+    /* Main Slides Stage */
+    .slides-stage {
+      position: relative;
+      z-index: 10;
+      width: 100vw;
+      height: calc(100vh - 64px - 64px);
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transform: translateX(40px) scale(0.98);
+      pointer-events: none;
+      transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      padding: 24px 48px;
+      overflow-y: auto;
+    }
+
+    .slide.active {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .slide.prev {
+      transform: translateX(-40px) scale(0.98);
+    }
+
+    /* Slide Header */
+    .slide-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--cyan);
+      margin-bottom: 6px;
+    }
+
+    .slide-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+      line-height: 1.2;
+    }
+
+    .slide-title .highlight {
+      background: linear-gradient(135deg, #60a5fa 0%, #06b6d4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .slide-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      max-width: 850px;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    /* 2-Column Split Content */
+    .split-content {
+      display: grid;
+      grid-template-columns: 460px 1fr;
+      gap: 28px;
+      flex: 1;
+      min-height: 0;
+      align-items: stretch;
+    }
+
+    .card-left {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      backdrop-filter: blur(12px);
+    }
+
+    .features-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .feature-item {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .feature-bullet {
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
+      background: rgba(59, 130, 246, 0.15);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: #60a5fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .feature-content h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 3px;
+    }
+
+    .feature-content p {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    .kpi-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid var(--card-border);
+    }
+
+    .kpi-pill {
+      background: rgba(11, 19, 36, 0.8);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+
+    .kpi-val {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--cyan);
+      font-family: var(--font-mono);
+      line-height: 1.2;
+    }
+
+    .kpi-lbl {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+    }
+
+    /* Right Preview Container */
+    .card-preview {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      cursor: zoom-in;
+    }
+
+    .card-preview:hover {
+      border-color: var(--card-hover-border);
+    }
+
+    .card-preview img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      transition: transform 0.3s ease;
+    }
+
+    .card-preview:hover img {
+      transform: scale(1.015);
+    }
+
+    .zoom-hint {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 11px;
+      padding: 5px 10px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    /* Mobile Device Showcase */
+    .mobile-duo-container {
+      display: flex;
+      gap: 20px;
+      height: 100%;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .device-mockup {
+      width: 250px;
+      height: 96%;
+      background: #000;
+      border-radius: 38px;
+      padding: 8px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 0 2px #334155;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      cursor: zoom-in;
+    }
+
+    .device-mockup img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 30px;
+    }
+
+    .device-label {
+      position: absolute;
+      bottom: -28px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    /* Title Slide Custom Layout */
+    .title-slide-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px 40px;
+    }
+
+    .title-pill {
+      background: rgba(59, 130, 246, 0.15);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      color: #60a5fa;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 6px 16px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hero-h1 {
+      font-size: 52px;
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      margin-bottom: 16px;
+      max-width: 950px;
+    }
+
+    .hero-p {
+      font-size: 18px;
+      color: var(--text-muted);
+      max-width: 800px;
+      line-height: 1.6;
+      margin-bottom: 36px;
+    }
+
+    .hero-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      width: 100%;
+      max-width: 1100px;
+    }
+
+    .hero-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 20px;
+      text-align: left;
+      transition: all 0.2s ease;
+    }
+
+    .hero-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+    }
+
+    .hero-card-icon {
+      font-size: 22px;
+      color: var(--cyan);
+      margin-bottom: 12px;
+    }
+
+    .hero-card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .hero-card-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Pain Points Slide Layout */
+    .pain-cards-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 1050px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .pain-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: grid;
+      grid-template-columns: 48px 1fr 220px;
+      gap: 20px;
+      align-items: center;
+      transition: border-color 0.2s;
+    }
+
+    .pain-card:hover {
+      border-color: rgba(239, 68, 68, 0.4);
+    }
+
+    .pain-num {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #f87171;
+      font-weight: 800;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pain-info h4 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 3px;
+    }
+
+    .pain-info p {
+      font-size: 12.5px;
+      color: var(--text-muted);
+    }
+
+    .pain-impact {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      color: #fca5a5;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 8px 14px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    /* Architecture 3-Column Slide */
+    .arch-cols-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+      flex: 1;
+    }
+
+    .arch-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .arch-card.highlight-card {
+      border-color: var(--cyan);
+      box-shadow: 0 0 24px rgba(6, 182, 212, 0.12);
+    }
+
+    .arch-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .arch-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: #fff;
+    }
+
+    .arch-title h3 {
+      font-size: 17px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .arch-title span {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--cyan);
+    }
+
+    .arch-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .arch-list li {
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .arch-list li i {
+      color: var(--emerald);
+      font-size: 12px;
+    }
+
+    /* Comparison Table Slide */
+    .table-container {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      overflow: hidden;
+      flex: 1;
+    }
+
+    .comp-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .comp-table th {
+      background: rgba(30, 41, 59, 0.8);
+      padding: 14px 18px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #fff;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .comp-table th.ours-header {
+      background: rgba(37, 99, 235, 0.3);
+      color: var(--cyan);
+      border-bottom: 2px solid var(--cyan);
+    }
+
+    .comp-table td {
+      padding: 13px 18px;
+      font-size: 13px;
+      color: var(--text-muted);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .comp-table td.ours-col {
+      background: rgba(37, 99, 235, 0.08);
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .tag-check { color: var(--emerald); font-weight: 700; }
+    .tag-cross { color: var(--rose); font-weight: 700; }
+    .tag-warn { color: var(--amber); font-weight: 700; }
+
+    /* ROI Slide & Interactive Calculator */
+    .roi-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      flex: 1;
+    }
+
+    .roi-calc-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .calc-slider-box {
+      margin-bottom: 20px;
+    }
+
+    .calc-slider-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .calc-val-badge {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      color: var(--cyan);
+      background: rgba(6, 182, 212, 0.15);
+      padding: 4px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+
+    .calc-range {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      background: #1e293b;
+      outline: none;
+      -webkit-appearance: none;
+    }
+    .calc-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      box-shadow: 0 0 10px var(--accent);
+    }
+
+    .calc-results-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .calc-result-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 10px;
+      border: 1px solid var(--card-border);
+    }
+
+    .calc-result-row span {
+      font-size: 12.5px;
+      color: var(--text-muted);
+    }
+
+    .calc-result-row strong {
+      font-family: var(--font-mono);
+      font-size: 15px;
+      color: var(--emerald);
+    }
+
+    .calc-total-box {
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(6, 182, 212, 0.2) 100%);
+      border: 1px solid var(--cyan);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      margin-top: 14px;
+    }
+
+    .calc-total-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--cyan);
+      font-weight: 700;
+    }
+
+    .calc-total-num {
+      font-size: 32px;
+      font-weight: 800;
+      color: #fff;
+      font-family: var(--font-mono);
+      margin: 4px 0;
+    }
+
+    /* Bottom Deck Controller */
+    .deck-footer {
+      position: relative;
+      z-index: 20;
+      height: 64px;
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--card-border);
+      background: rgba(7, 11, 20, 0.85);
+      backdrop-filter: blur(16px);
+    }
+
+    .slide-counter {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .slide-counter strong {
+      color: #fff;
+      font-size: 15px;
+    }
+
+    .progress-bar-container {
+      width: 240px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-left: 14px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #06b6d4);
+      width: 5%;
+      transition: width 0.3s ease;
+    }
+
+    .footer-nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-nav-circle {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-nav-circle:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    /* Speaker Notes Drawer */
+    .notes-drawer {
+      position: fixed;
+      bottom: 64px;
+      left: 0;
+      width: 100vw;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--accent);
+      padding: 20px 48px;
+      z-index: 30;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6);
+      max-height: 220px;
+      overflow-y: auto;
+    }
+
+    .notes-drawer.open {
+      transform: translateY(0);
+    }
+
+    .notes-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .notes-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--cyan);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .notes-body {
+      font-size: 14px;
+      color: #e2e8f0;
+      line-height: 1.6;
+    }
+
+    /* Grid / Slide Jump Modal */
+    .grid-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(7, 11, 20, 0.95);
+      backdrop-filter: blur(24px);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      padding: 32px 48px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .grid-modal.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .grid-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .grid-h2 {
+      font-size: 24px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .grid-filters {
+      display: flex;
+      gap: 8px;
+    }
+
+    .filter-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .filter-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .grid-items {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+      overflow-y: auto;
+      flex: 1;
+      padding-bottom: 20px;
+    }
+
+    .grid-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .grid-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+    }
+
+    .grid-card.current {
+      border-color: var(--cyan);
+      box-shadow: 0 0 16px rgba(6, 182, 212, 0.3);
+    }
+
+    .grid-card-num {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--cyan);
+      margin-bottom: 4px;
+    }
+
+    .grid-card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.3;
+    }
+
+    .grid-card-category {
+      font-size: 10px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      margin-top: 8px;
+    }
+
+    /* Lightbox Modal */
+    .lightbox-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      cursor: zoom-out;
+    }
+
+    .lightbox-modal.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .lightbox-modal img {
+      max-width: 95vw;
+      max-height: 92vh;
+      object-fit: contain;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    /* PRINT STYLES */
+    @media print {
+      body {
+        overflow: visible !important;
+        height: auto !important;
+        background: #070b14 !important;
+        color: #fff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .deck-nav, .deck-footer, .notes-drawer, .grid-modal, .ambient-glow, .zoom-hint {
+        display: none !important;
+      }
+      .slides-stage {
+        height: auto !important;
+        overflow: visible !important;
+      }
+      .slide {
+        position: relative !important;
+        opacity: 1 !important;
+        transform: none !important;
+        page-break-after: always !important;
+        height: 100vh !important;
+        padding: 40px !important;
+        display: flex !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Ambient Glow -->
+  <div class="ambient-glow" id="ambientGlow"></div>
+
+  <!-- Top Navigation Bar -->
+  <header class="deck-nav">
+    <div class="brand-badge">
+      <div class="brand-icon">
+        <i class="fa-solid fa-plane-departure"></i>
+      </div>
+      <div class="brand-name">
+        <span class="brand-title">AURA HRMS ENTERPRISE</span>
+        <span class="brand-sub">Workforce OS & Mobile Suite</span>
+      </div>
+    </div>
+
+    <div class="nav-actions">
+      <button class="btn-action" id="btnNotes" title="Toggle Speaker Notes (N)">
+        <i class="fa-solid fa-note-sticky"></i> Speaker Notes
+      </button>
+      <button class="btn-action" id="btnGrid" title="Slide Navigator (G)">
+        <i class="fa-solid fa-grip"></i> All Slides
+      </button>
+      <button class="btn-action" id="btnFullscreen" title="Toggle Fullscreen (F)">
+        <i class="fa-solid fa-expand"></i> Fullscreen
+      </button>
+      <button class="btn-action btn-primary-action" id="btnPrint" title="Export as PDF (Cmd+P)">
+        <i class="fa-solid fa-file-pdf"></i> Export PDF
+      </button>
+    </div>
+  </header>
+
+  <!-- Slides Stage -->
+  <main class="slides-stage" id="slidesStage">
+
+    <!-- ========================================================== -->
+    <!-- SLIDE 1: Title & Executive Vision -->
+    <!-- ========================================================== -->
+    <section class="slide active" data-category="Executive Vision" data-notes="Opening executive hook: Welcome stakeholders. This presentation presents Aura HRMS—our unified workforce operating system that combines a desktop command portal, native iOS and Android mobile apps, live GPS field tracking, and autonomous Indian statutory payroll into one cohesive platform.">
+      <div class="title-slide-container">
+        <div class="title-pill">
+          <i class="fa-solid fa-star"></i> Enterprise Decision & Adoption Pitch Deck • 2026
+        </div>
+        <h1 class="hero-h1">AURA ENTERPRISE <span class="highlight">HRMS & MOBILE SUITE</span></h1>
+        <p class="hero-p">The Modern Autonomous Workforce Operating System. Eliminating spreadsheet chaos, unverified travel claims, and multi-SaaS software sprawl across our entire organization.</p>
+
+        <div class="hero-cards-grid">
+          <div class="hero-card">
+            <div class="hero-card-icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
+            <div class="hero-card-title">Native Mobile App</div>
+            <div class="hero-card-desc">React Native for iOS & Android with 1-tap geofenced punch and digital employee ID badge.</div>
+          </div>
+          <div class="hero-card">
+            <div class="hero-card-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+            <div class="hero-card-title">Zero-Cost GPS Radar</div>
+            <div class="hero-card-desc">Pure OpenStreetMap vector tiles eliminating expensive proprietary Google Maps API billing.</div>
+          </div>
+          <div class="hero-card">
+            <div class="hero-card-icon"><i class="fa-solid fa-calculator"></i></div>
+            <div class="hero-card-title">Statutory Indian Payroll</div>
+            <div class="hero-card-desc">Automated computation of PF, ESI, TDS slabs, PT, and Loss of Pay with instant payslips.</div>
+          </div>
+          <div class="hero-card">
+            <div class="hero-card-icon"><i class="fa-solid fa-shield-halved"></i></div>
+            <div class="hero-card-title">Dedicated Database Isolation</div>
+            <div class="hero-card-desc">Dynamic multi-tenancy provisioning an isolated database per company adhering to DPDP Act 2023.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================== -->
+    <!-- SLIDE 2: The Strategic Imperative (Pain Points) -->
+    <!-- ========================================================== -->
+    <section class="slide" data-category="Executive Vision" data-notes="Walk leadership through why staying on disconnected spreadsheets or paying for multiple SaaS tools is costing us over ₹14 Lakhs annually. We have 5 specific leakages: tool sprawl, buddy punching, fraudulent field travel vouchers, manual payroll mistakes, and exorbitant SaaS renewals.">
+      <div class="slide-eyebrow"><i class="fa-solid fa-triangle-exclamation"></i> The Strategic Imperative</div>
+      <h2 class="slide-title">Why Traditional HR Software is <span class="highlight">Costing Us Millions</span></h2>
+      <p class="slide-desc">Modern companies lose an average of 40+ hours every month juggling disconnected tools, manual spreadsheets, and opaque enterprise software.</p>
+
+      <div class="pain-cards-list">
+        <div class="pain-card">
+          <div class="pain-num">1</div>
+          <div class="pain-info">
+            <h4>Spreadsheet & Tool Fragmentation</h4>
+            <p>HR teams juggle 5+ separate tools for attendance, payroll calculation, travel vouchers, leaves, and emails.</p>
+          </div>
+          <div class="pain-impact">40+ Hours Wasted / Month</div>
+        </div>
+
+        <div class="pain-card">
+          <div class="pain-num">2</div>
+          <div class="pain-info">
+            <h4>Attendance Leakage & Buddy-Punching</h4>
+            <p>Physical biometric machines fail for remote/field staff, leading to unverified clock-ins and false overtime claims.</p>
+          </div>
+          <div class="pain-impact">₹3.8L Annual Leakage</div>
+        </div>
+
+        <div class="pain-card">
+          <div class="pain-num">3</div>
+          <div class="pain-info">
+            <h4>Opaque Travel Reimbursement Fraud</h4>
+            <p>Sales and field personnel submit estimated mileage and paper taxi bills with zero GPS route verification.</p>
+          </div>
+          <div class="pain-impact">₹5.4L In Inflated Claims</div>
+        </div>
+
+        <div class="pain-card">
+          <div class="pain-num">4</div>
+          <div class="pain-info">
+            <h4>Statutory Tax Calculation Errors</h4>
+            <p>Manual computation of PF (12%), ESI, Professional Tax, and TDS slabs creates compliance liabilities and penalties.</p>
+          </div>
+          <div class="pain-impact">High Legal & Tax Risk</div>
+        </div>
+
+        <div class="pain-card">
+          <div class="pain-num">5</div>
+          <div class="pain-info">
+            <h4>Extortionate Multi-SaaS Fees</h4>
+            <p>Legacy platforms (Keka, Darwinbox, Workday) lock businesses into multi-year contracts with separate add-on fees.</p>
+          </div>
+          <div class="pain-impact">68% Higher TCO</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================== -->
+    <!-- SLIDE 3: The Unified Ecosystem Architecture -->
+    <!-- ========================================================== -->
+    <section class="slide" data-category="Platform Architecture" data-notes="Present the 3-pillar ecosystem. We are not just buying another software; we are deploying a unified architecture consisting of a desktop command center, a native mobile app for employees and managers, and autonomous AI engines.">
+      <div class="slide-eyebrow"><i class="fa-solid fa-cubes"></i> System Architecture</div>
+      <h2 class="slide-title">One Unified Ecosystem: <span class="highlight">Web + Mobile + AI</span></h2>
+      <p class="slide-desc">A single intelligent platform that harmonizes the entire workforce lifecycle from hiring to retirement.</p>
+
+      <div class="arch-cols-grid">
+        <div class="arch-card">
+          <div class="arch-header">
+            <div class="arch-icon" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);"><i class="fa-solid fa-desktop"></i></div>
+            <div class="arch-title">
+              <h3>Web Commander</h3>
+              <span>Administrative Portal</span>
+            </div>
+          </div>
+          <ul class="arch-list">
+            <li><i class="fa-solid fa-circle-check"></i> Live Workforce Telemetry Radar</li>
+            <li><i class="fa-solid fa-circle-check"></i> Automated Indian Statutory Payroll</li>
+            <li><i class="fa-solid fa-circle-check"></i> Geofence Radar Polygon Setup</li>
+            <li><i class="fa-solid fa-circle-check"></i> Shift Rostering & Overtime Rules</li>
+            <li><i class="fa-solid fa-circle-check"></i> IT Hardware Asset & Helpdesk Hub</li>
+          </ul>
+        </div>
+
+        <div class="arch-card highlight-card">
+          <div class="arch-header">
+            <div class="arch-icon" style="background: linear-gradient(135deg, #06b6d4, #0891b2);"><i class="fa-solid fa-mobile-screen"></i></div>
+            <div class="arch-title">
+              <h3>Native Mobile Suite</h3>
+              <span>iOS & Android (React Native)</span>
+            </div>
+          </div>
+          <ul class="arch-list">
+            <li><i class="fa-solid fa-circle-check"></i> 1-Tap Geofenced OpenStreetMap Punch</li>
+            <li><i class="fa-solid fa-circle-check"></i> Real-Time Field Trip & GPS Telemetry</li>
+            <li><i class="fa-solid fa-circle-check"></i> Digital Employee Identification Badge</li>
+            <li><i class="fa-solid fa-circle-check"></i> 1-Click Leave & Expense Filing</li>
+            <li><i class="fa-solid fa-circle-check"></i> Manager On-The-Go Approvals</li>
+          </ul>
+        </div>
+
+        <div class="arch-card">
+          <div class="arch-header">
+            <div class="arch-icon" style="background: linear-gradient(135deg, #10b981, #059669);"><i class="fa-solid fa-microchip"></i></div>
+            <div class="arch-title">
+              <h3>Autonomous AI Engine</h3>
+              <span>Machine Intelligence & RAG</span>
+            </div>
+          </div>
+          <ul class="arch-list">
+            <li><i class="fa-solid fa-circle-check"></i> AI Resume Screener (PDF/DOCX)</li>
+            <li><i class="fa-solid fa-circle-check"></i> 0-100% Scientific Fit Scoring</li>
+            <li><i class="fa-solid fa-circle-check"></i> 1-Click Candidate Onboarding</li>
+            <li><i class="fa-solid fa-circle-check"></i> Dynamic Multi-Tenant DB Isolation</li>
+            <li><i class="fa-solid fa-circle-check"></i> DPDP Act 2023 Ironclad Compliance</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================== -->
+    <!-- SLIDE 4: HR Executive Commander Dashboard -->
+    <!-- ========================================================== -->
+    <section class="slide" data-category="Core Operations" data-notes="Demonstrate the desktop HR Commander dashboard. This is the central nerve center for our HR department. In one glance, HR managers view today's total present count, active shifts, completed checkouts, and unexcused absences.">
+      <div class="slide-eyebrow"><i class="fa-solid fa-chart-line"></i> Operations Command</div>
+      <h2 class="slide-title">Executive HR Commander: <span class="highlight">Real-Time Workforce Telemetry</span></h2>
+      <p class="slide-desc">A single-pane-of-glass executive console giving HR managers instant workforce visibility and action shortcuts.</p>
+
+      <div class="split-content">
+        <div class="card-left">
+          <div class="features-list">
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-check"></i></div>
+              <div class="feature-content">
+                <h4>Live Operational Pulse</h4>
+                <p>Track real-time employee check-ins, active shifts, completed shifts, and absence metrics updated automatically.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-check"></i></div>
+              <div class="feature-content">
+                <h4>One-Click HR Operations Hub</h4>
+                <p>Instant shortcuts to Users Directory, New Onboarding, Leave Approvals, Expense Claims, and Trip Tracking.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-check"></i></div>
+              <div class="feature-content">
+                <h4>Granular Timecard Verification</h4>
+                <p>Audit exact punch timestamps, device telemetry, and geofence verification status to prevent discrepancies.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-row">
+            <div class="kpi-pill">
+              <div class="kpi-val">Real-Time</div>
+              <div class="kpi-lbl">Attendance Stream</div>
+            </div>
+            <div class="kpi-pill">
+              <div class="kpi-val">100%</div>
+              <div class="kpi-lbl">Audit Integrity</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-preview" onclick="openLightbox('./images/03_hr_control_center.png')">
+          <img src="./images/03_hr_control_center.png" alt="HR Executive Control Center">
+          <div class="zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Click to Zoom</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================== -->
+    <!-- SLIDE 5: MOBILE APP SPOTLIGHT: Dual Persona Experience -->
+    <!-- ========================================================== -->
+    <section class="slide" data-category="Mobile App Spotlight" data-notes="Spotlight on our Mobile App! We have a native React Native application running on both iOS and Android. It features a dual-persona design: employees see their personal terminal with 1-tap punch, leaves, payslips, and expenses; HR administrators can switch to the HR Commander terminal directly on mobile to approve requests on the go.">
+      <div class="slide-eyebrow"><i class="fa-solid fa-mobile-screen"></i> Mobile-First Architecture</div>
+      <h2 class="slide-title">Empowering Every Employee with the <span class="highlight">Native Mobile Suite</span></h2>
+      <p class="slide-desc">Available for iOS & Android. Employees carry their office, attendance, trips, and payslips right in their pockets.</p>
+
+      <div class="split-content">
+        <div class="card-left">
+          <div class="features-list">
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-star"></i></div>
+              <div class="feature-content">
+                <h4>Dual-Persona Mobile Architecture</h4>
+                <p>Single app adapts dynamically: Employee Self-Service Terminal for staff, and mobile HR Commander for managers.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-star"></i></div>
+              <div class="feature-content">
+                <h4>1-Tap Attendance Punch</h4>
+                <p>Instant check-in with GPS boundary verification. Displays monthly attendance rate, days present, and leaves.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-star"></i></div>
+              <div class="feature-content">
+                <h4>On-The-Go Manager Approvals</h4>
+                <p>Review leave applications, verify expense receipts, and approve travel itineraries in seconds from anywhere.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-row">
+            <div class="kpi-pill">
+              <div class="kpi-val">iOS + Android</div>
+              <div class="kpi-lbl">Native React Native</div>
+            </div>
+            <div class="kpi-pill">
+              <div class="kpi-val">&lt; 3 Seconds</div>
+              <div class="kpi-lbl">Clock-In Speed</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mobile-duo-container">
+          <div class="device-mockup" onclick="openLightbox('./images/mobile_employee_terminal.png')">
+            <img src="./images/mobile_employee_terminal.png" alt="Employee Terminal Mobile">
+            <div class="device-label">Employee Terminal</div>
+          </div>
+          <div class="device-mockup" onclick="openLightbox('./images/mobile_hr_commander.png')">
+            <img src="./images/mobile_hr_commander.png" alt="HR Commander Mobile">
+            <div class="device-label">HR Commander Mobile</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================== -->
+    <!-- SLIDE 6: MOBILE APP: Geofenced Punch & Security Radar -->
+    <!-- ========================================================== -->
+    <section class="slide" data-category="Mobile App Spotlight" data-notes="Highlight geofenced clock-in. Employees can only punch when physically inside the office perimeter circle. This eliminates buddy punching and replaces costly biometric machines that break down.">
+      <div class="slide-eyebrow"><i class="fa-solid fa-location-crosshairs"></i> Mobile Security</div>
+      <h2 class="slide-title">Geofenced Map Punch: <span class="highlight">Eliminate Buddy-Punching</span></h2>
+      <p class="slide-desc">Employees clock in on an interactive 3D map. Attendance is validated only within approved office perimeter circles.</p>
+
+      <div class="split-content">
+        <div class="card-left">
+          <div class="features-list">
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-shield"></i></div>
+              <div class="feature-content">
+                <h4>High-Precision GPS Perimeter</h4>
+                <p>Configure designated office coordinates with custom radius circles (50m, 100m, 250m) rendered in 3D.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-shield"></i></div>
+              <div class="feature-content">
+                <h4>Hardware Anti-Spoofing</h4>
+                <p>Detects and blocks mock location apps, GPS spoofers, and VPN tunnels to guarantee verified physical presence.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-shield"></i></div>
+              <div class="feature-content">
+                <h4>Zero Hardware Maintenance Capex</h4>
+                <p>No fingerprint scanners to buy, repair, or connect. Every employee's smartphone becomes a secure clock-in terminal.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-row">
+            <div class="kpi-pill">
+              <div class="kpi-val">100%</div>
+              <div class="kpi-lbl">Buddy-Punch Proof</div>
+            </div>
+            <div class="kpi-pill">
+              <div class="kpi-val">₹0</div>
+              <div class="kpi-lbl">Hardware Capex</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-preview" onclick="openLightbox('./images/32_attendance_geofence_punch.png')">
+          <img src="./images/32_attendance_geofence_punch.png" alt="Geofenced Attendance Map Punch">
+          <div class="zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Click to Zoom</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================== -->
+    <!-- SLIDE 7: Live Field Travel & Route Telemetry -->
+    <!-- ========================================================== -->
+    <section class="slide" data-category="Field Travel & Fleet" data-notes="This is our biggest market differentiator. We provide live GPS route auditing for sales teams and executive trips. Notice that we use pure OpenStreetMap vector tiles, so we pay ZERO dollars in Google Maps API surcharges.">
+      <div class="slide-eyebrow"><i class="fa-solid fa-route"></i> Field Mobility Telemetry</div>
+      <h2 class="slide-title">Live Field Mobility & <span class="highlight">GPS Breadcrumb Telemetry</span></h2>
+      <p class="slide-desc">Track sales visits, client meetings, and executive business trips in real time. Eliminate fake expense vouchers permanently.</p>
+
+      <div class="split-content">
+        <div class="card-left">
+          <div class="features-list">
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-map-pin"></i></div>
+              <div class="feature-content">
+                <h4>Breadcrumb Route Tracing</h4>
+                <p>Record verified transit checkpoints with timestamped coordinates, halt durations, and exact kilometers traveled.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-map-pin"></i></div>
+              <div class="feature-content">
+                <h4>Zero Google Maps API Billing</h4>
+                <p>Engineered on pure OpenStreetMap vector tiles, avoiding thousands of dollars in recurring Google Maps API invoices.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-map-pin"></i></div>
+              <div class="feature-content">
+                <h4>Automated Mileage Reimbursement</h4>
+                <p>System automatically calculates travel allowance from verified GPS odometer readings, preventing inflated claims.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-row">
+            <div class="kpi-pill">
+              <div class="kpi-val">100%</div>
+              <div class="kpi-lbl">Verified Mileage</div>
+            </div>
+            <div class="kpi-pill">
+              <div class="kpi-val">$0</div>
+              <div class="kpi-lbl">Google Maps Tax</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-preview" onclick="openLightbox('./images/09_trip_route_telemetry.png')">
+          <img src="./images/09_trip_route_telemetry.png" alt="OpenStreetMap Live Route Telemetry">
+          <div class="zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Click to Zoom</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================== -->
+    <!-- SLIDE 8: Business Trip Wizard & Approval Routing -->
+    <!-- ========================================================== -->
+    <section class="slide" data-category="Field Travel & Fleet" data-notes="Walk through business trip requisition. Employees create multi-city itineraries, estimate per-diem allowances, and managers approve or modify travel budgets with full audit trails.">
+      <div class="slide-eyebrow"><i class="fa-solid fa-suitcase-rolling"></i> Travel Governance</div>
+      <h2 class="slide-title">Multi-City Travel Wizard & <span class="highlight">Budget Advance Approvals</span></h2>
+      <p class="slide-desc">Standardized travel requisition workflow capturing itinerary stops, daily allowances, and multi-tier manager routing.</p>
+
+      <div class="split-content">
+        <div class="card-left">
+          <div class="features-list">
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-plane"></i></div>
+              <div class="feature-content">
+                <h4>Multi-City Itinerary Wizard</h4>
+                <p>Captures origin, destination, business rationale, transit modes (flight, rail, cab), and planned meeting agendas.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-plane"></i></div>
+              <div class="feature-content">
+                <h4>Per-Diem Allowance Calculations</h4>
+                <p>Automatic computation of daily meals, lodging caps, and emergency cash advances governed by company travel policy.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-plane"></i></div>
+              <div class="feature-content">
+                <h4>Manager Routing & Audit</h4>
+                <p>Real-time notifications sent to reporting managers to approve itineraries and release travel cash advances.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-row">
+            <div class="kpi-pill">
+              <div class="kpi-val">&lt; 4 Hours</div>
+              <div class="kpi-lbl">Approval Turnaround</div>
+            </div>
+            <div class="kpi-pill">
+              <div class="kpi-val">100%</div>
+              <div class="kpi-lbl">Policy Adherence</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-preview" onclick="openLightbox('./images/28_business_trip_wizard.png')">
+          <img src="./images/28_business_trip_wizard.png" alt="Business Trip Requisition Wizard">
+          <div class="zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Click to Zoom</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================== -->
+    <!-- SLIDE 9: Shifts, Rosters & Overtime Multipliers -->
+    <!-- ========================================================== -->
+    <section class="slide" data-category="Core Operations" data-notes="Showcase shift scheduling. The platform handles complex enterprise rosters: Morning, General, Night, and rotational shifts with configurable grace periods and automated overtime multipliers.">
+      <div class="slide-eyebrow"><i class="fa-solid fa-clock"></i> Workforce Scheduling</div>
+      <h2 class="slide-title">Rotational Shift Rostering & <span class="highlight">Overtime Multipliers</span></h2>
+      <p class="slide-desc">Configure flexible shifts, grace periods, and overtime rules that feed seamlessly into the payroll calculation engine.</p>
+
+      <div class="split-content">
+        <div class="card-left">
+          <div class="features-list">
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-calendar-days"></i></div>
+              <div class="feature-content">
+                <h4>Multi-Shift Configurations</h4>
+                <p>Define General, Morning, Night, and rotational shift schedules with customized work durations and lunch hours.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-calendar-days"></i></div>
+              <div class="feature-content">
+                <h4>Automated Grace Periods</h4>
+                <p>Set 15 or 30-minute grace windows before marking late arrival or triggering automated Loss of Pay (LOP) penalties.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-calendar-days"></i></div>
+              <div class="feature-content">
+                <h4>Overtime Multiplier Logic</h4>
+                <p>Configure standard (1.5x) and holiday (2.0x) overtime pay rates calculated automatically from punch timestamps.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-row">
+            <div class="kpi-pill">
+              <div class="kpi-val">24/7</div>
+              <div class="kpi-lbl">Roster Coverage</div>
+            </div>
+            <div class="kpi-pill">
+              <div class="kpi-val">Automated</div>
+              <div class="kpi-lbl">Overtime Math</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-preview" onclick="openLightbox('./images/13_company_settings_shifts.png')">
+          <img src="./images/13_company_settings_shifts.png" alt="Company Shift Configuration">
+          <div class="zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Click to Zoom</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================== -->
+    <!-- SLIDE 10: Autonomous Indian Statutory Payroll -->
+    <!-- ========================================================== -->
+    <section class="slide" data-category="Payroll & Finance" data-notes="Explain the autonomous payroll engine. It computes Employee PF (12%), Employer PF, ESI, Professional Tax, TDS slabs, and syncs attendance logs to calculate Loss of Pay (LOP) with zero manual Excel formulas.">
+      <div class="slide-eyebrow"><i class="fa-solid fa-file-invoice-dollar"></i> Statutory Payroll</div>
+      <h2 class="slide-title">Autonomous Payroll Engine & <span class="highlight">100% Indian Tax Compliance</span></h2>
+      <p class="slide-desc">Say goodbye to Excel payroll formulas. Process company-wide payroll with automated statutory tax calculations in under 15 minutes.</p>
+
+      <div class="split-content">
+        <div class="card-left">
+          <div class="features-list">
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+              <div class="feature-content">
+                <h4>100% Indian Statutory Compliance</h4>
+                <p>Automated computation of Employee PF (12%), Employer PF (12%), ESI, State Professional Tax, and Income Tax TDS slabs.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+              <div class="feature-content">
+                <h4>Loss of Pay (LOP) Attendance Sync</h4>
+                <p>Unexcused absences, half-days, and unpaid leaves sync automatically from timecards to compute accurate pro-rata salary deductions.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+              <div class="feature-content">
+                <h4>Bank Disbursal CSV & Payslips</h4>
+                <p>Export standard bank NEFT/RTGS disbursal spreadsheets and publish password-protected PDF payslips instantly.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-row">
+            <div class="kpi-pill">
+              <div class="kpi-val">&lt; 15 Mins</div>
+              <div class="kpi-lbl">Payroll Run Time</div>
+            </div>
+            <div class="kpi-pill">
+              <div class="kpi-val">Zero Error</div>
+              <div class="kpi-lbl">Statutory Math</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-preview" onclick="openLightbox('./images/05_payroll_management.png')">
+          <img src="./images/05_payroll_management.png" alt="Automated Payroll Console">
+          <div class="zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Click to Zoom</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================== -->
+    <!-- SLIDE 11: CTC Hike Simulator & Increment Letters -->
+    <!-- ========================================================== -->
+    <section class="slide" data-category="Payroll & Finance" data-notes="Demonstrate the CTC Hike Simulator. During annual performance reviews, leadership can simulate salary increments with instant math, preview updated employer liabilities, and generate branded PDF increment letters with 1 click.">
+      <div class="slide-eyebrow"><i class="fa-solid fa-sliders"></i> Compensation Engineering</div>
+      <h2 class="slide-title">Interactive CTC Simulator & <span class="highlight">Branded Increment Letters</span></h2>
+      <p class="slide-desc">Model salary revisions in real time with interactive percentage sliders and generate official appraisal increment letters instantly.</p>
+
+      <div class="split-content">
+        <div class="card-left">
+          <div class="features-list">
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-percent"></i></div>
+              <div class="feature-content">
+                <h4>Real-Time CTC 'What-If' Simulation</h4>
+                <p>Slide percentage increments (e.g. 8%, 12%, 18%) and instantly see revised Basic Pay, HRA, PF, and total employer liability.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-percent"></i></div>
+              <div class="feature-content">
+                <h4>Promotions & Band Upgrades</h4>
+                <p>Simultaneously adjust job titles, managerial levels, and departmental designations alongside salary revisions.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-percent"></i></div>
+              <div class="feature-content">
+                <h4>1-Click Branded Increment Letters</h4>
+                <p>Produce formal, branded PDF compensation revision letters ready for executive sign-off and employee dispatch.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-row">
+            <div class="kpi-pill">
+              <div class="kpi-val">Real-Time</div>
+              <div class="kpi-lbl">Budget Modeling</div>
+            </div>
+            <div class="kpi-pill">
+              <div class="kpi-val">1-Click</div>
+              <div class="kpi-lbl">PDF Generation</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-preview" onclick="openLightbox('./images/16_compensation_revision.png')">
+          <img src="./images/16_compensation_revision.png" alt="Compensation Revision & CTC Hike Simulator">
+          <div class="zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Click to Zoom</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================== -->
+    <!-- SLIDE 12: AI Resume Screener & Talent Acquisition -->
+    <!-- ========================================================== -->
+    <section class="slide" data-category="AI & Recruitment" data-notes="Highlight our AI recruitment engine. Drag and drop up to 20 candidate resumes at once. The AI extracts skills, calculates fit scores (0-100%), displays a ranked leaderboard, and allows 1-click onboarding of the candidate directly into an active employee account.">
+      <div class="slide-eyebrow"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Talent Intelligence</div>
+      <h2 class="slide-title">AI Resume Screener & <span class="highlight">1-Click Talent Onboarding</span></h2>
+      <p class="slide-desc">Screen hundreds of applicant resumes in seconds. AI extracts skills, computes scientific fit scores, and onboards talent in 1 click.</p>
+
+      <div class="split-content">
+        <div class="card-left">
+          <div class="features-list">
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-robot"></i></div>
+              <div class="feature-content">
+                <h4>Bulk PDF/DOCX Resume Parsing</h4>
+                <p>Drag and drop up to 20 candidate resumes simultaneously. The NLP engine extracts skills, experience, and academic history.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-robot"></i></div>
+              <div class="feature-content">
+                <h4>Scientific 0-100% Fit Scoring</h4>
+                <p>Evaluates Skill Coverage (40%), Domain Experience (25%), and Credentials (15%), tagging candidates as STRONG_HIRE or SHORTLIST.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-robot"></i></div>
+              <div class="feature-content">
+                <h4>1-Click Employee Onboarding</h4>
+                <p>Click 'Onboard' to instantly convert shortlisted candidates into active employee accounts with auto-generated login credentials.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-row">
+            <div class="kpi-pill">
+              <div class="kpi-val">10x Faster</div>
+              <div class="kpi-lbl">Hiring Velocity</div>
+            </div>
+            <div class="kpi-pill">
+              <div class="kpi-val">STRONG_HIRE</div>
+              <div class="kpi-lbl">AI Recommendation</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-preview" onclick="openLightbox('./images/17_ai_talent_acquisition.png')">
+          <img src="./images/17_ai_talent_acquisition.png" alt="AI Resume Screener & Candidate Leaderboard">
+          <div class="zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Click to Zoom</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================== -->
+    <!-- SLIDE 13: 360° Appraisals & OKR Tracking -->
+    <!-- ========================================================== -->
+    <section class="slide" data-category="AI & Recruitment" data-notes="Show how our Performance Management System links day-to-day work with annual merit increments. It captures multi-tier evaluations (self-review, manager appraisal) and objective OKR metrics.">
+      <div class="slide-eyebrow"><i class="fa-solid fa-trophy"></i> Performance Management</div>
+      <h2 class="slide-title">360° Appraisal Framework & <span class="highlight">Continuous OKR Tracking</span></h2>
+      <p class="slide-desc">Objective, transparent performance appraisals aligning employee achievements directly with company strategic milestones.</p>
+
+      <div class="split-content">
+        <div class="card-left">
+          <div class="features-list">
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-chart-pie"></i></div>
+              <div class="feature-content">
+                <h4>Multi-Tier Evaluation Dossier</h4>
+                <p>Combines self-evaluations, manager ratings, and peer feedback into a single transparent score matrix.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-chart-pie"></i></div>
+              <div class="feature-content">
+                <h4>Quarterly OKR & KPI Milestones</h4>
+                <p>Track project delivery milestones, revenue quotas, and leadership competencies with verifiable scorecards.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-chart-pie"></i></div>
+              <div class="feature-content">
+                <h4>Merit Hike Alignment</h4>
+                <p>Appraisal ratings feed directly into the CTC Hike Simulator to recommend justified, performance-based salary increments.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-row">
+            <div class="kpi-pill">
+              <div class="kpi-val">100%</div>
+              <div class="kpi-lbl">Objective Merit</div>
+            </div>
+            <div class="kpi-pill">
+              <div class="kpi-val">Paperless</div>
+              <div class="kpi-lbl">Review Cycles</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-preview" onclick="openLightbox('./images/10_performance_appraisal.png')">
+          <img src="./images/10_performance_appraisal.png" alt="360 Performance Appraisal Dashboard">
+          <div class="zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Click to Zoom</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================== -->
+    <!-- SLIDE 14: Employee Self-Service & Digital Workplace -->
+    <!-- ========================================================== -->
+    <section class="slide" data-category="Core Operations" data-notes="Demonstrate the Employee Self-Service portal. Employees check leave quotas, view interactive payslips, upload compliance documents, and read company broadcast notices without bombarding HR.">
+      <div class="slide-eyebrow"><i class="fa-solid fa-user-check"></i> Employee Experience</div>
+      <h2 class="slide-title">Employee Self-Service (ESS) & <span class="highlight">Digital Workplace</span></h2>
+      <p class="slide-desc">A consumer-grade portal where employees manage their leaves, payslips, personal profile, and internal communications.</p>
+
+      <div class="split-content">
+        <div class="card-left">
+          <div class="features-list">
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-heart"></i></div>
+              <div class="feature-content">
+                <h4>Transparent Interactive Payslips</h4>
+                <p>Employees inspect earnings, statutory deductions, and tax withholdings with 1-click official PDF downloads.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-heart"></i></div>
+              <div class="feature-content">
+                <h4>Frictionless Leave Requisitions</h4>
+                <p>Check live leave balances (Casual, Sick, Earned) and submit time-off requests with real-time manager approval status.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-heart"></i></div>
+              <div class="feature-content">
+                <h4>Company Broadcast Notice Board</h4>
+                <p>Stay informed with organization-wide executive memos, policy updates, holiday announcements, and emergency notices.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-row">
+            <div class="kpi-pill">
+              <div class="kpi-val">-65%</div>
+              <div class="kpi-lbl">HR Support Inquiries</div>
+            </div>
+            <div class="kpi-pill">
+              <div class="kpi-val">4.9 / 5</div>
+              <div class="kpi-lbl">Staff Satisfaction</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-preview" onclick="openLightbox('./images/20_employee_self_service.png')">
+          <img src="./images/20_employee_self_service.png" alt="Employee Self Service Command Center">
+          <div class="zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Click to Zoom</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================== -->
+    <!-- SLIDE 15: Security, Dynamic Tenancy & DPDP Compliance -->
+    <!-- ========================================================== -->
+    <section class="slide" data-category="Security & Compliance" data-notes="Assure leadership, IT, and legal that our platform uses dynamic database isolation: each company's records live in a dedicated MongoDB database, not a shared table. This complies with DPDP Act 2023.">
+      <div class="slide-eyebrow"><i class="fa-solid fa-shield-halved"></i> Enterprise Security</div>
+      <h2 class="slide-title">Bank-Grade Isolation: <span class="highlight">DPDP Act 2023 Compliance</span></h2>
+      <p class="slide-desc">Your employee records, salary confidentialities, and identity documents are protected by isolated database multi-tenancy.</p>
+
+      <div class="split-content">
+        <div class="card-left">
+          <div class="features-list">
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-lock"></i></div>
+              <div class="feature-content">
+                <h4>Dynamic Database Isolation Per Company</h4>
+                <p>Every tenant's data is housed in an isolated MongoDB database (HRMS_tenantId). Zero risk of multi-tenant data leakage.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-lock"></i></div>
+              <div class="feature-content">
+                <h4>Encrypted Digital Document Locker</h4>
+                <p>Secure AES-256 encrypted repository for government IDs (Aadhaar, PAN), employment contracts, and academic certificates.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-lock"></i></div>
+              <div class="feature-content">
+                <h4>Strict Role-Based Access Controls (RBAC)</h4>
+                <p>Separate security tiers isolating Super-Admin, HR Administrator, Department Manager, and Employee permissions.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-row">
+            <div class="kpi-pill">
+              <div class="kpi-val">100%</div>
+              <div class="kpi-lbl">Database Isolation</div>
+            </div>
+            <div class="kpi-pill">
+              <div class="kpi-val">DPDP 2023</div>
+              <div class="kpi-lbl">Statutory Compliance</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-preview" onclick="openLightbox('./images/26_secure_document_vault.png')">
+          <img src="./images/26_secure_document_vault.png" alt="Secure Encrypted Document Vault">
+          <div class="zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Click to Zoom</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================== -->
+    <!-- SLIDE 16: Operations: IT Asset Tracking & Helpdesk -->
+    <!-- ========================================================== -->
+    <section class="slide" data-category="Core Operations" data-notes="Explain our integrated IT asset management and multi-department ticketing. Replaces separate subscriptions for Jira Service Desk or Freshdesk, and ensures no laptops or monitors are lost during offboarding.">
+      <div class="slide-eyebrow"><i class="fa-solid fa-laptop-code"></i> IT Operations</div>
+      <h2 class="slide-title">Hardware Asset Management & <span class="highlight">Multi-Department Helpdesk</span></h2>
+      <p class="slide-desc">Track company laptops, monitors, and equipment while managing internal support tickets with SLA resolution workflows.</p>
+
+      <div class="split-content">
+        <div class="card-left">
+          <div class="features-list">
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-boxes-stacked"></i></div>
+              <div class="feature-content">
+                <h4>Hardware Asset Inventory & Custodian Logs</h4>
+                <p>Maintain serial numbers, purchase dates, warranty info, and custodian assignment histories for all company devices.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-boxes-stacked"></i></div>
+              <div class="feature-content">
+                <h4>Multi-Department SLA Ticketing Hub</h4>
+                <p>Support queues routing tickets to IT, HR, Finance, or Admin with priority levels, attachments, and resolution timers.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-bullet"><i class="fa-solid fa-boxes-stacked"></i></div>
+              <div class="feature-content">
+                <h4>Offboarding Recovery Checklist</h4>
+                <p>Automated asset recovery checklist during employee exit to ensure all physical assets are returned prior to settlement.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-row">
+            <div class="kpi-pill">
+              <div class="kpi-val">100%</div>
+              <div class="kpi-lbl">Asset Recovery</div>
+            </div>
+            <div class="kpi-pill">
+              <div class="kpi-val">&lt; 24 Hrs</div>
+              <div class="kpi-lbl">Ticket SLA Resolution</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-preview" onclick="openLightbox('./images/24_it_asset_management.png')">
+          <img src="./images/24_it_asset_management.png" alt="IT Hardware Asset Management">
+          <div class="zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Click to Zoom</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================== -->
+    <!-- SLIDE 17: Competitive Benchmark Matrix -->
+    <!-- ========================================================== -->
+    <section class="slide" data-category="Market Comparison" data-notes="This table demonstrates our value proposition to executive decision-makers. We match or exceed enterprise capabilities of Keka, Darwinbox, and Workday while saving over 68% in recurring subscription fees.">
+      <div class="slide-eyebrow"><i class="fa-solid fa-table-list"></i> Market Comparison</div>
+      <h2 class="slide-title">How Aura HRMS Compares with <span class="highlight">Legacy Alternatives</span></h2>
+      <p class="slide-desc">See why modern organizations choose our unified platform over bloated, expensive legacy software.</p>
+
+      <div class="table-container">
+        <table class="comp-table">
+          <thead>
+            <tr>
+              <th>Capability / Requirement</th>
+              <th class="ours-header">AURA HRMS (Ours)</th>
+              <th>Keka HR</th>
+              <th>Darwinbox</th>
+              <th>Workday</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Native iOS & Android Mobile Suite</td>
+              <td class="ours-col"><span class="tag-check">✔ Built-in (Dual-Persona)</span></td>
+              <td><span class="tag-check">✔ Included</span></td>
+              <td><span class="tag-check">✔ Included</span></td>
+              <td><span class="tag-check">✔ Included</span></td>
+            </tr>
+            <tr>
+              <td>Live OpenStreetMap GPS Tracking</td>
+              <td class="ours-col"><span class="tag-check">✔ 100% Free ($0 API Tax)</span></td>
+              <td><span class="tag-cross">❌ Not Available</span></td>
+              <td><span class="tag-warn">⚠ Expensive Add-on</span></td>
+              <td><span class="tag-cross">❌ Not Available</span></td>
+            </tr>
+            <tr>
+              <td>Indian Statutory Payroll (PF, ESI, TDS)</td>
+              <td class="ours-col"><span class="tag-check">✔ Fully Automated</span></td>
+              <td><span class="tag-check">✔ Included</span></td>
+              <td><span class="tag-check">✔ Complex Setup</span></td>
+              <td><span class="tag-warn">⚠ High Customization</span></td>
+            </tr>
+            <tr>
+              <td>AI Resume Screener & Scrutiny Engine</td>
+              <td class="ours-col"><span class="tag-check">✔ Integrated Engine</span></td>
+              <td><span class="tag-cross">❌ Third-Party Add-on</span></td>
+              <td><span class="tag-warn">⚠ Enterprise Add-on</span></td>
+              <td><span class="tag-warn">⚠ High Cost Module</span></td>
+            </tr>
+            <tr>
+              <td>Multi-Tenancy Database Architecture</td>
+              <td class="ours-col"><span class="tag-check">✔ Dynamic Isolated DB</span></td>
+              <td><span class="tag-cross">❌ Shared Table Schema</span></td>
+              <td><span class="tag-cross">❌ Shared Cluster</span></td>
+              <td><span class="tag-warn">⚠ Shared Cloud</span></td>
+            </tr>
+            <tr>
+              <td>Estimated Annual Cost (150 Staff)</td>
+              <td class="ours-col" style="color: var(--cyan); font-family: var(--font-mono);">₹75,000 / year total</td>
+              <td style="font-family: var(--font-mono);">₹2,16,000 / year</td>
+              <td style="font-family: var(--font-mono);">₹3,80,000 / year</td>
+              <td style="font-family: var(--font-mono);">$25,000+ USD</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========================================================== -->
+    <!-- SLIDE 18: Quantifiable ROI & Live Interactive Calculator -->
+    <!-- ========================================================== -->
+    <section class="slide" data-category="Financial ROI" data-notes="Use this slide to engage the CFO. Drag the headcount slider live to see our organization's exact projected annual savings. Adopting Aura HRMS generates an ROI within 30 days.">
+      <div class="slide-eyebrow"><i class="fa-solid fa-sack-dollar"></i> Business Impact & ROI</div>
+      <h2 class="slide-title">Measurable Financial ROI: <span class="highlight">₹14.5L+ Annual Savings</span></h2>
+      <p class="slide-desc">Use our interactive ROI model to calculate exact savings based on current organization headcount.</p>
+
+      <div class="roi-grid">
+        <div class="roi-calc-card">
+          <div class="calc-slider-box">
+            <div class="calc-slider-label">
+              <span>Organization Employee Headcount:</span>
+              <span class="calc-val-badge" id="calcHeadcountDisplay">150 Staff</span>
+            </div>
+            <input type="range" class="calc-range" id="headcountSlider" min="25" max="1000" step="25" value="150" oninput="updateROI()">
+          </div>
+
+          <div class="calc-results-list">
+            <div class="calc-result-row">
+              <span>Eliminate Travel Claim Overstatements</span>
+              <strong id="roiTravel">₹5,40,000 / yr</strong>
+            </div>
+            <div class="calc-result-row">
+              <span>Stop Buddy-Punching & Timecard Leakage</span>
+              <strong id="roiAttendance">₹3,80,000 / yr</strong>
+            </div>
+            <div class="calc-result-row">
+              <span>Consolidate Fragmented SaaS Software</span>
+              <strong id="roiSaaS">₹3,20,000 / yr</strong>
+            </div>
+            <div class="calc-result-row">
+              <span>Recover 40+ HR Reconciliation Hours / Mo</span>
+              <strong id="roiAdmin">₹2,10,000 / yr</strong>
+            </div>
+          </div>
+
+          <div class="calc-total-box">
+            <div class="calc-total-title">Total Projected Annual Savings</div>
+            <div class="calc-total-num" id="roiTotal">₹14,50,000</div>
+            <span style="font-size: 11px; color: var(--text-muted);">Payback period: Less than 30 days</span>
+          </div>
+        </div>
+
+        <div class="card-left">
+          <div class="features-list">
+            <div class="feature-item">
+              <div class="feature-bullet" style="background: rgba(16, 185, 129, 0.15); border-color: var(--emerald); color: var(--emerald);"><i class="fa-solid fa-check-double"></i></div>
+              <div class="feature-content">
+                <h4>Verified Field Telemetry Savings</h4>
+                <p>OpenStreetMap vector breadcrumbs calculate exact distance driven, immediately eliminating exaggerated taxi and fuel reimbursement vouchers.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-bullet" style="background: rgba(16, 185, 129, 0.15); border-color: var(--emerald); color: var(--emerald);"><i class="fa-solid fa-check-double"></i></div>
+              <div class="feature-content">
+                <h4>Zero Unverified Overtime Payouts</h4>
+                <p>Geofenced clock-in ensures staff cannot log overtime unless physically present at customer project sites or company branches.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-bullet" style="background: rgba(16, 185, 129, 0.15); border-color: var(--emerald); color: var(--emerald);"><i class="fa-solid fa-check-double"></i></div>
+              <div class="feature-content">
+                <h4>Single Vendor Elimination</h4>
+                <p>Cancel multiple subscriptions for attendance software, travel expense tools, IT ticketing, and recruitment parsers into one single bill.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-row">
+            <div class="kpi-pill">
+              <div class="kpi-val">&lt; 30 Days</div>
+              <div class="kpi-lbl">Payback Period</div>
+            </div>
+            <div class="kpi-pill">
+              <div class="kpi-val">68%</div>
+              <div class="kpi-lbl">Net Cost Reduction</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================== -->
+    <!-- SLIDE 19: Implementation Roadmap (30-Day Go-Live) -->
+    <!-- ========================================================== -->
+    <section class="slide" data-category="Implementation" data-notes="Address the implementation risk. We do not disrupt current operations. We follow a structured 3-phase rollout over 30 days. Phase 3 executes a parallel payroll run to confirm 100% tax and net salary consistency before switching over.">
+      <div class="slide-eyebrow"><i class="fa-solid fa-calendar-check"></i> Rollout Timeline</div>
+      <h2 class="slide-title">Frictionless 30-Day Rollout: <span class="highlight">Zero-Downtime Migration</span></h2>
+      <p class="slide-desc">Our dedicated onboarding specialists handle configuration, employee data import, and staff training with zero business disruption.</p>
+
+      <div class="arch-cols-grid">
+        <div class="arch-card">
+          <div class="arch-header">
+            <div class="arch-icon" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">1</div>
+            <div class="arch-title">
+              <h3>Phase 1: Setup & Policy</h3>
+              <span>Days 1 to 5</span>
+            </div>
+          </div>
+          <ul class="arch-list">
+            <li><i class="fa-solid fa-check"></i> Provision Dedicated Tenant Database</li>
+            <li><i class="fa-solid fa-check"></i> Configure Office Geofence Coordinates</li>
+            <li><i class="fa-solid fa-check"></i> Set up Shifts, Rosters & Grace Periods</li>
+            <li><i class="fa-solid fa-check"></i> Input Indian Tax Slabs (PF/ESI/PT/TDS)</li>
+          </ul>
+        </div>
+
+        <div class="arch-card highlight-card">
+          <div class="arch-header">
+            <div class="arch-icon" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">2</div>
+            <div class="arch-title">
+              <h3>Phase 2: Data & Mobile</h3>
+              <span>Days 6 to 15</span>
+            </div>
+          </div>
+          <ul class="arch-list">
+            <li><i class="fa-solid fa-check"></i> Bulk CSV Import of Employees & CTC</li>
+            <li><i class="fa-solid fa-check"></i> Deploy Native iOS & Android Mobile Apps</li>
+            <li><i class="fa-solid fa-check"></i> 30-Min Manager & Employee Training</li>
+            <li><i class="fa-solid fa-check"></i> Test Geofenced Clock-In & Trip Tracking</li>
+          </ul>
+        </div>
+
+        <div class="arch-card">
+          <div class="arch-header">
+            <div class="arch-icon" style="background: linear-gradient(135deg, #10b981, #059669);">3</div>
+            <div class="arch-title">
+              <h3>Phase 3: Parallel Run & Launch</h3>
+              <span>Days 16 to 30</span>
+            </div>
+          </div>
+          <ul class="arch-list">
+            <li><i class="fa-solid fa-check"></i> Run Parallel Payroll with Historical Data</li>
+            <li><i class="fa-solid fa-check"></i> Confirm 100% Tax & Disbursal Consistency</li>
+            <li><i class="fa-solid fa-check"></i> Sunset Legacy Spreadsheets & Software</li>
+            <li><i class="fa-solid fa-check"></i> Full Company-Wide Production Launch</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================== -->
+    <!-- SLIDE 20: Executive Recommendation & Decision -->
+    <!-- ========================================================== -->
+    <section class="slide" data-category="Decision" data-notes="Closing call to action. Summarize why moving forward is the right choice today: zero setup risk, immediate ₹14.5L+ cost savings, mobile apps ready on day 1, and complete statutory peace of mind. Ask leadership for approval to initiate Phase 1.">
+      <div class="title-slide-container" style="max-width: 950px; margin: 0 auto;">
+        <div class="title-pill" style="background: rgba(16, 185, 129, 0.15); border-color: var(--emerald); color: var(--emerald);">
+          <i class="fa-solid fa-circle-check"></i> Executive Decision & Next Steps
+        </div>
+        <h2 class="hero-h1" style="font-size: 42px;">Approve Immediate Deployment of <span class="highlight">Aura HRMS</span></h2>
+        <p class="hero-p" style="font-size: 16px;">Everything is built, verified, and operational. Adopting this unified suite secures our workforce data, slashes administrative costs, and arms our team with a modern mobile app.</p>
+
+        <div class="pain-cards-list" style="width: 100%;">
+          <div class="pain-card" style="border-color: rgba(59, 130, 246, 0.3);">
+            <div class="pain-num" style="background: rgba(59, 130, 246, 0.15); border-color: var(--accent); color: var(--accent);">✔</div>
+            <div class="pain-info">
+              <h4>Zero Setup & Disruption Risk</h4>
+              <p>Our dedicated database workspace is ready to provision in under 5 minutes with automated CSV data imports.</p>
+            </div>
+            <div class="pain-impact" style="background: rgba(59, 130, 246, 0.1); border-color: var(--accent); color: #60a5fa;">Turnkey Deployment</div>
+          </div>
+
+          <div class="pain-card" style="border-color: rgba(16, 185, 129, 0.3);">
+            <div class="pain-num" style="background: rgba(16, 185, 129, 0.15); border-color: var(--emerald); color: var(--emerald);">✔</div>
+            <div class="pain-info">
+              <h4>Immediate ₹14.5L+ Annual Cost Savings</h4>
+              <p>Eliminate bloated multi-vendor software bills, unverified travel claims, and administrative friction.</p>
+            </div>
+            <div class="pain-impact" style="background: rgba(16, 185, 129, 0.1); border-color: var(--emerald); color: var(--emerald);">Payback in &lt; 30 Days</div>
+          </div>
+
+          <div class="pain-card" style="border-color: rgba(6, 182, 212, 0.3);">
+            <div class="pain-num" style="background: rgba(6, 182, 212, 0.15); border-color: var(--cyan); color: var(--cyan);">✔</div>
+            <div class="pain-info">
+              <h4>Native Mobile Apps Ready for Day 1</h4>
+              <p>Employees download the iOS & Android app immediately to punch in, track travel, and view payslips.</p>
+            </div>
+            <div class="pain-impact" style="background: rgba(6, 182, 212, 0.1); border-color: var(--cyan); color: var(--cyan);">iOS & Android Ready</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Bottom Deck Controller -->
+  <footer class="deck-footer">
+    <div class="slide-counter">
+      Slide <strong id="currentSlideNum">1</strong> of <span id="totalSlidesNum">20</span>
+      <div class="progress-bar-container">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </div>
+
+    <div class="footer-nav-controls">
+      <button class="btn-nav-circle" id="btnPrev" title="Previous Slide (Left Arrow)">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <button class="btn-nav-circle" id="btnNext" title="Next Slide (Right Arrow)">
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+  </footer>
+
+  <!-- Speaker Notes Drawer -->
+  <div class="notes-drawer" id="notesDrawer">
+    <div class="notes-header">
+      <div class="notes-title">
+        <i class="fa-solid fa-microphone-lines"></i> Presenter Talking Points
+      </div>
+      <button class="btn-action" style="padding: 4px 8px;" onclick="toggleNotes()">Close</button>
+    </div>
+    <div class="notes-body" id="notesContent">
+      Loading presenter notes...
+    </div>
+  </div>
+
+  <!-- Slide Jump / Grid Modal -->
+  <div class="grid-modal" id="gridModal">
+    <div class="grid-top">
+      <div class="grid-h2">All Presentation Slides (20)</div>
+      <div class="grid-filters">
+        <button class="filter-btn active" onclick="filterGrid('All', this)">All</button>
+        <button class="filter-btn" onclick="filterGrid('Executive Vision', this)">Executive Vision</button>
+        <button class="filter-btn" onclick="filterGrid('Mobile App Spotlight', this)">Mobile App</button>
+        <button class="filter-btn" onclick="filterGrid('Field Travel & Fleet', this)">Field & Travel</button>
+        <button class="filter-btn" onclick="filterGrid('Payroll & Finance', this)">Payroll & Finance</button>
+        <button class="filter-btn" onclick="filterGrid('Core Operations', this)">Core Operations</button>
+        <button class="filter-btn" onclick="filterGrid('Decision', this)">Decision</button>
+      </div>
+      <button class="btn-action" onclick="toggleGrid()"><i class="fa-solid fa-xmark"></i> Close (Esc)</button>
+    </div>
+
+    <div class="grid-items" id="gridItemsContainer">
+      <!-- Injected dynamically via JS -->
+    </div>
+  </div>
+
+  <!-- Image Lightbox Modal -->
+  <div class="lightbox-modal" id="lightboxModal" onclick="closeLightbox()">
+    <div class="lightbox-close"><i class="fa-solid fa-xmark"></i></div>
+    <img id="lightboxImg" src="" alt="Enlarged Screenshot">
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+
+    const currentSlideNum = document.getElementById('currentSlideNum');
+    const totalSlidesNum = document.getElementById('totalSlidesNum');
+    const progressFill = document.getElementById('progressFill');
+    const notesDrawer = document.getElementById('notesDrawer');
+    const notesContent = document.getElementById('notesContent');
+    const btnNotes = document.getElementById('btnNotes');
+    const gridModal = document.getElementById('gridModal');
+    const gridItemsContainer = document.getElementById('gridItemsContainer');
+    const ambientGlow = document.getElementById('ambientGlow');
+
+    totalSlidesNum.textContent = totalSlides;
+
+    // Ambient glow colors based on categories
+    const categoryGlows = {
+      'Executive Vision': 'rgba(59, 130, 246, 0.12)',
+      'Platform Architecture': 'rgba(6, 182, 212, 0.14)',
+      'Core Operations': 'rgba(16, 185, 129, 0.12)',
+      'Mobile App Spotlight': 'rgba(139, 92, 246, 0.15)',
+      'Field Travel & Fleet': 'rgba(6, 182, 212, 0.14)',
+      'Payroll & Finance': 'rgba(245, 158, 11, 0.12)',
+      'AI & Recruitment': 'rgba(16, 185, 129, 0.14)',
+      'Security & Compliance': 'rgba(59, 130, 246, 0.12)',
+      'Market Comparison': 'rgba(139, 92, 246, 0.12)',
+      'Financial ROI': 'rgba(16, 185, 129, 0.16)',
+      'Implementation': 'rgba(6, 182, 212, 0.14)',
+      'Decision': 'rgba(16, 185, 129, 0.15)'
+    };
+
+    function showSlide(index) {
+      if (index < 0) index = 0;
+      if (index >= totalSlides) index = totalSlides - 1;
+
+      slides.forEach((s, idx) => {
+        s.classList.remove('active', 'prev');
+        if (idx < index) {
+          s.classList.add('prev');
+        } else if (idx === index) {
+          s.classList.add('active');
+        }
+      });
+
+      currentSlide = index;
+      currentSlideNum.textContent = currentSlide + 1;
+      progressFill.style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+
+      // Update speaker notes
+      const activeSlide = slides[currentSlide];
+      const notes = activeSlide.getAttribute('data-notes') || 'No notes available for this slide.';
+      notesContent.textContent = notes;
+
+      // Update ambient glow color
+      const cat = activeSlide.getAttribute('data-category') || 'Executive Vision';
+      const glowColor = categoryGlows[cat] || 'rgba(59, 130, 246, 0.12)';
+      ambientGlow.style.background = `radial-gradient(circle, ${glowColor} 0%, rgba(6, 182, 212, 0.04) 45%, transparent 70%)`;
+
+      // Update active grid card
+      document.querySelectorAll('.grid-card').forEach((gc, idx) => {
+        gc.classList.toggle('current', idx === currentSlide);
+      });
+    }
+
+    function nextSlide() { showSlide(currentSlide + 1); }
+    function prevSlide() { showSlide(currentSlide - 1); }
+
+    document.getElementById('btnNext').addEventListener('click', nextSlide);
+    document.getElementById('btnPrev').addEventListener('click', prevSlide);
+
+    // Keyboard Navigation
+    document.addEventListener('keydown', (e) => {
+      if (gridModal.classList.contains('open')) {
+        if (e.key === 'Escape') toggleGrid();
+        return;
+      }
+      if (document.getElementById('lightboxModal').classList.contains('open')) {
+        if (e.key === 'Escape') closeLightbox();
+        return;
+      }
+
+      if (e.key === 'ArrowRight' || e.key === 'Space' || e.key === 'PageDown') {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        showSlide(0);
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        showSlide(totalSlides - 1);
+      } else if (e.key === 'n' || e.key === 'N') {
+        toggleNotes();
+      } else if (e.key === 'g' || e.key === 'G') {
+        toggleGrid();
+      } else if (e.key === 'f' || e.key === 'F') {
+        toggleFullscreen();
+      }
+    });
+
+    // Speaker Notes Drawer
+    function toggleNotes() {
+      notesDrawer.classList.toggle('open');
+      btnNotes.classList.toggle('active', notesDrawer.classList.contains('open'));
+    }
+    btnNotes.addEventListener('click', toggleNotes);
+
+    // Fullscreen Toggle
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+    document.getElementById('btnFullscreen').addEventListener('click', toggleFullscreen);
+
+    // Export PDF / Print
+    document.getElementById('btnPrint').addEventListener('click', () => {
+      window.print();
+    });
+
+    // Populate Slide Grid Modal
+    function buildGrid() {
+      gridItemsContainer.innerHTML = '';
+      slides.forEach((s, idx) => {
+        const cat = s.getAttribute('data-category') || 'Overview';
+        let title = `Slide ${idx + 1}`;
+        const titleEl = s.querySelector('.slide-title') || s.querySelector('.hero-h1');
+        if (titleEl) title = titleEl.textContent.trim().replace(/\s+/g, ' ');
+
+        const card = document.createElement('div');
+        card.className = `grid-card ${idx === currentSlide ? 'current' : ''}`;
+        card.setAttribute('data-category', cat);
+        card.innerHTML = `
+          <div class="grid-card-num">#${String(idx + 1).padStart(2, '0')}</div>
+          <div class="grid-card-title">${title}</div>
+          <div class="grid-card-category">${cat}</div>
+        `;
+        card.onclick = () => {
+          showSlide(idx);
+          toggleGrid();
+        };
+        gridItemsContainer.appendChild(card);
+      });
+    }
+
+    function toggleGrid() {
+      gridModal.classList.toggle('open');
+    }
+    document.getElementById('btnGrid').addEventListener('click', toggleGrid);
+
+    function filterGrid(category, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const cards = document.querySelectorAll('.grid-card');
+      cards.forEach(card => {
+        if (category === 'All' || card.getAttribute('data-category') === category) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    // Lightbox for Screenshots
+    function openLightbox(src) {
+      const modal = document.getElementById('lightboxModal');
+      const img = document.getElementById('lightboxImg');
+      img.src = src;
+      modal.classList.add('open');
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightboxModal').classList.remove('open');
+    }
+
+    // Interactive ROI Calculator Logic
+    function updateROI() {
+      const slider = document.getElementById('headcountSlider');
+      if (!slider) return;
+      const count = parseInt(slider.value, 10);
+      document.getElementById('calcHeadcountDisplay').textContent = `${count} Staff`;
+
+      // Rates calibrated per employee
+      const travel = Math.round(count * 3600);      // ₹3,600 / employee / yr travel overclaim elimination
+      const attendance = Math.round(count * 2533);  // ₹2,533 / employee / yr buddy-punching & LOP recovery
+      const saas = Math.round(count * 2133);        // ₹2,133 / employee / yr tool consolidation
+      const admin = Math.round(count * 1400);       // ₹1,400 / employee / yr HR productivity hours saved
+
+      const total = travel + attendance + saas + admin;
+
+      document.getElementById('roiTravel').textContent = formatINR(travel) + ' / yr';
+      document.getElementById('roiAttendance').textContent = formatINR(attendance) + ' / yr';
+      document.getElementById('roiSaaS').textContent = formatINR(saas) + ' / yr';
+      document.getElementById('roiAdmin').textContent = formatINR(admin) + ' / yr';
+      document.getElementById('roiTotal').textContent = formatINR(total);
+    }
+
+    function formatINR(val) {
+      if (val >= 10000000) {
+        return '₹' + (val / 10000000).toFixed(2) + ' Crores';
+      } else if (val >= 100000) {
+        return '₹' + (val / 100000).toFixed(2) + ' Lakhs';
+      } else {
+        return '₹' + val.toLocaleString('en-IN');
+      }
+    }
+
+    // Init
+    buildGrid();
+    showSlide(0);
+    updateROI();
+  </script>
+</body>
+</html>

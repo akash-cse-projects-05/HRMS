@@ -3,10 +3,12 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>Live Staff Tracking | HRMS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <!-- MapLibre GL CSS for OpenStreetMap 3D Interactive Tiles -->
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
     <style>
         body {
             background-color: #f7f9fc;
@@ -47,81 +49,61 @@
             padding: 15px 20px;
             border-bottom: 1px solid #f0f0f0;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s;
         }
 
-        .user-item:hover {
-            background: #f8f9fa;
-        }
-
+        .user-item:hover,
         .user-item.active {
-            background: #e6f0ff;
-            border-left: 4px solid #0052cc;
+            background-color: #f0f7ff;
+            border-left: 4px solid #0d6efd;
         }
 
         .status-dot {
-            height: 10px;
-            width: 10px;
+            height: 8px;
+            width: 8px;
+            background-color: #28a745;
             border-radius: 50%;
             display: inline-block;
-            margin-right: 6px;
         }
 
-        .status-active {
-            background-color: #28a745;
-        }
-
-        .status-inactive {
+        .status-idle {
             background-color: #ffc107;
         }
 
-        .avatar {
-            width: 40px;
-            height: 40px;
-            background: #eee;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: #555;
+        .status-offline {
+            background-color: #dc3545;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- Header -->
-    <header class="bg-white border-bottom py-2 px-3 d-flex align-items-center justify-content-between z-3">
-        <div class="d-flex align-items-center">
-            <a href="/hr/dashboard" class="btn btn-outline-secondary btn-sm rounded-circle me-3"><i
-                    class="fa-solid fa-arrow-left"></i></a>
-            <h5 class="mb-0 fw-bold text-primary"><i class="fa-solid fa-satellite-dish me-2"></i> Live Staff Tracking
-            </h5>
-        </div>
-        <div class="text-muted small">
-            <span class="fw-bold text-dark">
-                <%= trackedEmployees.length %>
-            </span> Active Personnel
-        </div>
-    </header>
+    <!-- Navbar -->
+    <nav class="navbar navbar-light bg-white border-bottom px-3 py-2">
+        <a href="/hr/dashboard" class="btn btn-outline-dark rounded-circle me-3"><i
+                class="fa-solid fa-arrow-left"></i></a>
+        <span class="navbar-brand mb-0 h1 fw-bold">Live Fleet & Field Workforce Tracking</span>
+    </nav>
 
-    <div class="d-flex flex-grow-1">
+    <!-- Main Content Area -->
+    <div class="d-flex flex-grow-1 overflow-hidden">
         <!-- Sidebar -->
         <div class="sidebar">
-            <div class="p-3 bg-light border-bottom">
-                <input type="text" class="form-control form-control-sm" placeholder="Search employee..." id="searchBox">
+            <div class="p-3 border-bottom">
+                <input type="text" id="searchBox" class="form-control" placeholder="Search employee...">
             </div>
-            <div class="user-list" id="userList">
-                <% trackedEmployees.forEach((emp, index)=> { %>
+
+            <div class="user-list">
+                <% trackedEmployees.forEach(emp=> { %>
                     <div class="user-item"
-                        onclick="focusUser('<%= emp._id %>', <%= emp.lastKnownLocation.lat %>, <%= emp.lastKnownLocation.lng %>)">
+                        onclick="focusUser('<%= emp._id %>', <%= emp.lastKnownLocation ? emp.lastKnownLocation.lat : 0 %>, <%= emp.lastKnownLocation ? emp.lastKnownLocation.lng : 0 %>)">
                         <div class="d-flex align-items-center">
-                            <div class="avatar me-3">
+                            <div class="rounded-circle bg-primary text-white d-flex justify-content-center align-items-center me-3"
+                                style="width: 40px; height: 40px; font-weight: bold;">
                                 <%= emp.firstName.charAt(0) %>
                             </div>
-                            <div>
-                                <h6 class="mb-0 fw-bold text-dark">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0 fw-bold">
                                     <%= emp.firstName %>
                                         <%= emp.lastName %>
                                 </h6>
@@ -151,44 +133,74 @@
         </div>
     </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <!-- MapLibre GL JS for OpenStreetMap Interactive 3D Maps -->
+    <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
     <script>
-        const map = L.map('map').setView([20.5937, 78.9629], 5);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+        // Initialize MapLibre GL 3D Map
+        const map = new maplibregl.Map({
+            container: 'map',
+            style: 'https://tiles.openfreemap.org/styles/liberty',
+            center: [78.9629, 20.5937],
+            zoom: 5,
+            pitch: 50, // 3D perspective with extruded buildings
+            bearing: -10,
+            maxPitch: 85,
+            dragRotate: true,
+            pitchWithRotate: true,
+            attributionControl: false
+        });
 
-        const employees = <% - JSON.stringify(trackedEmployees) %>;
+        map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
+        map.addControl(new maplibregl.AttributionControl({
+            compact: true,
+            customAttribution: '<a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
+        }), 'bottom-right');
+
+        const employees = <%- JSON.stringify(trackedEmployees) %>;
         const markers = {};
+        const coordinates = [];
 
-        employees.forEach(emp => {
-            if (emp.lastKnownLocation && emp.lastKnownLocation.lat) {
-                const lat = emp.lastKnownLocation.lat;
-                const lng = emp.lastKnownLocation.lng;
+        map.on('load', () => {
+            employees.forEach(emp => {
+                if (emp.lastKnownLocation && emp.lastKnownLocation.lat) {
+                    const lat = emp.lastKnownLocation.lat;
+                    const lng = emp.lastKnownLocation.lng;
+                    coordinates.push([lng, lat]);
 
-                const marker = L.marker([lat, lng])
-                    .bindPopup(`
+                    const popup = new maplibregl.Popup({ offset: 25 }).setHTML(`
                         <b>${emp.firstName} ${emp.lastName}</b><br>
-                        ${emp.designation}<br>
+                        ${emp.designation} &bull; ${emp.department}<br>
                         <small class="text-muted">Updated: ${new Date(emp.lastKnownLocation.timestamp).toLocaleTimeString()}</small>
-                    `)
-                    .addTo(map);
+                    `);
 
-                markers[emp._id] = marker;
+                    const marker = new maplibregl.Marker({ color: '#0d6efd' })
+                        .setLngLat([lng, lat])
+                        .setPopup(popup)
+                        .addTo(map);
+
+                    markers[emp._id] = { marker, popup, lat, lng };
+                }
+            });
+
+            // Fit bounds if employees exist
+            if (coordinates.length > 0) {
+                const bounds = coordinates.reduce((b, coord) => b.extend(coord), new maplibregl.LngLatBounds(coordinates[0], coordinates[0]));
+                map.fitBounds(bounds, { padding: 60, maxZoom: 15 });
             }
         });
 
-        // Fit bounds if employees exist
-        if (employees.length > 0) {
-            const group = new L.featureGroup(Object.values(markers));
-            map.fitBounds(group.getBounds(), { padding: [50, 50] });
-        }
-
         function focusUser(id, lat, lng) {
-            map.setView([lat, lng], 16);
-            if (markers[id]) markers[id].openPopup();
+            if (!lat || !lng) return;
+            map.flyTo({ center: [lng, lat], zoom: 16, pitch: 50, bearing: -15, essential: true });
+            if (markers[id] && markers[id].marker) {
+                markers[id].marker.togglePopup();
+            }
 
             // Highlight list item
             document.querySelectorAll('.user-item').forEach(el => el.classList.remove('active'));
-            // (Simple implementation, would be better with ID selector on element)
+            if (event && event.currentTarget) {
+                event.currentTarget.classList.add('active');
+            }
         }
 
         // Search Filter

@@ -87,3 +87,12 @@ This document lists all active features currently implemented in the codebase, g
 ## 💳 12. SaaS Registration & Billing
 *   **Tenancy Registry:** Create custom tenants (subdomains/slugs) with separate database connections.
 *   **Razorpay Billing:** Integrated subscription renewal system which extends tenancy access by 30 days upon successful payment.
+
+---
+
+## 🚀 13. Planned & Upcoming Features (Roadmap)
+*   **Employee 360° Monthly Performance Review Dossier (PDF):**
+    *   One-click executive report for manager-employee end-of-month 1-on-1 appraisal reviews.
+    *   **Unified Telemetry:** Aggregates monthly Attendance compliance, Leaves taken & remaining balance, Business Trips completed, OKR & Key Results milestone progress, Manager & Self Appraisal ratings + feedback, and Expense reimbursement claims.
+    *   **Export & Print:** Branded, high-resolution A4 printable PDF report with manager sign-off boxes.
+

@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enterprise HRMS & Mobile Suite — Client Pitch Deck</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --bg: #070b14;
+      --card-bg: rgba(18, 26, 44, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent: #3b82f6;
+      --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+      --emerald-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      --amber-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      --purple-gradient: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      user-select: none;
+    }
+
+    /* Ambient Background Glow */
+    .ambient-glow {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, rgba(6, 182, 212, 0.04) 40%, transparent 70%);
+      filter: blur(80px);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Deck Container */
+    .deck-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header Nav Bar */
+    .top-nav {
+      height: 64px;
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--card-border);
+      background: rgba(7, 11, 20, 0.8);
+      backdrop-filter: blur(12px);
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      background: var(--accent-gradient);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 16px;
+    }
+
+    .badge-enterprise {
+      background: rgba(59, 130, 246, 0.15);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: #60a5fa;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .nav-btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .nav-btn-primary:hover {
+      background: #2563eb;
+    }
+
+    /* Slides Stage */
+    .slides-stage {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      padding: 40px 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(60px);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(0);
+    }
+
+    /* Typography */
+    .slide-eyebrow {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #38bdf8;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .slide-title {
+      font-size: 42px;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -1px;
+      margin-bottom: 18px;
+      max-width: 900px;
+    }
+
+    .slide-title span.highlight {
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .slide-desc {
+      font-size: 18px;
+      line-height: 1.6;
+      color: var(--text-muted);
+      max-width: 800px;
+      margin-bottom: 35px;
+    }
+
+    /* Grid Layouts */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      align-items: center;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    /* Glass Cards */
+    .glass-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 26px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .glass-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(59, 130, 246, 0.4);
+    }
+
+    .card-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      background: rgba(59, 130, 246, 0.12);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      color: #60a5fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 18px;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+
+    .card-text {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-muted);
+    }
+
+    /* Mobile Mockup Card */
+    .phone-mockup-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .phone-frame {
+      width: 290px;
+      height: 520px;
+      background: #0f172a;
+      border-radius: 40px;
+      border: 6px solid #334155;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(59, 130, 246, 0.2);
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .phone-notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 20px;
+      background: #334155;
+      border-bottom-left-radius: 14px;
+      border-bottom-right-radius: 14px;
+      z-index: 20;
+    }
+
+    .phone-screen {
+      flex: 1;
+      padding: 30px 16px 16px;
+      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      font-size: 12px;
+    }
+
+    .phone-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .phone-punch-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .punch-btn {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: var(--emerald-gradient);
+      color: #fff;
+      margin: 10px auto 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+    }
+
+    .phone-stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .phone-stat-pill {
+      background: rgba(255, 255, 255, 0.04);
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* Comparison Table */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .compare-table th {
+      text-align: left;
+      padding: 14px 18px;
+      color: var(--text-muted);
+      border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    .compare-table td {
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      color: #cbd5e1;
+    }
+
+    .compare-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .compare-highlight {
+      background: rgba(59, 130, 246, 0.1) !important;
+      color: #fff !important;
+      font-weight: 700;
+      border-left: 1px solid rgba(59, 130, 246, 0.3);
+      border-right: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .badge-check {
+      color: #34d399;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge-cross {
+      color: #f87171;
+    }
+
+    /* Bottom Control Bar */
+    .bottom-bar {
+      height: 60px;
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--card-border);
+      background: rgba(7, 11, 20, 0.8);
+      backdrop-filter: blur(12px);
+      z-index: 10;
+    }
+
+    .slide-counter {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .progress-bar-wrapper {
+      flex: 0 0 250px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--accent-gradient);
+      transition: width 0.3s ease;
+    }
+
+    .nav-arrow-btns {
+      display: flex;
+      gap: 8px;
+    }
+
+    .arrow-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--card-border);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .arrow-btn:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    /* Big Metric Display */
+    .stat-number {
+      font-size: 44px;
+      font-weight: 800;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    /* Print Optimization for PDF Export */
+    @media print {
+      body {
+        overflow: visible !important;
+        background: #0b0f19 !important;
+        -webkit-print-color-adjust: exact !important;
+      }
+      .top-nav, .bottom-bar, .ambient-glow { display: none !important; }
+      .slides-stage { overflow: visible !important; }
+      .slide {
+        position: relative !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
+        page-break-after: always !important;
+        height: 100vh !important;
+        width: 100vw !important;
+        padding: 50px 70px !important;
+        box-sizing: border-box !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-glow"></div>
+
+  <div class="deck-container">
+    <!-- Top Nav -->
+    <header class="top-nav">
+      <div class="brand">
+        <div class="brand-logo"><i class="fa-solid fa-cube"></i></div>
+        <span>AURA HRMS</span>
+        <span class="badge-enterprise">Enterprise Suite</span>
+      </div>
+      <div class="nav-actions">
+        <button class="nav-btn" onclick="toggleFullscreen()"><i class="fa-solid fa-expand"></i> Fullscreen</button>
+        <button class="nav-btn nav-btn-primary" onclick="window.print()"><i class="fa-solid fa-file-pdf"></i> Export PDF</button>
+      </div>
+    </header>
+
+    <!-- Slide Stage -->
+    <main class="slides-stage">
+
+      <!-- SLIDE 1: Title / Hero -->
+      <section class="slide active">
+        <div class="slide-eyebrow"><i class="fa-solid fa-sparkles"></i> The Modern Workforce Operating System</div>
+        <h1 class="slide-title">Reimagine HR, Payroll & Field Operations with <span class="highlight">Intelligent Automation</span></h1>
+        <p class="slide-desc">A unified cloud platform and native mobile application designed for agile, high-growth organizations. From biometric attendance to live GPS travel and automatic statutory payroll.</p>
+        <div class="grid-4" style="margin-top: 10px;">
+          <div class="glass-card">
+            <div class="stat-number">100%</div>
+            <div class="card-title" style="font-size: 15px;">Automated Payroll</div>
+            <div class="card-text">PF, PT, TDS & LOP deductions calculated automatically.</div>
+          </div>
+          <div class="glass-card">
+            <div class="stat-number">Live</div>
+            <div class="card-title" style="font-size: 15px;">Field GPS Telemetry</div>
+            <div class="card-text">Interactive route tracking & trip reimbursement logs.</div>
+          </div>
+          <div class="glass-card">
+            <div class="stat-number">iOS & Android</div>
+            <div class="card-title" style="font-size: 15px;">Native Mobile App</div>
+            <div class="card-text">Punches, leaves, payslips & notices on the go.</div>
+          </div>
+          <div class="glass-card">
+            <div class="stat-number">Zero</div>
+            <div class="card-title" style="font-size: 15px;">Data Sharing Guarantee</div>
+            <div class="card-text">DPDP Act 2023 certified tenant-isolated databases.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 2: The Problem -->
+      <section class="slide">
+        <div class="slide-eyebrow"><i class="fa-solid fa-triangle-exclamation"></i> The Industry Pain Point</div>
+        <h2 class="slide-title">Why Traditional HR Software is <span class="highlight">Broken & Bloated</span></h2>
+        <p class="slide-desc">Modern companies lose an average of 40+ hours every month juggling disconnected tools, manual spreadsheets, and opaque enterprise software.</p>
+        <div class="grid-3">
+          <div class="glass-card">
+            <div class="card-icon" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border-color: rgba(239, 68, 68, 0.3);">
+              <i class="fa-solid fa-network-wired"></i>
+            </div>
+            <div class="card-title">Fragmented Tool Sprawl</div>
+            <div class="card-text">Biometrics on one machine, leaves on email, travel expense receipts on WhatsApp, and payroll calculated by hand on Excel. Nothing speaks to each other.</div>
+          </div>
+          <div class="glass-card">
+            <div class="card-icon" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border-color: rgba(239, 68, 68, 0.3);">
+              <i class="fa-solid fa-money-bill-transfer"></i>
+            </div>
+            <div class="card-title">Costly Enterprise Monopolies</div>
+            <div class="card-text">Legacy platforms like Darwinbox and Keka charge exorbitant annual minimum contracts (₹1L–₹10L/year) with 6-month painful onboarding delays.</div>
+          </div>
+          <div class="glass-card">
+            <div class="card-icon" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border-color: rgba(239, 68, 68, 0.3);">
+              <i class="fa-solid fa-map-location-dot"></i>
+            </div>
+            <div class="card-title">Blind Spot in Field Staff</div>
+            <div class="card-text">Zero visibility into executive client visits, business travel routes, or field logistics. Managers blindly approve mileage claims with no proof.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 3: The All-In-One Solution -->
+      <section class="slide">
+        <div class="slide-eyebrow"><i class="fa-solid fa-wand-magic-sparkles"></i> The Solution</div>
+        <h2 class="slide-title">One Unified Ecosystem: <span class="highlight">Web + Mobile + AI</span></h2>
+        <p class="slide-desc">A single intelligent platform that harmonizes your entire workforce lifecycle from hiring to retirement.</p>
+        <div class="grid-4">
+          <div class="glass-card">
+            <div class="card-icon"><i class="fa-solid fa-fingerprint"></i></div>
+            <div class="card-title">Attendance & Rosters</div>
+            <div class="card-text">Geofenced mobile punch, biometric sync, multi-shift calendar planning & regularization workflows.</div>
+          </div>
+          <div class="glass-card">
+            <div class="card-icon"><i class="fa-solid fa-money-check-dollar"></i></div>
+            <div class="card-title">Statutory Payroll</div>
+            <div class="card-text">Single-click bulk payslips, automated PF/PT/TDS, LOP deduction, and instant PDF generation.</div>
+          </div>
+          <div class="glass-card">
+            <div class="card-icon"><i class="fa-solid fa-plane-departure"></i></div>
+            <div class="card-title">Live Travel Desk</div>
+            <div class="card-text">GPS route monitoring, official business trip logs, and instant camera receipt reimbursement links.</div>
+          </div>
+          <div class="glass-card">
+            <div class="card-icon"><i class="fa-solid fa-award"></i></div>
+            <div class="card-title">PMS & Salary Hikes</div>
+            <div class="card-text">OKRs, 360 monthly review dossiers, real-time CTC simulator, and branded promotion letters.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 4: The Mobile Application Showcase -->
+      <section class="slide">
+        <div class="grid-2">
+          <div>
+            <div class="slide-eyebrow"><i class="fa-solid fa-mobile-screen-button"></i> Mobile-First Experience</div>
+            <h2 class="slide-title">Empower Your Workforce with the <span class="highlight">Native Mobile App</span></h2>
+            <p class="slide-desc">Available for both <strong>Android & iOS</strong>. Your employees carry their office, leaves, attendance, and payslips right in their pockets.</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+              <div style="display: flex; gap: 12px; align-items: flex-start;">
+                <div style="color: #38bdf8; font-size: 18px; margin-top: 2px;"><i class="fa-solid fa-location-crosshairs"></i></div>
+                <div>
+                  <strong style="color: #fff;">1-Tap Geofenced Punching:</strong>
+                  <span style="color: var(--text-muted); font-size: 14px;">Verifies GPS coordinates and camera capture before logging punch-in/out.</span>
+                </div>
+              </div>
+              <div style="display: flex; gap: 12px; align-items: flex-start;">
+                <div style="color: #34d399; font-size: 18px; margin-top: 2px;"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                <div>
+                  <strong style="color: #fff;">Instant Payslip PDF Downloads:</strong>
+                  <span style="color: var(--text-muted); font-size: 14px;">Employees download encrypted monthly payslips directly to phone storage.</span>
+                </div>
+              </div>
+              <div style="display: flex; gap: 12px; align-items: flex-start;">
+                <div style="color: #f59e0b; font-size: 18px; margin-top: 2px;"><i class="fa-solid fa-camera"></i></div>
+                <div>
+                  <strong style="color: #fff;">Snap & Claim Expense Reimbursements:</strong>
+                  <span style="color: var(--text-muted); font-size: 14px;">Take photo receipts of meals, fuel, and lodging on trips for immediate HR approval.</span>
+                </div>
+              </div>
+              <div style="display: flex; gap: 12px; align-items: flex-start;">
+                <div style="color: #a78bfa; font-size: 18px; margin-top: 2px;"><i class="fa-solid fa-bell"></i></div>
+                <div>
+                  <strong style="color: #fff;">Real-Time Push Alerts:</strong>
+                  <span style="color: var(--text-muted); font-size: 14px;">Instant alerts for leave approvals, birthday celebrations, and urgent corporate notices.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Real Mobile App Screenshots Gallery -->
+          <div style="display: flex; gap: 14px; justify-content: center; align-items: center;">
+            <div style="border: 2px solid rgba(59, 130, 246, 0.4); border-radius: 20px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.5); width: 140px; background: #0f172a;">
+              <img src="public/presentation/images/mobile_attendance.jpg" alt="Mobile Attendance" style="width: 100%; display: block;">
+              <div style="font-size: 10px; text-align: center; padding: 6px 2px; color: #38bdf8; font-weight: 700;">GPS Punch</div>
+            </div>
+            <div style="border: 2px solid rgba(16, 185, 129, 0.4); border-radius: 20px; overflow: hidden; box-shadow: 0 20px 45px rgba(0,0,0,0.6); width: 155px; background: #0f172a; transform: translateY(-8px);">
+              <img src="public/presentation/images/mobile_dashboard.jpg" alt="Mobile Dashboard" style="width: 100%; display: block;">
+              <div style="font-size: 10px; text-align: center; padding: 6px 2px; color: #34d399; font-weight: 700;">Employee Hub</div>
+            </div>
+            <div style="border: 2px solid rgba(245, 158, 11, 0.4); border-radius: 20px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.5); width: 140px; background: #0f172a;">
+              <img src="public/presentation/images/mobile_trips.jpg" alt="Mobile Trips" style="width: 100%; display: block;">
+              <div style="font-size: 10px; text-align: center; padding: 6px 2px; color: #f59e0b; font-weight: 700;">Field Trips</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 5: Travel Desk & Field GPS Telemetry -->
+      <section class="slide">
+        <div class="slide-eyebrow"><i class="fa-solid fa-route"></i> Unique Competitive Differentiator</div>
+        <h2 class="slide-title">Live Field Travel & <span class="highlight">Interactive GPS Map Telemetry</span></h2>
+        <p class="slide-desc">Track sales visits, client meetings, and executive business trips in real time. Eliminate fake expense vouchers permanently.</p>
+        <div class="grid-2">
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div class="glass-card" style="padding: 18px;">
+              <div class="card-title" style="color: #38bdf8; font-size: 16px;"><i class="fa-solid fa-map-location-dot"></i> Live HR Operations Map</div>
+              <div class="card-text">View active employees across the state or globe on an interactive satellite map with live location pings and route timelines.</div>
+            </div>
+            <div class="glass-card" style="padding: 18px;">
+              <div class="card-title" style="color: #34d399; font-size: 16px;"><i class="fa-solid fa-receipt"></i> Trip Expense Integration</div>
+              <div class="card-text">Reimbursements are attached directly to verified travel route IDs. No receipts, no travel movement = no reimbursement.</div>
+            </div>
+            <div class="glass-card" style="padding: 18px;">
+              <div class="card-title" style="color: #c084fc; font-size: 16px;"><i class="fa-solid fa-passport"></i> Branded Trip Dossiers</div>
+              <div class="card-text">Generate comprehensive travel mission dossiers containing purpose, boarding passes, hotel bookings, and client deliverables.</div>
+            </div>
+          </div>
+          <div style="border-radius: 16px; overflow: hidden; border: 2px solid rgba(59, 130, 246, 0.4); box-shadow: 0 15px 40px rgba(0,0,0,0.6);">
+            <img src="public/presentation/images/09_trip_route_telemetry.png" alt="Live Route Telemetry" style="width: 100%; display: block;">
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 6: OKRs, Appraisals & Monthly Dossier -->
+      <section class="slide">
+        <div class="slide-eyebrow"><i class="fa-solid fa-chart-line-up"></i> Performance Management (PMS)</div>
+        <h2 class="slide-title">From Quarterly OKRs to <span class="highlight">1-on-1 Monthly Review Dossiers</span></h2>
+        <p class="slide-desc">Objective, continuous performance management that aligns employee outcomes with corporate revenue goals.</p>
+        <div class="grid-2">
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div class="glass-card" style="padding: 18px;">
+              <div class="card-title" style="color: #38bdf8; font-size: 16px;"><i class="fa-solid fa-bullseye"></i> Objectives & Key Results (OKRs)</div>
+              <div class="card-text">Employees define quarterly targets with checkable sub-milestones and live percentage progress bars.</div>
+            </div>
+            <div class="glass-card" style="padding: 18px;">
+              <div class="card-title" style="color: #34d399; font-size: 16px;"><i class="fa-solid fa-scale-balanced"></i> Two-Stage Appraisal Cycles</div>
+              <div class="card-text">Self-appraisal followed by managerial 1-to-5 star evaluation with detailed qualitative review feedback.</div>
+            </div>
+            <div class="glass-card" style="padding: 18px;">
+              <div class="card-title" style="color: #a78bfa; font-size: 16px;"><i class="fa-solid fa-file-contract"></i> 360° Monthly Review Dossier (PDF)</div>
+              <div class="card-text">One-click executive report bringing attendance rate, leaves, trips, OKRs, and manager ratings into one printable sheet.</div>
+            </div>
+          </div>
+          <div style="border-radius: 16px; overflow: hidden; border: 2px solid rgba(59, 130, 246, 0.4); box-shadow: 0 15px 40px rgba(0,0,0,0.6);">
+            <img src="public/presentation/images/10_performance_appraisal.png" alt="Performance Appraisal" style="width: 100%; display: block;">
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 7: Compensation Simulator & Increment Letters -->
+      <section class="slide">
+        <div class="slide-eyebrow"><i class="fa-solid fa-calculator"></i> Compensation Engineering</div>
+        <h2 class="slide-title">Real-Time CTC Simulation & <span class="highlight">Branded Increment Letters</span></h2>
+        <p class="slide-desc">Take the guesswork out of salary revisions, promotions, and market corrections with automated math and formal documentation.</p>
+        <div class="grid-2">
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div class="glass-card" style="padding: 18px;">
+              <div class="card-title" style="color: #f59e0b; font-size: 16px;"><i class="fa-solid fa-sliders"></i> Real-Time CTC Simulator</div>
+              <div class="card-text">Adjust hike percentages or target CTCs on the fly. The engine recalculates Basic (50%), HRA, PF, Gratuity, and Net In-Hand automatically.</div>
+            </div>
+            <div class="glass-card" style="padding: 18px;">
+              <div class="card-title" style="color: #34d399; font-size: 16px;"><i class="fa-solid fa-stamp"></i> 1-Click Master Sync</div>
+              <div class="card-text">Once HR approves a proposed hike or promotion, the employee's master salary and designation are updated immediately in the live database.</div>
+            </div>
+            <div class="glass-card" style="padding: 18px;">
+              <div class="card-title" style="color: #60a5fa; font-size: 16px;"><i class="fa-solid fa-envelope-open-text"></i> Branded Increment Letters</div>
+              <div class="card-text">Generate formal, print-ready increment & promotion letters with corporate letterheads, breakdown tables, and director sign-offs.</div>
+            </div>
+          </div>
+          <div style="border-radius: 16px; overflow: hidden; border: 2px solid rgba(59, 130, 246, 0.4); box-shadow: 0 15px 40px rgba(0,0,0,0.6);">
+            <img src="public/presentation/images/16_compensation_revision.png" alt="Compensation Revisions" style="width: 100%; display: block;">
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 8: AI-Powered Recruitment & Policy RAG -->
+      <section class="slide">
+        <div class="slide-eyebrow"><i class="fa-solid fa-robot"></i> Built-in Artificial Intelligence</div>
+        <h2 class="slide-title">AI Workspaces: <span class="highlight">Smart Policy RAG & Resume Screening</span></h2>
+        <p class="slide-desc">Harness modern vector search and machine intelligence directly inside your HR and employee portals.</p>
+        <div class="grid-2">
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div class="glass-card" style="padding: 18px;">
+              <div class="card-title" style="color: #a78bfa; font-size: 16px;"><i class="fa-solid fa-messages-question"></i> AI HR Policy Chatbot (RAG Engine)</div>
+              <div class="card-text">Employees ask: <em>"What is the maternity leave entitlement?"</em> or <em>"How does travel reimbursement work?"</em>. The vector AI engine cites exact clauses from your company handbook instantly, reducing routine HR queries by 80%.</div>
+            </div>
+            <div class="glass-card" style="padding: 18px;">
+              <div class="card-title" style="color: #22d3ee; font-size: 16px;"><i class="fa-solid fa-user-check"></i> AI Candidate Resume Screener</div>
+              <div class="card-text">Upload 50+ candidate PDF resumes. The system parses work history, technical proficiencies, calculates JD match percentage, and ranks the best candidates in seconds.</div>
+            </div>
+          </div>
+          <div style="border-radius: 16px; overflow: hidden; border: 2px solid rgba(59, 130, 246, 0.4); box-shadow: 0 15px 40px rgba(0,0,0,0.6);">
+            <img src="public/presentation/images/17_ai_talent_acquisition.png" alt="AI Talent Acquisition" style="width: 100%; display: block;">
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 9: Security, DPDP Act & Data Privacy -->
+      <section class="slide">
+        <div class="slide-eyebrow"><i class="fa-solid fa-shield-halved"></i> Enterprise Security & Compliance</div>
+        <h2 class="slide-title">Bank-Grade Privacy: <span class="highlight">DPDP Act 2023 & Zero Data Sharing</span></h2>
+        <p class="slide-desc">Your employee records, salary confidentialities, and identity documents are protected by ironclad legal agreements and multi-tenant isolation.</p>
+        <div class="grid-4">
+          <div class="glass-card">
+            <div class="card-icon"><i class="fa-solid fa-database"></i></div>
+            <div class="card-title">Dedicated Tenant Isolation</div>
+            <div class="card-text">Each company operates in an isolated, partitioned database. Cross-tenant leakage is architecturally impossible.</div>
+          </div>
+          <div class="glass-card">
+            <div class="card-icon"><i class="fa-solid fa-lock"></i></div>
+            <div class="card-title">AES-256 & TLS 1.3</div>
+            <div class="card-text">Military-grade encryption at rest for documents & databases, with TLS 1.3 encryption across all network transmissions.</div>
+          </div>
+          <div class="glass-card">
+            <div class="card-icon"><i class="fa-solid fa-handshake-slash"></i></div>
+            <div class="card-title">Strict Non-Sharing Pledge</div>
+            <div class="card-text">We never sell, rent, monetize, or share client data with third-party advertisers or data brokers. You own 100% of your data.</div>
+          </div>
+          <div class="glass-card">
+            <div class="card-icon"><i class="fa-solid fa-file-shield"></i></div>
+            <div class="card-title">Enterprise Legal Agreement</div>
+            <div class="card-text">Comprehensive Master Subscription Agreement with liability protections and mutual hold-harmless defense clauses.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 10: Competitor Comparison Table -->
+      <section class="slide">
+        <div class="slide-eyebrow"><i class="fa-solid fa-table-list"></i> Market Benchmark</div>
+        <h2 class="slide-title">How We Compare with <span class="highlight">Legacy Alternatives</span></h2>
+        <p class="slide-desc">See why agile companies choose our unified platform over bloated legacy systems.</p>
+        
+        <div class="glass-card" style="padding: 10px; overflow-x: auto;">
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>Capabilities</th>
+                <th class="compare-highlight">AURA HRMS (Our Platform)</th>
+                <th>Keka HR</th>
+                <th>Darwinbox</th>
+                <th>greytHR</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Mobile App (iOS & Android)</strong></td>
+                <td class="compare-highlight"><span class="badge-check"><i class="fa-solid fa-circle-check"></i> Included Free</span></td>
+                <td><span class="badge-check"><i class="fa-solid fa-circle-check"></i> Yes</span></td>
+                <td><span class="badge-check"><i class="fa-solid fa-circle-check"></i> Yes</span></td>
+                <td><span class="badge-check"><i class="fa-solid fa-circle-check"></i> Yes</span></td>
+              </tr>
+              <tr>
+                <td><strong>Live Field GPS Trip Telemetry</strong></td>
+                <td class="compare-highlight"><span class="badge-check"><i class="fa-solid fa-circle-check"></i> Native Map & Telemetry</span></td>
+                <td><span class="badge-cross"><i class="fa-solid fa-circle-xmark"></i> Add-on cost</span></td>
+                <td><span class="badge-cross"><i class="fa-solid fa-circle-xmark"></i> Third-party plugin</span></td>
+                <td><span class="badge-cross"><i class="fa-solid fa-circle-xmark"></i> Not available</span></td>
+              </tr>
+              <tr>
+                <td><strong>AI Policy RAG & Resume Screening</strong></td>
+                <td class="compare-highlight"><span class="badge-check"><i class="fa-solid fa-circle-check"></i> Built-in Core</span></td>
+                <td><span class="badge-cross"><i class="fa-solid fa-circle-xmark"></i> Limited</span></td>
+                <td><span class="badge-cross"><i class="fa-solid fa-circle-xmark"></i> Enterprise custom tier</span></td>
+                <td><span class="badge-cross"><i class="fa-solid fa-circle-xmark"></i> Not available</span></td>
+              </tr>
+              <tr>
+                <td><strong>Deployment & Setup Time</strong></td>
+                <td class="compare-highlight"><span class="badge-check"><i class="fa-solid fa-bolt"></i> Under 24 Hours</span></td>
+                <td>3 to 6 Weeks</td>
+                <td>2 to 4 Months</td>
+                <td>2 to 3 Weeks</td>
+              </tr>
+              <tr>
+                <td><strong>Minimum Annual Contract</strong></td>
+                <td class="compare-highlight"><span class="badge-check"><i class="fa-solid fa-circle-check"></i> Zero Lock-in (Monthly)</span></td>
+                <td>₹60,000+ Minimum</td>
+                <td>₹2,50,000+ Minimum</td>
+                <td>₹35,000+ Minimum</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- SLIDE 11: ROI & Value Metrics -->
+      <section class="slide">
+        <div class="slide-eyebrow"><i class="fa-solid fa-sack-dollar"></i> Business Impact & ROI</div>
+        <h2 class="slide-title">Measurable Return on Investment <span class="highlight">Within 30 Days</span></h2>
+        <p class="slide-desc">Our customers cut administrative overhead and eliminate operational leakages immediately.</p>
+        <div class="grid-3">
+          <div class="glass-card" style="text-align: center;">
+            <div class="stat-number">85%</div>
+            <div class="card-title">Reduction in Payroll Hours</div>
+            <div class="card-text">Payroll generation drops from 4 full days of manual Excel reconciliation to under 15 minutes of automated calculation.</div>
+          </div>
+          <div class="glass-card" style="text-align: center;">
+            <div class="stat-number">100%</div>
+            <div class="card-title">Elimination of Fake Claims</div>
+            <div class="card-text">GPS verified field trip check-ins and camera receipt captures ensure every reimbursed rupee corresponds to genuine travel.</div>
+          </div>
+          <div class="glass-card" style="text-align: center;">
+            <div class="stat-number">3.2x</div>
+            <div class="card-title">Faster Onboarding Speed</div>
+            <div class="card-text">Automated document collection checklists and dynamic employee profile setup speed up new hire productivity by 300%.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 12: Implementation Roadmap & Next Steps -->
+      <section class="slide">
+        <div class="slide-eyebrow"><i class="fa-solid fa-rocket"></i> Fast-Track Onboarding</div>
+        <h2 class="slide-title">Go Live in <span class="highlight">3 Simple Steps</span></h2>
+        <p class="slide-desc">No complicated server installations. Our dedicated deployment engineers handle everything for you.</p>
+        <div class="grid-3">
+          <div class="glass-card">
+            <div class="card-icon" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border-color: rgba(59, 130, 246, 0.3);">
+              <strong>01</strong>
+            </div>
+            <div class="card-title">Employee Roster Import</div>
+            <div class="card-text">Send us your existing employee roster sheet. We map departments, designations, salary bands, and leave balances in a single bulk import.</div>
+          </div>
+          <div class="glass-card">
+            <div class="card-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border-color: rgba(16, 185, 129, 0.3);">
+              <strong>02</strong>
+            </div>
+            <div class="card-title">Mobile App Rollout</div>
+            <div class="card-text">Employees download the iOS/Android app, log in with their credentials, and punch in their first geofenced attendance immediately.</div>
+          </div>
+          <div class="glass-card">
+            <div class="card-icon" style="background: rgba(168, 85, 247, 0.15); color: #c084fc; border-color: rgba(168, 85, 247, 0.3);">
+              <strong>03</strong>
+            </div>
+            <div class="card-title">Run Payroll in 1-Click</div>
+            <div class="card-text">At month end, click generate bulk payslips. Review automated tax and LOP adjustments, and distribute digital payslips seamlessly.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 13: The Pilot Offer & CTA -->
+      <section class="slide" style="text-align: center; align-items: center;">
+        <div class="slide-eyebrow"><i class="fa-solid fa-sparkles"></i> Risk-Free Partnership</div>
+        <h2 class="slide-title" style="max-width: 800px;">Experience the Future of Workforce Management with a <span class="highlight">30-Day Free Pilot</span></h2>
+        <p class="slide-desc" style="max-width: 650px; margin: 0 auto 35px auto;">Zero upfront implementation fees. We configure your company's dedicated workspace, migrate your employee records, and deploy the mobile app for your entire team.</p>
+        
+        <div style="display: flex; gap: 16px; justify-content: center; margin-bottom: 30px;">
+          <button class="nav-btn nav-btn-primary" style="padding: 14px 28px; font-size: 16px;" onclick="alert('Contact sales: sales@aurahrms.com | Mobile: +91 98765 43210')">
+            <i class="fa-solid fa-calendar-check"></i> Book Your 1-on-1 Pilot Demo
+          </button>
+        </div>
+
+        <div style="color: var(--text-muted); font-size: 14px;">
+          <span><i class="fa-solid fa-circle-check" style="color: #34d399;"></i> Dedicated Account Manager</span>
+          <span style="margin: 0 15px;">•</span>
+          <span><i class="fa-solid fa-circle-check" style="color: #34d399;"></i> Full Mobile App Access</span>
+          <span style="margin: 0 15px;">•</span>
+          <span><i class="fa-solid fa-circle-check" style="color: #34d399;"></i> Cancel Anytime</span>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Bottom Control Bar -->
+    <footer class="bottom-bar">
+      <div class="slide-counter">
+        <span id="currentSlideNum">01</span> / <span id="totalSlideNum">13</span>
+      </div>
+
+      <div class="progress-bar-wrapper">
+        <div class="progress-bar" id="deckProgressBar"></div>
+      </div>
+
+      <div class="nav-arrow-btns">
+        <button class="arrow-btn" onclick="prevSlide()" title="Previous (Left Arrow)"><i class="fa-solid fa-chevron-left"></i></button>
+        <button class="arrow-btn" onclick="nextSlide()" title="Next (Right Arrow)"><i class="fa-solid fa-chevron-right"></i></button>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentIndex = 0;
+
+    const currentSlideNumEl = document.getElementById('currentSlideNum');
+    const totalSlideNumEl = document.getElementById('totalSlideNum');
+    const progressBar = document.getElementById('deckProgressBar');
+
+    totalSlideNumEl.textContent = String(totalSlides).padStart(2, '0');
+
+    function updateDeck() {
+      slides.forEach((slide, idx) => {
+        slide.classList.toggle('active', idx === currentIndex);
+      });
+      currentSlideNumEl.textContent = String(currentIndex + 1).padStart(2, '0');
+      const progressPercent = ((currentIndex + 1) / totalSlides) * 100;
+      progressBar.style.width = progressPercent + '%';
+    }
+
+    function nextSlide() {
+      if (currentIndex < totalSlides - 1) {
+        currentIndex++;
+        updateDeck();
+      }
+    }
+
+    function prevSlide() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updateDeck();
+      }
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          console.warn(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    // Keyboard Navigation
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        prevSlide();
+      } else if (e.key.toLowerCase() === 'f') {
+        toggleFullscreen();
+      } else if (e.key.toLowerCase() === 'p') {
+        window.print();
+      }
+    });
+
+    updateDeck();
+  </script>
+</body>
+</html>

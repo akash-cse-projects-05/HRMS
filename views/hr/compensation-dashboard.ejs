@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compensation Revision & CTC Management | HRMS</title>
+  
+  <!-- Google Fonts & Bootstrap -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #0052cc;
+      --primary-dark: #0747a6;
+      --hrms-cobalt: #2563eb;
+      --hrms-cyan: #06b6d4;
+      --hrms-text-dark: #0f172a;
+      --hrms-text-muted: #475569;
+      --hrms-border: #dfe1e6;
+      --hrms-bg-light: #f8fafc;
+      --btn-gradient: linear-gradient(135deg, #2563eb 0%, #0284c7 50%, #06b6d4 100%);
+      --btn-gradient-hover: linear-gradient(135deg, #1d4ed8 0%, #0369a1 50%, #0891b2 100%);
+    }
+
+    body {
+      background-color: var(--hrms-bg-light);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--hrms-text-dark);
+      letter-spacing: -0.01em;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .navbar {
+      background: #ffffff !important;
+      border-bottom: 1px solid var(--hrms-border);
+      padding: 0.85rem 0;
+    }
+
+    .brand-emblem {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      background: linear-gradient(135deg, var(--hrms-cobalt) 0%, var(--hrms-cyan) 100%);
+      border-radius: 9px;
+      color: #ffffff;
+      font-size: 0.95rem;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .page-header {
+      padding: 32px 0 24px;
+      border-bottom: 1px solid var(--hrms-border);
+      background: #ffffff;
+    }
+
+    .kpi-card {
+      background: white;
+      border: 1px solid var(--hrms-border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 6px rgba(9, 30, 66, 0.04);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(9, 30, 66, 0.08);
+    }
+
+    .glass-card {
+      background: white;
+      border: 1px solid var(--hrms-border);
+      border-radius: 16px;
+      padding: 1.75rem;
+      box-shadow: 0 2px 8px rgba(9, 30, 66, 0.04);
+    }
+
+    .btn-gradient-custom {
+      background: var(--btn-gradient);
+      color: #fff !important;
+      border: none;
+      font-weight: 700;
+      transition: all 0.2s ease;
+    }
+
+    .btn-gradient-custom:hover {
+      background: var(--btn-gradient-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    }
+
+    /* Simulator styling */
+    .hero-take-home {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border: 1px solid #bfdbfe;
+      border-radius: 14px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .styled-slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      background: #e2e8f0;
+      outline: none;
+    }
+
+    .styled-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--hrms-cobalt);
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+      transition: transform 0.1s;
+    }
+
+    .styled-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
+    .breakdown-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 0.88rem;
+    }
+
+    .breakdown-row:last-child {
+      border-bottom: none;
+    }
+
+    .emp-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #e0f2fe;
+      color: #0369a1;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.88rem;
+    }
+  </style>
+</head>
+<body>
+  <%- include('../partials/anti-cache') %>
+
+  <!-- Standard App Navbar -->
+  <nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container-fluid px-4 px-lg-5">
+      <a class="navbar-brand d-flex align-items-center fw-bold" href="/hr/dashboard" style="color: var(--primary);">
+        <span class="brand-emblem me-2"><i class="fa-solid fa-money-bill-trend-up"></i></span>
+        <span>HRMS Control Center</span>
+      </a>
+      <div class="ms-auto d-flex align-items-center gap-2">
+        <button type="button" class="btn btn-sm btn-gradient-custom rounded-pill px-3.5 shadow-sm" data-bs-toggle="modal" data-bs-target="#proposeModal">
+          <i class="fa-solid fa-plus-circle me-1.5"></i> Propose Salary Hike
+        </button>
+        <a href="/hr/dashboard" class="btn btn-outline-dark btn-sm rounded-pill px-3">
+          <i class="fa-solid fa-arrow-left me-1"></i> Dashboard
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Standard Page Header -->
+  <div class="page-header mb-4">
+    <div class="container-fluid px-4 px-lg-5">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+          <span class="badge mb-2" style="background: rgba(0, 82, 204, 0.08); color: var(--primary); border: 1px solid rgba(0, 82, 204, 0.2); font-weight: 700; font-size: 0.72rem;">
+            <i class="fa-solid fa-calculator me-1 text-primary"></i> TOTAL REWARDS & STATUTORY PAYROLL SUITE
+          </span>
+          <h2 class="fw-bold mb-1" style="color: #091e42; letter-spacing: -0.02em;">Compensation Revision & CTC Simulator Hub</h2>
+          <p class="text-muted mb-0" style="font-size: 0.88rem;">Real-time CTC Breakdown Simulator, Appraisal Hikes, Statutory Allowances & Official Letters</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid px-4 px-lg-5 pb-5">
+    
+    <!-- Flash Messages -->
+    <% if (typeof success_msg !== 'undefined' && success_msg) { %>
+      <div class="alert alert-success alert-dismissible fade show rounded-3 fw-semibold shadow-sm mb-4" role="alert">
+        <i class="fa-solid fa-circle-check me-2"></i><%= success_msg %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    <% } %>
+    <% if (typeof error_msg !== 'undefined' && error_msg) { %>
+      <div class="alert alert-danger alert-dismissible fade show rounded-3 fw-semibold shadow-sm mb-4" role="alert">
+        <i class="fa-solid fa-triangle-exclamation me-2"></i><%= error_msg %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    <% } %>
+
+    <!-- KPI METRICS BANNER -->
+    <%
+      const revList = revisions || [];
+      const totalRev = revList.length;
+      const approvedRev = revList.filter(r => r.status === 'APPROVED').length;
+      const avgHike = totalRev > 0 ? (revList.reduce((acc, r) => acc + (r.hikePercentage || 0), 0) / totalRev).toFixed(1) : '0';
+    %>
+    <div class="row g-3 mb-4">
+      <div class="col-md-3 col-6">
+        <div class="kpi-card">
+          <span class="text-uppercase small fw-bold text-muted" style="font-size: 0.72rem;">Total Revisions</span>
+          <h3 class="fw-extrabold text-dark mt-2 mb-0"><%= totalRev %></h3>
+          <span class="text-secondary small mt-2 d-block" style="font-size: 0.78rem;">Proposals recorded</span>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="kpi-card" style="border-top: 3px solid var(--hrms-cobalt);">
+          <span class="text-uppercase small fw-bold text-primary" style="font-size: 0.72rem;">Approved Hikes</span>
+          <h3 class="fw-extrabold text-primary mt-2 mb-0"><%= approvedRev %></h3>
+          <span class="text-muted small mt-2 d-block" style="font-size: 0.78rem;">Applied to employee payroll</span>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="kpi-card">
+          <span class="text-uppercase small fw-bold text-muted" style="font-size: 0.72rem;">Average Hike Rate</span>
+          <h3 class="fw-extrabold text-dark mt-2 mb-0">+<%= avgHike %>%</h3>
+          <span class="text-secondary small mt-2 d-block" style="font-size: 0.78rem;">Across all appraisal cycles</span>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="kpi-card">
+          <span class="text-uppercase small fw-bold text-muted" style="font-size: 0.72rem;">Compliance Standard</span>
+          <h3 class="fw-extrabold text-dark mt-2 mb-0" style="font-size: 1.3rem;">
+            <i class="fa-solid fa-shield-halved text-primary me-1 fs-5"></i> 100% Compliant
+          </h3>
+          <span class="text-secondary small mt-2 d-block" style="font-size: 0.78rem;">PF, Gratuity & PT Formula</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 1: Interactive Real-Time CTC Simulator -->
+    <div class="glass-card mb-4">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
+        <div>
+          <h5 class="fw-bold text-primary mb-1">
+            <i class="fa-solid fa-calculator me-2"></i>Real-Time CTC & Take-Home Salary Simulator
+          </h5>
+          <p class="text-muted small mb-0">Slide target annual CTC to instantly simulate statutory Basic, HRA, PF, Gratuity, and Net In-Hand monthly salary</p>
+        </div>
+        <span class="badge" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; font-weight: 700; padding: 6px 14px; border-radius: 20px;">
+          <i class="fa-solid fa-building-shield me-1 text-primary"></i>Statutory Formula Active
+        </span>
+      </div>
+
+      <div class="row g-4 align-items-center">
+        <!-- Controls Column -->
+        <div class="col-lg-6 col-12">
+          <div class="p-4 bg-light rounded-3 border">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <label class="form-label fw-bold small text-muted text-uppercase mb-0">Target Annual CTC (INR)</label>
+              <span class="fw-extrabold text-primary fs-5" id="ctcDisplay">₹ 9,00,000 / yr</span>
+            </div>
+            
+            <input type="range" id="ctcSlider" min="300000" max="3000000" step="50000" value="900000" class="styled-slider my-2">
+            
+            <div class="d-flex justify-content-between text-muted small fw-semibold mb-4" style="font-size: 0.76rem;">
+              <span>₹3 Lakhs</span>
+              <span>₹15 Lakhs</span>
+              <span>₹30 Lakhs</span>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-6">
+                <label class="form-label fw-bold small text-muted text-uppercase">Basic % of CTC</label>
+                <select id="basicPercentSelect" class="form-select fw-semibold">
+                  <option value="40">40% of CTC</option>
+                  <option value="50" selected>50% of CTC (Standard)</option>
+                  <option value="60">60% of CTC</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <label class="form-label fw-bold small text-muted text-uppercase">HRA % of Basic</label>
+                <select id="hraPercentSelect" class="form-select fw-semibold">
+                  <option value="40">40% (Non-Metro)</option>
+                  <option value="50" selected>50% (Metro: BLR/MUM/DEL)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Simulation Breakdown Column -->
+        <div class="col-lg-6 col-12">
+          <div class="hero-take-home mb-3">
+            <span class="text-uppercase small fw-bold text-muted d-block" style="font-size: 0.76rem; letter-spacing: 0.05em;">Estimated Monthly Take-Home Pay</span>
+            <h2 class="fw-extrabold text-primary my-1" id="netPayDisplay">₹ 71,200</h2>
+            <span class="text-muted small" style="font-size: 0.78rem;">Post PF (12%) and Professional Tax statutory deductions</span>
+          </div>
+
+          <div class="bg-white rounded-3 border">
+            <div class="breakdown-row">
+              <span class="text-muted fw-semibold">Basic Salary (Monthly)</span>
+              <strong class="text-dark" id="basicVal">₹ 37,500</strong>
+            </div>
+            <div class="breakdown-row">
+              <span class="text-muted fw-semibold">House Rent Allowance (HRA)</span>
+              <strong class="text-dark" id="hraVal">₹ 18,750</strong>
+            </div>
+            <div class="breakdown-row">
+              <span class="text-muted fw-semibold">Special & Other Allowances</span>
+              <strong class="text-dark" id="specialVal">₹ 16,950</strong>
+            </div>
+            <div class="breakdown-row" style="background: #fafafa;">
+              <span class="text-secondary fw-semibold">Employee PF Contribution (12% capped)</span>
+              <span class="text-danger fw-bold" id="pfVal">- ₹ 1,800</span>
+            </div>
+            <div class="breakdown-row" style="background: #fafafa;">
+              <span class="text-secondary fw-semibold">Professional Tax (PT)</span>
+              <span class="text-danger fw-bold" id="ptVal">- ₹ 200</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: Active Revisions & Promotion Log -->
+    <div class="glass-card">
+      <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+        <div>
+          <h5 class="fw-bold mb-1">
+            <i class="fa-solid fa-clock-rotate-left text-primary me-2"></i>Salary Revisions & Promotion History
+          </h5>
+          <p class="text-muted small mb-0">Review proposed revisions, apply company approvals, and download formal letters</p>
+        </div>
+        <span class="badge bg-light text-primary border fw-bold px-3 py-1.5 rounded-pill">
+          <%= revList.length %> Records
+        </span>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr class="text-uppercase small text-muted" style="font-size: 0.72rem; letter-spacing: 0.05em;">
+              <th>Employee</th>
+              <th>Designation Change</th>
+              <th>Hike %</th>
+              <th>Previous Monthly</th>
+              <th>New Monthly</th>
+              <th>Effective Date</th>
+              <th>Status</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (revList.length === 0) { %>
+              <tr>
+                <td colspan="8" class="text-center py-5 text-muted">
+                  <i class="fa-solid fa-folder-open display-4 text-secondary opacity-50 mb-3 d-block"></i>
+                  <p class="fw-bold mb-1">No salary revisions proposed yet.</p>
+                  <span class="small">Click <strong>"Propose Salary Hike"</strong> above to initiate an appraisal revision.</span>
+                </td>
+              </tr>
+            <% } %>
+            <% revList.forEach(rev => { %>
+              <% const emp = rev.employeeId || {}; %>
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <span class="emp-avatar me-2.5"><%= emp.firstName ? emp.firstName.charAt(0) : 'E' %></span>
+                    <div>
+                      <strong class="text-dark"><%= emp.firstName %> <%= emp.lastName %></strong>
+                      <small class="text-muted d-block" style="font-size: 0.75rem;"><%= emp.employeeCode %> &bull; <%= emp.department %></small>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="d-flex align-items-center gap-1.5 small">
+                    <span class="text-muted"><%= rev.previousDesignation || emp.designation %></span>
+                    <% if (rev.newDesignation && rev.newDesignation !== rev.previousDesignation) { %>
+                      <i class="fa-solid fa-arrow-right text-primary text-xs"></i>
+                      <strong class="text-primary"><%= rev.newDesignation %></strong>
+                    <% } %>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; font-weight: 800;">
+                    +<%= rev.hikePercentage %>%
+                  </span>
+                </td>
+                <td class="text-muted">₹ <%= Number(rev.previousSalary).toLocaleString('en-IN') %></td>
+                <td><strong class="text-dark">₹ <%= Number(rev.newSalary).toLocaleString('en-IN') %></strong></td>
+                <td class="small text-muted"><%= new Date(rev.effectiveDate).toLocaleDateString('en-IN') %></td>
+                <td>
+                  <% if (rev.status === 'APPROVED') { %>
+                    <span class="badge" style="background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0;">
+                      <i class="fa-solid fa-check me-1"></i>Approved
+                    </span>
+                  <% } else { %>
+                    <span class="badge" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;">
+                      <i class="fa-solid fa-hourglass-half me-1"></i>Proposed
+                    </span>
+                  <% } %>
+                </td>
+                <td class="text-end">
+                  <div class="d-inline-flex align-items-center gap-1">
+                    <% if (rev.status === 'PROPOSED') { %>
+                      <form action="/hr/compensation/<%= rev._id %>/approve" method="POST" style="margin: 0; display: inline;">
+                        <button type="submit" class="btn btn-sm btn-primary rounded-pill fw-bold px-2.5 py-1" style="font-size: 0.72rem;" title="Approve & Apply to Payroll">
+                          <i class="fa-solid fa-check me-1"></i>Approve
+                        </button>
+                      </form>
+                    <% } %>
+                    <a href="/hr/compensation/<%= rev._id %>/letter" target="_blank" class="btn btn-sm btn-outline-dark rounded-pill fw-bold px-2.5 py-1" style="font-size: 0.72rem;" title="View Branded Increment Letter">
+                      <i class="fa-solid fa-file-pdf me-1 text-danger"></i>Letter
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MODAL: PROPOSE SALARY REVISION -->
+  <div class="modal fade" id="proposeModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="modal-header bg-primary text-white p-4">
+          <div class="d-flex align-items-center gap-2">
+            <div class="bg-white text-primary p-2.5 rounded-3">
+              <i class="fa-solid fa-plus-circle fs-4 text-primary"></i>
+            </div>
+            <div>
+              <span class="badge bg-white text-primary fw-bold text-uppercase mb-1 px-2.5 py-1">APPRAISAL WORKFLOW</span>
+              <h5 class="modal-title fw-extrabold mb-0">Propose Salary Hike / Promotion</h5>
+            </div>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+
+        <form action="/hr/compensation/propose" method="POST">
+          <div class="modal-body p-4">
+            <div class="mb-3">
+              <label class="form-label fw-bold small text-muted text-uppercase">Select Employee *</label>
+              <select name="employeeId" class="form-select form-select-lg fw-semibold" required id="modalEmployeeSelect">
+                <option value="">-- Choose Employee --</option>
+                <% (employees || []).forEach(e => { %>
+                  <option value="<%= e._id %>" data-salary="<%= e.salary || 30000 %>" data-designation="<%= e.designation %>">
+                    <%= e.firstName %> <%= e.lastName %> (<%= e.employeeCode %> - <%= e.designation %>) - Curr: ₹<%= Number(e.salary || 30000).toLocaleString('en-IN') %>
+                  </option>
+                <% }); %>
+              </select>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-bold small text-muted text-uppercase">Revision Type</label>
+                <select name="revisionType" class="form-select fw-semibold">
+                  <option value="Annual Increment">Annual Increment</option>
+                  <option value="Promotion">Promotion & Role Upgrade</option>
+                  <option value="Market Correction">Market Correction</option>
+                  <option value="Special Adjustment">Special Adjustment</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold small text-muted text-uppercase">New Designation (Optional)</label>
+                <input type="text" name="newDesignation" class="form-control fw-semibold" placeholder="Leave blank if unchanged">
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-bold small text-muted text-uppercase">Hike Percentage (%) *</label>
+                <input type="number" step="0.5" name="hikePercentage" id="modalHikeInput" class="form-control fw-semibold" placeholder="e.g. 15.0" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold small text-muted text-uppercase">Effective Date *</label>
+                <input type="date" name="effectiveDate" class="form-control fw-semibold" required value="<%= new Date().toISOString().slice(0, 10) %>">
+              </div>
+            </div>
+
+            <div class="mb-2">
+              <label class="form-label fw-bold small text-muted text-uppercase">Appraisal Justification / Notes</label>
+              <textarea name="reason" rows="2" class="form-control" placeholder="Demonstrated outstanding performance, led cloud infrastructure migration..."></textarea>
+            </div>
+          </div>
+
+          <div class="modal-footer bg-light p-3">
+            <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary fw-bold px-4 rounded-3 shadow-sm">
+              <i class="fa-solid fa-paper-plane me-1.5"></i> Submit Proposal
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <footer class="text-center py-4 border-top bg-white mt-auto">
+    <p class="text-muted small mb-0">© 2026 HRMS • Enterprise Compensation & Statutory Payroll Engine</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Live Simulator Logic
+    const slider = document.getElementById('ctcSlider');
+    const ctcDisplay = document.getElementById('ctcDisplay');
+    const basicSelect = document.getElementById('basicPercentSelect');
+    const hraSelect = document.getElementById('hraPercentSelect');
+
+    const netPayDisplay = document.getElementById('netPayDisplay');
+    const basicVal = document.getElementById('basicVal');
+    const hraVal = document.getElementById('hraVal');
+    const specialVal = document.getElementById('specialVal');
+    const pfVal = document.getElementById('pfVal');
+    const ptVal = document.getElementById('ptVal');
+
+    function updateSimulation() {
+      const ctc = Number(slider.value);
+      ctcDisplay.innerText = '₹ ' + ctc.toLocaleString('en-IN') + ' / yr';
+
+      const basicPercent = Number(basicSelect.value) / 100;
+      const hraPercentOfBasic = Number(hraSelect.value) / 100;
+
+      const basicAnnual = ctc * basicPercent;
+      const basicMonthly = Math.round(basicAnnual / 12);
+
+      const hraAnnual = basicAnnual * hraPercentOfBasic;
+      const hraMonthly = Math.round(hraAnnual / 12);
+
+      const pfMonthly = Math.min(Math.round(basicMonthly * 0.12), 1800);
+      const pfAnnual = pfMonthly * 12;
+
+      const gratuityAnnual = Math.round(basicAnnual * 0.0481);
+      const ptMonthly = 200;
+
+      const specialAnnual = Math.max(0, ctc - (basicAnnual + hraAnnual + pfAnnual + gratuityAnnual));
+      const specialMonthly = Math.round(specialAnnual / 12);
+
+      const grossMonthly = basicMonthly + hraMonthly + specialMonthly;
+      const netMonthly = grossMonthly - (pfMonthly + ptMonthly);
+
+      netPayDisplay.innerText = '₹ ' + netMonthly.toLocaleString('en-IN');
+      basicVal.innerText = '₹ ' + basicMonthly.toLocaleString('en-IN');
+      hraVal.innerText = '₹ ' + hraMonthly.toLocaleString('en-IN');
+      specialVal.innerText = '₹ ' + specialMonthly.toLocaleString('en-IN');
+      pfVal.innerText = '- ₹ ' + pfMonthly.toLocaleString('en-IN');
+    }
+
+    if (slider) {
+      slider.addEventListener('input', updateSimulation);
+      basicSelect.addEventListener('change', updateSimulation);
+      hraSelect.addEventListener('change', updateSimulation);
+      updateSimulation();
+    }
+  </script>
+</body>
+</html>

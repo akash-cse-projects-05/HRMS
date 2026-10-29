@@ -3,27 +3,60 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Expense Map & Tracking | HR Dashboard</title>
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>Expense Tracker & Field Claims | HRMS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <!-- MapLibre GL CSS for OpenStreetMap 3D Interactive Tiles -->
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
 
     <style>
+        :root {
+            --rsr-blue: #0052cc;
+            --rsr-blue-hover: #0747a6;
+            --rsr-text: #172b4d;
+            --rsr-text-light: #626f86;
+            --rsr-border: #dfe1e6;
+            --rsr-bg: #f4f5f7;
+            --rsr-card: #ffffff;
+        }
+
         body {
-            background-color: #f7f9fc;
+            background-color: var(--rsr-bg);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--rsr-text);
+            letter-spacing: -0.01em;
+        }
+
+        .navbar {
+            background: #ffffff !important;
+            border-bottom: 1px solid var(--rsr-border);
+            padding: 0.85rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            color: var(--rsr-blue) !important;
+        }
+
+        .page-header {
+            padding: 24px 0 20px;
+            border-bottom: 1px solid var(--rsr-border);
+            background: #ffffff;
+            margin-bottom: 20px;
         }
 
         .sidebar-list {
-            height: calc(100vh - 100px);
+            height: calc(100vh - 195px);
             overflow-y: auto;
         }
 
         #map {
-            height: calc(100vh - 100px);
+            height: calc(100vh - 195px);
             width: 100%;
-            border-radius: 12px;
+            border-radius: 16px;
+            border: 1px solid var(--rsr-border);
         }
 
         .expense-item {
@@ -33,34 +66,63 @@
         }
 
         .expense-item:hover {
-            background-color: #f0f7ff;
-            border-left-color: #0052cc;
+            background-color: #f4f8fe;
+            border-left-color: var(--rsr-blue);
         }
 
         .avatar-small {
-            width: 32px;
-            height: 32px;
-            background: #e2e8f0;
+            width: 34px;
+            height: 34px;
+            background: #e9f2ff;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             font-weight: bold;
-            color: #475569;
+            color: var(--rsr-blue);
         }
     </style>
 </head>
 
 <body>
+    <%- include('../partials/anti-cache') %>
 
-    <nav class="navbar navbar-dark bg-dark sticky-top px-3">
-        <a class="navbar-brand fw-bold" href="/hr/dashboard"><i class="fa-solid fa-map-location-dot me-2"></i> Expense
-            Tracker</a>
-        <a href="/hr/dashboard" class="btn btn-sm btn-outline-light">Back to Dashboard</a>
+    <!-- Standard App Navbar -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand d-flex align-items-center" href="/hr/dashboard">
+                <i class="fa-solid fa-building-shield me-2 text-primary"></i>
+                <span>HRMS Control Center</span>
+            </a>
+            <div class="ms-auto d-flex align-items-center gap-2">
+                <a href="/hr/dashboard" class="btn btn-outline-dark btn-sm rounded-pill px-3">
+                    <i class="fa-solid fa-arrow-left me-1"></i> HR Dashboard
+                </a>
+            </div>
+        </div>
     </nav>
 
-    <div class="container-fluid mt-3">
+    <!-- Standard Page Header -->
+    <div class="page-header">
+        <div class="container-fluid px-4">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div>
+                    <span class="badge mb-1" style="background: rgba(0, 82, 204, 0.1); color: var(--rsr-blue); border: 1px solid rgba(0, 82, 204, 0.2); font-weight: 700; font-size: 0.72rem;">
+                        <i class="fa-solid fa-receipt me-1"></i> FIELD EXPENSE AUDIT & GEOTRACKING
+                    </span>
+                    <h3 class="fw-bold mb-0" style="color: #091e42; letter-spacing: -0.02em;">Expense Tracker & Geotagged Claims</h3>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-3 py-2 rounded-pill fw-bold">
+                        <i class="fa-solid fa-clock-rotate-left me-1"></i> <%= pendingExpenses.length %> Claims Pending Review
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid px-4">
         <div class="row g-3">
 
             <!-- Left Sidebar: Pending Lists -->
@@ -168,31 +230,68 @@
         </div>
     </div>
 
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- MapLibre GL JS for OpenStreetMap Interactive 3D Maps -->
+    <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 
     <script>
-        // Initialize Map
-        var map = L.map('map').setView([20.5937, 78.9629], 5); // India Centered
+        // Initialize MapLibre GL 3D Map
+        const map = new maplibregl.Map({
+            container: 'map',
+            style: 'https://tiles.openfreemap.org/styles/liberty',
+            center: [78.9629, 20.5937], // India Centered [lng, lat]
+            zoom: 5,
+            pitch: 50, // 3D perspective with extruded buildings
+            bearing: -10,
+            maxPitch: 85,
+            dragRotate: true,
+            pitchWithRotate: true,
+            attributionControl: false
+        });
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
+        map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
+        map.addControl(new maplibregl.AttributionControl({
+            compact: true,
+            customAttribution: '<a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
+        }), 'bottom-right');
 
         // Add Markers from Server Data
-        const employees = <% - JSON.stringify(employeesOnMap) %>;
+        const employees = <%- JSON.stringify(employeesOnMap) %>;
+        const employeeMarkers = {};
+        const coordinates = [];
 
-        employees.forEach(emp => {
-            if (emp.lastKnownLocation && emp.lastKnownLocation.lat) {
-                const marker = L.marker([emp.lastKnownLocation.lat, emp.lastKnownLocation.lng]).addTo(map);
-                marker.bindPopup(`<b>${emp.firstName} ${emp.lastName}</b><br>${emp.designation}<br><small>${new Date(emp.lastKnownLocation.timestamp).toLocaleString()}</small>`);
+        map.on('load', () => {
+            employees.forEach(emp => {
+                if (emp.lastKnownLocation && emp.lastKnownLocation.lat) {
+                    const lat = emp.lastKnownLocation.lat;
+                    const lng = emp.lastKnownLocation.lng;
+                    coordinates.push([lng, lat]);
+
+                    const popup = new maplibregl.Popup({ offset: 25 }).setHTML(`
+                        <b>${emp.firstName} ${emp.lastName}</b><br>
+                        ${emp.designation}<br>
+                        <small class="text-muted">${new Date(emp.lastKnownLocation.timestamp).toLocaleString()}</small>
+                    `);
+
+                    const marker = new maplibregl.Marker({ color: '#0052cc' })
+                        .setLngLat([lng, lat])
+                        .setPopup(popup)
+                        .addTo(map);
+
+                    employeeMarkers[`${lat}_${lng}`] = marker;
+                }
+            });
+
+            if (coordinates.length > 0) {
+                const bounds = coordinates.reduce((b, coord) => b.extend(coord), new maplibregl.LngLatBounds(coordinates[0], coordinates[0]));
+                map.fitBounds(bounds, { padding: 60, maxZoom: 14 });
             }
         });
 
         function focusMap(lat, lng) {
             if (lat && lng) {
-                map.flyTo([lat, lng], 15);
+                map.flyTo({ center: [parseFloat(lng), parseFloat(lat)], zoom: 15, pitch: 50, essential: true });
+                const m = employeeMarkers[`${lat}_${lng}`];
+                if (m) m.togglePopup();
             }
         }
 
@@ -202,6 +301,7 @@
         }
     </script>
 
+    <%- include('../partials/ai-floating-assistant') %>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

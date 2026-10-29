@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Increment & Promotion Letter — <%= employee ? employee.firstName + ' ' + employee.lastName : 'Employee' %></title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #0f172a;
+      --accent: #2563eb;
+      --border: #e2e8f0;
+      --text: #334155;
+      --muted: #64748b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background: #f1f5f9;
+      color: var(--text);
+      line-height: 1.6;
+      padding: 30px;
+    }
+    .print-bar {
+      max-width: 800px;
+      margin: 0 auto 20px auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .btn {
+      padding: 10px 18px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: none;
+      font-size: 14px;
+    }
+    .btn-print { background: var(--accent); color: #fff; }
+    .btn-back { background: #fff; color: var(--text); border: 1px solid var(--border); }
+
+    /* A4 Letter Sheet */
+    .letter-sheet {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 60px 70px;
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    /* Header */
+    .letter-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 25px;
+      margin-bottom: 35px;
+    }
+    .company-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 0.5px;
+    }
+    .company-sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+    .letter-badge {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      background: #eff6ff;
+      color: var(--accent);
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid #bfdbfe;
+    }
+
+    .letter-meta {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 30px;
+      font-size: 13px;
+    }
+    .recipient-box strong {
+      font-size: 16px;
+      color: var(--primary);
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .letter-subject {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 20px;
+      padding: 8px 12px;
+      background: #f8fafc;
+      border-left: 3px solid var(--accent);
+    }
+
+    .letter-body p {
+      margin-bottom: 16px;
+      font-size: 13.5px;
+      text-align: justify;
+    }
+
+    /* Annexure Table */
+    .annexure-header {
+      margin-top: 30px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .annexure-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      margin-bottom: 30px;
+    }
+    .annexure-table th, .annexure-table td {
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      text-align: left;
+    }
+    .annexure-table th {
+      background: #f8fafc;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .annexure-table .text-right { text-align: right; }
+    .annexure-table .total-row {
+      background: #f1f5f9;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    /* Signatory */
+    .signatory-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 40px;
+      padding-top: 20px;
+    }
+    .sign-box {
+      width: 220px;
+      border-top: 1px dashed var(--border);
+      padding-top: 10px;
+      font-size: 12px;
+    }
+    .sign-box strong {
+      display: block;
+      color: var(--primary);
+      font-size: 13px;
+    }
+
+    @media print {
+      body { background: #fff; padding: 0; }
+      .print-bar { display: none !important; }
+      .letter-sheet {
+        border: none;
+        box-shadow: none;
+        padding: 0;
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="print-bar">
+    <a href="/hr/compensation" class="btn btn-back"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a>
+    <button onclick="window.print()" class="btn btn-print"><i class="fa-solid fa-print"></i> Print Official Letter</button>
+  </div>
+
+  <div class="letter-sheet">
+    <!-- Header -->
+    <header class="letter-header">
+      <div>
+        <h1 class="company-title"><%= company.name %></h1>
+        <div class="company-sub">
+          <%= company.address %><br>
+          CIN: <%= company.cin %> &bull; Web: <%= company.website %>
+        </div>
+      </div>
+      <span class="letter-badge">Ref: RSR/REV/<%= revision._id.toString().slice(-6).toUpperCase() %></span>
+    </header>
+
+    <!-- Meta Details -->
+    <div class="letter-meta">
+      <div class="recipient-box">
+        <strong><%= employee ? employee.firstName + ' ' + employee.lastName : 'Valued Employee' %></strong>
+        Employee Code: <%= employee ? employee.employeeCode : 'N/A' %><br>
+        Department: <%= employee ? employee.department : 'General' %><br>
+        Current Role: <%= revision.previousDesignation || (employee ? employee.designation : 'Staff') %>
+      </div>
+      <div style="text-align: right;">
+        <strong>Date:</strong> <%= new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) %><br>
+        <strong>Effective Date:</strong> <%= new Date(revision.effectiveDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) %><br>
+        <strong>Revision Type:</strong> <%= revision.revisionType %>
+      </div>
+    </div>
+
+    <!-- Subject -->
+    <div class="letter-subject">
+      SUBJECT: OFFICIAL LETTER OF COMPENSATION REVISION & 
+      <%= (revision.newDesignation && revision.newDesignation !== revision.previousDesignation) ? 'PROMOTION' : 'SALARY APPRAISAL' %>
+    </div>
+
+    <!-- Letter Body -->
+    <div class="letter-body">
+      <p>Dear <strong><%= employee ? employee.firstName : 'Colleague' %></strong>,</p>
+
+      <p>
+        In recognition of your continued dedication, professional diligence, and valuable contributions toward the growth and success of <strong><%= company.name %></strong>, the Management is pleased to announce a revision in your compensation package.
+      </p>
+
+      <% if (revision.newDesignation && revision.newDesignation !== revision.previousDesignation) { %>
+        <p>
+          Furthermore, in acknowledgement of your expanding technical leadership and ownership, you are hereby promoted to the role of <strong><%= revision.newDesignation %></strong>, effective from <strong><%= new Date(revision.effectiveDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) %></strong>.
+        </p>
+      <% } %>
+
+      <p>
+        Your revised Gross Compensation is adjusted to <strong>₹ <%= Number(revision.newSalary).toLocaleString('en-IN') %> per month</strong> (representing an increment of <strong><%= revision.hikePercentage %>%</strong> over your previous remuneration).
+      </p>
+
+      <p>
+        All other terms and conditions stipulated in your original Appointment Letter remain intact. Please find the detailed statutory structure of your revised monthly and annualized package in <strong>Annexure A</strong> below.
+      </p>
+
+      <!-- Annexure A -->
+      <div class="annexure-header">Annexure A — Salary Structure Breakdown</div>
+      <table class="annexure-table">
+        <thead>
+          <tr>
+            <th>Salary Component</th>
+            <th class="text-right">Previous Monthly (₹)</th>
+            <th class="text-right">Revised Monthly (₹)</th>
+            <th class="text-right">Annualized Total (₹)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% const bd = revision.breakdown || {}; %>
+          <tr>
+            <td>Basic Salary</td>
+            <td class="text-right"><%= Math.round(revision.previousSalary * 0.5).toLocaleString('en-IN') %></td>
+            <td class="text-right"><%= (bd.basicSalary || Math.round(revision.newSalary * 0.5)).toLocaleString('en-IN') %></td>
+            <td class="text-right"><%= ((bd.basicSalary || Math.round(revision.newSalary * 0.5)) * 12).toLocaleString('en-IN') %></td>
+          </tr>
+          <tr>
+            <td>House Rent Allowance (HRA)</td>
+            <td class="text-right"><%= Math.round(revision.previousSalary * 0.25).toLocaleString('en-IN') %></td>
+            <td class="text-right"><%= (bd.hra || Math.round(revision.newSalary * 0.25)).toLocaleString('en-IN') %></td>
+            <td class="text-right"><%= ((bd.hra || Math.round(revision.newSalary * 0.25)) * 12).toLocaleString('en-IN') %></td>
+          </tr>
+          <tr>
+            <td>Special & Travel Allowances</td>
+            <td class="text-right"><%= Math.max(0, Math.round(revision.previousSalary * 0.25)).toLocaleString('en-IN') %></td>
+            <td class="text-right"><%= (bd.specialAllowance || Math.max(0, Math.round(revision.newSalary * 0.25))).toLocaleString('en-IN') %></td>
+            <td class="text-right"><%= ((bd.specialAllowance || Math.max(0, Math.round(revision.newSalary * 0.25))) * 12).toLocaleString('en-IN') %></td>
+          </tr>
+          <tr class="total-row">
+            <td>Gross Monthly Remuneration</td>
+            <td class="text-right">₹ <%= Number(revision.previousSalary).toLocaleString('en-IN') %></td>
+            <td class="text-right">₹ <%= Number(revision.newSalary).toLocaleString('en-IN') %></td>
+            <td class="text-right">₹ <%= (Number(revision.newSalary) * 12).toLocaleString('en-IN') %></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>We look forward to your ongoing leadership and commitment to excellence as we scale new heights together.</p>
+    </div>
+
+    <!-- Signatures -->
+    <div class="signatory-row">
+      <div class="sign-box">
+        <strong>Authorized Signatory</strong>
+        Head of People Operations & HR<br>
+        <%= company.name %>
+      </div>
+      <div class="sign-box" style="text-align: right;">
+        <strong>Employee Acceptance</strong>
+        Signature: _______________________<br>
+        Date: ___________________________
+      </div>
+    </div>
+  </div>
+</body>
+</html>

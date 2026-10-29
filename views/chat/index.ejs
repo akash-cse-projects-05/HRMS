@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Internal Team Chat & Channels — HRMS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/chat.css">
+</head>
+<body class="chat-app-body">
+  <div class="chat-container">
+    <!-- LEFT SIDEBAR: Channels & Coworkers -->
+    <aside class="chat-sidebar">
+      <div class="sidebar-header">
+        <div class="workspace-title">
+          <i class="fa-solid fa-comments"></i>
+          <span>RSR Team Chat</span>
+        </div>
+        <a href="/dashboard" class="sidebar-home-btn" title="Exit to HRMS Dashboard"><i class="fa-solid fa-house"></i></a>
+      </div>
+
+      <div class="sidebar-scrollable">
+        <!-- Section 1: Department Channels -->
+        <div class="sidebar-section">
+          <div class="section-heading">
+            <span><i class="fa-solid fa-hashtag"></i> Department Channels</span>
+          </div>
+          <ul class="channel-list">
+            <% channels.forEach(ch => { %>
+              <li class="channel-item <%= ch === 'general' ? 'active' : '' %>" data-channel="<%= ch %>" onclick="selectChannel('<%= ch %>', this)">
+                <i class="fa-solid fa-hashtag"></i>
+                <span class="channel-name"><%= ch %></span>
+              </li>
+            <% }); %>
+          </ul>
+        </div>
+
+        <!-- Section 2: Direct Messages (Coworkers) -->
+        <div class="sidebar-section">
+          <div class="section-heading">
+            <span><i class="fa-solid fa-user-group"></i> Direct Messages</span>
+          </div>
+          <ul class="dm-list">
+            <% coworkers.forEach(emp => { %>
+              <% if (String(emp._id) !== String(currentEmployeeId)) { %>
+                <li class="dm-item" data-user-id="<%= emp._id %>" onclick="selectDirectUser('<%= emp._id %>', '<%= emp.firstName %> <%= emp.lastName %>', this)">
+                  <div class="presence-wrapper">
+                    <span class="avatar-sm"><%= (emp.firstName || 'C').charAt(0) %></span>
+                    <span class="presence-dot presence-available"></span>
+                  </div>
+                  <div class="dm-info">
+                    <span class="dm-name"><%= emp.firstName %> <%= emp.lastName %></span>
+                    <span class="dm-dept"><%= emp.department || 'General' %></span>
+                  </div>
+                </li>
+              <% } %>
+            <% }); %>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Current User Profile Footer -->
+      <div class="sidebar-user-footer">
+        <div class="user-presence-row">
+          <span class="avatar-sm user-avatar-accent"><%= currentEmployee && currentEmployee.firstName ? currentEmployee.firstName.charAt(0) : 'U' %></span>
+          <div class="user-meta">
+            <strong><%= currentEmployee && currentEmployee.firstName ? currentEmployee.firstName + ' ' + (currentEmployee.lastName || '') : 'My Account' %></strong>
+            <span class="status-indicator">🟢 Available (Punched In)</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT: Active Chat Room -->
+    <main class="chat-main">
+      <!-- Chat Header -->
+      <header class="chat-main-header">
+        <div class="current-chat-info">
+          <h2 id="activeChatTitle"><i class="fa-solid fa-hashtag"></i> general</h2>
+          <span id="activeChatSubtitle" class="chat-subtitle">Company-wide all-hands announcements and cross-team discussion</span>
+        </div>
+        <div class="chat-header-actions">
+          <button class="btn-icon" title="Search messages"><i class="fa-solid fa-magnifying-glass"></i></button>
+          <button class="btn-icon" title="Channel members"><i class="fa-solid fa-users"></i></button>
+        </div>
+      </header>
+
+      <!-- Message History Feed -->
+      <div class="chat-messages-stream" id="messageStream">
+        <div class="message-row">
+          <span class="msg-avatar">S</span>
+          <div class="msg-content-wrapper">
+            <div class="msg-author-row">
+              <strong class="msg-author">System Bot</strong>
+              <span class="msg-time">Today at 09:00 AM</span>
+            </div>
+            <div class="msg-bubble">
+              Welcome to the official RSR Enterprise Team Chat! Use this space to collaborate on projects, share updates, and sync with your department.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Message Input Form -->
+      <footer class="chat-input-area">
+        <form id="chatForm" onsubmit="handleSendMessage(event)">
+          <div class="input-container">
+            <textarea id="chatInputText" rows="1" placeholder="Type your message... (Shift + Enter for new line)" required></textarea>
+            <div class="input-actions-bar">
+              <div class="left-actions">
+                <button type="button" class="btn-tool" title="Share Payslip / Ticket Context Card" onclick="promptContextCard()">
+                  <i class="fa-solid fa-id-card-clip"></i> HR Card
+                </button>
+                <button type="button" class="btn-tool" title="Attach Document" onclick="alert('File attachment: select PDF or Image')">
+                  <i class="fa-solid fa-paperclip"></i>
+                </button>
+              </div>
+              <button type="submit" class="btn-send">
+                <i class="fa-solid fa-paper-plane"></i> Send
+              </button>
+            </div>
+          </div>
+        </form>
+      </footer>
+    </main>
+  </div>
+
+  <script src="/js/chat-client.js"></script>
+</body>
+</html>

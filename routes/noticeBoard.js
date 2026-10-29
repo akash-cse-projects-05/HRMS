@@ -14,11 +14,15 @@ router.get('/', async (req, res) => {
     const month = today.getMonth() + 1;
     const day = today.getDate();
 
-    // 1. Fetch Communications
+    // 1. Fetch Communications (Retained for 15 days)
+    const fifteenDaysAgo = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000);
     const announcements = await Announcement.find({
+      date: { $gte: fifteenDaysAgo },
       $or: [{ department: { $exists: false } }, { department: null }]
     }).sort({ date: -1 });
-    const notifications = await Notification.find().sort({ date: -1 });
+    const notifications = await Notification.find({
+      date: { $gte: fifteenDaysAgo }
+    }).sort({ date: -1 });
 
     // 2. Fetch ALL Active Employees once to process logic
     const allEmployees = await Employee.find({ status: 'Active' });

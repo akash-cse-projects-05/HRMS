@@ -148,7 +148,7 @@ router.post("/apply", async (req, res) => {
                 <tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>Reason:</strong></td><td style="padding: 10px; border-bottom: 1px solid #eee;">${reason}</td></tr>
               </table>
               <p style="margin-top: 30px;">Please login to the HRMS dashboard to approve or reject this request.</p>
-              <p style="color: #888; font-size: 12px; margin-top: 20px;">This is an automated message from RSR Aviation HRMS.</p>
+              <p style="color: #888; font-size: 12px; margin-top: 20px;">This is an automated message from the HRMS Portal.</p>
             </div>
           `
         });
@@ -186,9 +186,20 @@ router.get("/my-leaves", async (req, res) => {
       return res.redirect("/auth/login");
     }
 
+    const fifteenDaysAgo = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000);
     const leaves = await Leave.find({
-      employeeId: req.session.employeeId
-    }).sort({ createdAt: -1 });
+      employeeId: req.session.employeeId,
+      $or: [
+        { status: "PENDING" },
+        {
+          status: { $in: ["APPROVED", "REJECTED"] },
+          $or: [
+            { actionAt: { $gte: fifteenDaysAgo } },
+            { appliedAt: { $gte: fifteenDaysAgo } }
+          ]
+        }
+      ]
+    }).sort({ appliedAt: -1, createdAt: -1 });
 
     if (req.query.format === 'json' || req.headers.accept?.includes('application/json')) {
       return res.json(leaves);

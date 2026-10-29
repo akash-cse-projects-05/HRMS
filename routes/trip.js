@@ -227,12 +227,12 @@ router.get('/track/:id', requireAuth, async (req, res) => {
             return res.status(404).send("Trip not found");
         }
 
-        const viewer = await Employee.findById(req.session.employeeId);
+        const viewer = req.session.employeeId ? await Employee.findById(req.session.employeeId) : null;
 
         // Access Control: HR, Manager of same Dept, or OWNER
         const isHR = req.session.role === 'HR';
-        const isManager = req.session.role === 'MANAGER' && viewer.department === trip.employeeId.department;
-        const isOwner = trip.employeeId._id.toString() === req.session.employeeId;
+        const isManager = req.session.role === 'MANAGER' && viewer && trip.employeeId && viewer.department === trip.employeeId.department;
+        const isOwner = trip.employeeId && req.session.employeeId && trip.employeeId._id.toString() === req.session.employeeId.toString();
 
         if (!isHR && !isManager && !isOwner) {
             if (isJson) return res.status(403).json({ error: "Access Denied" });

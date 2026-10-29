@@ -1,91 +1,563 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Manage Helpdesk Tickets | HRMS</title>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Google Fonts & Bootstrap -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
   <style>
-    body { background-color: #f8fafc; font-family: 'Plus Jakarta Sans', sans-serif; color: #0f172a; }
-    .page-header { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; padding: 35px 0; margin-bottom: 30px; }
-    .card-ticket { background: white; border: 1px solid #e2e8f0; border-radius: 14px; padding: 20px; margin-bottom: 16px; }
+    :root {
+      --hrms-blue-dark: #050c1e;
+      --hrms-blue-glow: #020612;
+      --hrms-electric: #38bdf8;
+      --hrms-cyan: #06b6d4;
+      --hrms-cobalt: #2563eb;
+      --hrms-text-dark: #0f172a;
+      --hrms-text-muted: #475569;
+      --hrms-border: rgba(15, 23, 42, 0.08);
+      --hrms-bg-light: #f8fafc;
+      --btn-gradient: linear-gradient(135deg, #2563eb 0%, #0284c7 50%, #06b6d4 100%);
+      --btn-gradient-hover: linear-gradient(135deg, #1d4ed8 0%, #0369a1 50%, #0891b2 100%);
+    }
+
+    body {
+      background-color: var(--hrms-bg-light);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--hrms-text-dark);
+      letter-spacing: -0.015em;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* --- BRANDING NAVBAR --- */
+    .navbar-landing {
+      background: rgba(255, 255, 255, 0.95) !important;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--hrms-border);
+      padding: 0.75rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 1020;
+    }
+
+    .brand-emblem {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      background: linear-gradient(135deg, var(--hrms-cobalt) 0%, var(--hrms-cyan) 100%);
+      border-radius: 9px;
+      color: #ffffff;
+      font-size: 0.95rem;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .brand-emblem i.fa-circle-nodes {
+      font-size: 0.55rem;
+      position: absolute;
+      bottom: 4px;
+      right: 4px;
+      color: var(--hrms-electric);
+      background: var(--hrms-blue-dark);
+      border-radius: 50%;
+      padding: 1px;
+    }
+
+    .navbar-brand {
+      font-weight: 800;
+      color: var(--hrms-blue-dark) !important;
+      letter-spacing: -0.04em;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-size: 1.25rem;
+      text-decoration: none;
+    }
+
+    .brand-accent {
+      background: linear-gradient(to right, var(--hrms-cobalt), var(--hrms-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* --- PAGE HEADER --- */
+    .page-header {
+      background: linear-gradient(135deg, #050c1e 0%, #0a192f 50%, #0d234a 100%);
+      color: white;
+      padding: 42px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page-header::before {
+      content: "";
+      position: absolute;
+      top: -30%;
+      right: -10%;
+      width: 420px;
+      height: 420px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.9rem;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 99px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--hrms-electric);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.85rem;
+    }
+
+    /* --- KPI CARDS --- */
+    .kpi-card {
+      background: #ffffff;
+      border: 1px solid var(--hrms-border);
+      border-radius: 14px;
+      padding: 20px;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+      height: 100%;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.07);
+      border-color: rgba(37, 99, 235, 0.2);
+    }
+
+    .kpi-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      background: rgba(37, 99, 235, 0.08);
+      color: var(--hrms-cobalt);
+    }
+
+    /* --- TICKET RESOLUTION CARD --- */
+    .manage-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.02);
+      margin-bottom: 1.25rem;
+    }
+
+    .manage-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.06);
+      border-color: rgba(37, 99, 235, 0.3);
+    }
+
+    /* Status & Priority Pills */
+    .status-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.35rem 0.85rem;
+      border-radius: 99px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .status-Open {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+    }
+
+    .status-In-Progress {
+      background: #fefce8;
+      color: #a16207;
+      border: 1px solid #fef08a;
+    }
+
+    .status-Resolved {
+      background: #f0fdf4;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+    }
+
+    .status-Closed {
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+    }
+
+    .priority-Urgent {
+      background: #fff1f2;
+      color: #be123c;
+      border: 1px solid #fecdd3;
+    }
+
+    .priority-High {
+      background: #fff7ed;
+      color: #c2410c;
+      border: 1px solid #fed7aa;
+    }
+
+    .priority-Medium {
+      background: #eff6ff;
+      color: #2563eb;
+      border: 1px solid #bfdbfe;
+    }
+
+    .priority-Low {
+      background: #f8fafc;
+      color: #64748b;
+      border: 1px solid #e2e8f0;
+    }
+
+    /* Filter Pills */
+    .nav-pills-hrms .nav-link {
+      color: #64748b;
+      font-weight: 600;
+      font-size: 0.875rem;
+      padding: 0.5rem 1.1rem;
+      border-radius: 99px;
+      border: 1px solid #e2e8f0;
+      background: #ffffff;
+      transition: all 0.2s ease;
+    }
+
+    .nav-pills-hrms .nav-link:hover {
+      color: var(--hrms-cobalt);
+      border-color: var(--hrms-cobalt);
+    }
+
+    .nav-pills-hrms .nav-link.active {
+      background: var(--hrms-cobalt);
+      color: #ffffff;
+      border-color: var(--hrms-cobalt);
+    }
   </style>
 </head>
+
 <body>
   <%- include('../partials/anti-cache') %>
 
-  <div class="page-header">
-    <div class="container d-flex justify-content-between align-items-center">
-      <div>
-        <h3 class="fw-bold mb-1"><i class="fa-solid fa-list-check me-2 text-info"></i>Ticket Resolution Hub</h3>
-        <p class="text-slate-400 mb-0">Review, update, and resolve support requests assigned to your department</p>
-      </div>
-      <div>
-        <a href="/ticket" class="btn btn-outline-light rounded-pill px-3 me-2"><i class="fa-solid fa-arrow-left me-1"></i>My Tickets</a>
-        <a href="/dashboard" class="btn btn-light rounded-pill px-3"><i class="fa-solid fa-house me-1"></i>Dashboard</a>
+  <!-- Top Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-landing">
+    <div class="container">
+      <a class="navbar-brand" href="/dashboard">
+        <div class="brand-emblem">
+          <i class="fa-solid fa-shield-halved"></i>
+          <i class="fa-solid fa-circle-nodes"></i>
+        </div>
+        <span><span class="brand-accent">H</span>RMS</span>
+      </a>
+
+      <div class="ms-auto d-flex align-items-center gap-2">
+        <a href="/ticket" class="btn btn-outline-primary btn-sm rounded-pill px-3 shadow-sm">
+          <i class="fa-solid fa-ticket me-1"></i> My Tickets
+        </a>
+        <a href="/dashboard" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+          <i class="fa-solid fa-arrow-left me-1"></i> Dashboard
+        </a>
+        <% if (typeof employee !== 'undefined' && employee) { %>
+          <div class="ms-2 ps-2 border-start d-none d-md-flex align-items-center text-muted small">
+            <i class="fa-solid fa-circle-user me-1 text-primary"></i>
+            <span class="fw-semibold text-dark"><%= employee.firstName %> <%= employee.lastName %></span>
+            <% if (typeof isHR !== 'undefined' && isHR) { %>
+              <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill ms-2">HR Lead</span>
+            <% } else if (employee.department) { %>
+              <span class="badge bg-light text-muted border rounded-pill ms-2"><%= employee.department %></span>
+            <% } %>
+          </div>
+        <% } %>
       </div>
     </div>
-  </div>
+  </nav>
 
-  <div class="container pb-5">
+  <!-- Page Header -->
+  <header class="page-header">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-8">
+          <span class="header-badge">
+            <i class="fa-solid fa-sliders"></i> Resolution Control Desk
+          </span>
+          <h1 class="fw-bold mb-2 text-white">Ticket Resolution Hub</h1>
+          <p class="text-white-50 mb-0 fs-6">
+            Review, investigate, and provide resolution updates for support requests assigned to your department queue.
+          </p>
+        </div>
+        <div class="col-lg-4 text-lg-end mt-3 mt-lg-0 d-flex justify-content-lg-end gap-2">
+          <a href="/ticket" class="btn btn-outline-light rounded-pill px-4 shadow-sm fw-semibold">
+            <i class="fa-solid fa-ticket me-2"></i>My Tickets
+          </a>
+          <a href="/dashboard" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold">
+            <i class="fa-solid fa-house me-2"></i>Dashboard
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container py-4 flex-grow-1">
+
     <% if (typeof success !== 'undefined' && success) { %>
-      <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4"><%= success %><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
-    <% } %>
-    <% if (typeof error !== 'undefined' && error) { %>
-      <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4"><%= error %><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+      <div class="alert alert-success alert-dismissible fade show rounded-4 border-0 shadow-sm mb-4 d-flex align-items-center">
+        <i class="fa-solid fa-circle-check fs-5 me-2 text-success"></i>
+        <div class="fw-semibold"><%= success %></div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
     <% } %>
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h5 class="fw-bold mb-0">Active Department Support Tickets (<%= tickets.length %>)</h5>
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="alert alert-danger alert-dismissible fade show rounded-4 border-0 shadow-sm mb-4 d-flex align-items-center">
+        <i class="fa-solid fa-circle-exclamation fs-5 me-2 text-danger"></i>
+        <div class="fw-semibold"><%= error %></div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    <% } %>
+
+    <!-- KPI Summary Row -->
+    <% 
+      const totalTickets = tickets.length;
+      const openTickets = tickets.filter(t => t.status === 'Open').length;
+      const inProgressTickets = tickets.filter(t => t.status === 'In Progress').length;
+      const resolvedTickets = tickets.filter(t => t.status === 'Resolved' || t.status === 'Closed').length;
+    %>
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-lg-3">
+        <div class="kpi-card d-flex align-items-center gap-3">
+          <div class="kpi-icon">
+            <i class="fa-solid fa-list-check"></i>
+          </div>
+          <div>
+            <div class="text-muted small fw-semibold">Assigned Queue</div>
+            <div class="fs-4 fw-bold text-dark"><%= totalTickets %></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="kpi-card d-flex align-items-center gap-3">
+          <div class="kpi-icon" style="background: rgba(37, 99, 235, 0.12); color: #2563eb;">
+            <i class="fa-solid fa-envelope-open-text"></i>
+          </div>
+          <div>
+            <div class="text-muted small fw-semibold">Awaiting Action</div>
+            <div class="fs-4 fw-bold text-primary"><%= openTickets %></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="kpi-card d-flex align-items-center gap-3">
+          <div class="kpi-icon" style="background: rgba(161, 98, 7, 0.1); color: #a16207;">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+          </div>
+          <div>
+            <div class="text-muted small fw-semibold">Under Investigation</div>
+            <div class="fs-4 fw-bold" style="color: #a16207;"><%= inProgressTickets %></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="kpi-card d-flex align-items-center gap-3">
+          <div class="kpi-icon" style="background: rgba(21, 128, 61, 0.1); color: #15803d;">
+            <i class="fa-solid fa-circle-check"></i>
+          </div>
+          <div>
+            <div class="text-muted small fw-semibold">Closed & Resolved</div>
+            <div class="fs-4 fw-bold" style="color: #15803d;"><%= resolvedTickets %></div>
+          </div>
+        </div>
+      </div>
     </div>
 
+    <!-- Filter Tabs & Search Bar -->
+    <div class="card border-0 shadow-sm rounded-4 p-3 mb-4">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <ul class="nav nav-pills nav-pills-hrms gap-2 mb-0" id="manageFilterTabs">
+          <li class="nav-item">
+            <button class="nav-link active" onclick="filterManage('all')">All Queue (<%= totalTickets %>)</button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" onclick="filterManage('Open')">Open (<%= openTickets %>)</button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" onclick="filterManage('In Progress')">In Progress (<%= inProgressTickets %>)</button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" onclick="filterManage('Resolved')">Resolved (<%= resolvedTickets %>)</button>
+          </li>
+        </ul>
+
+        <div class="input-group" style="max-width: 320px;">
+          <span class="input-group-text bg-light border-end-0 text-muted">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </span>
+          <input type="text" id="manageSearchInput" class="form-control bg-light border-start-0" placeholder="Search employee, subject..." onkeyup="searchManage()">
+        </div>
+      </div>
+    </div>
+
+    <!-- Ticket Management Queue -->
     <% if (tickets.length === 0) { %>
-      <div class="text-center py-5 bg-white rounded-4 border">
-        <i class="fa-solid fa-check-double text-success fa-3x mb-3"></i>
-        <h5 class="fw-semibold text-muted">All support tickets resolved</h5>
-        <p class="text-muted small">No pending support requests in queue for your department.</p>
+      <div class="text-center py-5 bg-white rounded-4 border shadow-sm">
+        <div class="w-16 h-16 rounded-circle bg-light d-inline-flex align-items-center justify-content-center p-4 mb-3 text-success">
+          <i class="fa-solid fa-check-double fa-3x"></i>
+        </div>
+        <h4 class="fw-bold text-dark mb-1">Queue is Fully Clear</h4>
+        <p class="text-muted small mb-0" style="max-width: 420px; margin: 0 auto;">
+          There are no pending support or service tickets in your department queue at this moment.
+        </p>
       </div>
     <% } else { %>
-      <% tickets.forEach(t => { %>
-        <div class="card-ticket shadow-sm">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <div>
-              <span class="badge bg-primary rounded-pill me-2"><%= t.targetDepartment %> Dept</span>
-              <span class="badge bg-secondary rounded-pill me-2">Priority: <%= t.priority %></span>
-              <span class="badge bg-dark rounded-pill"><%= t.status %></span>
-            </div>
-            <small class="text-muted"><i class="fa-regular fa-user me-1"></i><%= t.employeeName %> | <%= new Date(t.createdAt).toLocaleDateString() %></small>
-          </div>
-          <h5 class="fw-bold text-dark mb-1"><%= t.subject %></h5>
-          <p class="text-slate-600 mb-3"><%= t.description %></p>
+      <div id="manageContainer">
+        <% tickets.forEach(t => { %>
+          <div class="manage-card manage-item" data-status="<%= t.status %>" data-search="<%= ((t.employeeName || '') + ' ' + t.subject + ' ' + t.targetDepartment + ' ' + (t.category || '') + ' ' + t.description).toLowerCase() %>">
+            
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+              <div class="d-flex flex-wrap align-items-center gap-2">
+                <!-- Status Badge -->
+                <% const statusClass = t.status === 'In Progress' ? 'status-In-Progress' : ('status-' + t.status); %>
+                <span class="status-badge <%= statusClass %>">
+                  <% if (t.status === 'Open') { %><i class="fa-solid fa-envelope-open me-1"></i><% } %>
+                  <% if (t.status === 'In Progress') { %><i class="fa-solid fa-spinner fa-spin me-1"></i><% } %>
+                  <% if (t.status === 'Resolved' || t.status === 'Closed') { %><i class="fa-solid fa-check-circle me-1"></i><% } %>
+                  <%= t.status %>
+                </span>
 
-          <form action="/ticket/<%= t._id %>/update" method="POST" class="bg-slate-50 p-3 rounded-3 border">
-            <div class="row g-2 align-items-center">
-              <div class="col-md-3">
-                <label class="form-label small fw-semibold mb-1">Update Status</label>
-                <select name="status" class="form-select form-select-sm">
-                  <option value="Open" <%= t.status === 'Open' ? 'selected' : '' %>>Open</option>
-                  <option value="In Progress" <%= t.status === 'In Progress' ? 'selected' : '' %>>In Progress</option>
-                  <option value="Resolved" <%= t.status === 'Resolved' ? 'selected' : '' %>>Resolved</option>
-                  <option value="Closed" <%= t.status === 'Closed' ? 'selected' : '' %>>Closed</option>
-                </select>
+                <!-- Priority Badge -->
+                <span class="status-badge priority-<%= t.priority %>">
+                  <i class="fa-solid fa-flag me-1"></i><%= t.priority %> Priority
+                </span>
+
+                <!-- Department Tag -->
+                <span class="badge bg-light text-dark border px-3 py-2 rounded-pill fw-semibold">
+                  <i class="fa-solid fa-building me-1 text-primary"></i><%= t.targetDepartment %>
+                </span>
+
+                <% if (t.category) { %>
+                  <span class="badge bg-light text-muted border px-3 py-2 rounded-pill fw-normal">
+                    <%= t.category %>
+                  </span>
+                <% } %>
               </div>
-              <div class="col-md-5">
-                <label class="form-label small fw-semibold mb-1">Resolution Notes</label>
-                <input type="text" name="resolutionNotes" class="form-control form-control-sm" value="<%= t.resolutionNotes || '' %>" placeholder="Enter resolution explanation...">
-              </div>
-              <div class="col-md-4 text-end mt-4">
-                <button type="submit" class="btn btn-success btn-sm rounded-pill px-4"><i class="fa-solid fa-save me-1"></i>Save Updates</button>
+
+              <div class="text-muted small">
+                <i class="fa-regular fa-user me-1 text-primary"></i> <strong class="text-dark"><%= t.employeeName || 'Staff Member' %></strong>
+                <span class="mx-1">•</span>
+                <i class="fa-regular fa-clock me-1"></i> <%= new Date(t.createdAt).toLocaleDateString() %>
               </div>
             </div>
-          </form>
-        </div>
-      <% }) %>
+
+            <!-- Subject & Description -->
+            <h5 class="fw-bold text-dark mb-2"><%= t.subject %></h5>
+            <p class="text-secondary small mb-3" style="line-height: 1.6;"><%= t.description %></p>
+
+            <!-- Existing comments if any -->
+            <% if (t.comments && t.comments.length > 0) { %>
+              <div class="p-3 bg-light rounded-3 border mb-3">
+                <div class="text-muted small fw-bold mb-2">
+                  <i class="fa-regular fa-comments me-1 text-primary"></i> Thread Updates (<%= t.comments.length %>)
+                </div>
+                <% t.comments.forEach(c => { %>
+                  <div class="border-bottom py-1 small">
+                    <strong class="text-primary"><%= c.postedBy %> (<%= c.role %>):</strong>
+                    <span class="text-dark"><%= c.text %></span>
+                  </div>
+                <% }) %>
+              </div>
+            <% } %>
+
+            <!-- Resolution Update Form -->
+            <form action="/ticket/<%= t._id %>/update" method="POST" class="p-3 bg-light rounded-3 border">
+              <div class="row g-2 align-items-end">
+                <div class="col-md-3">
+                  <label class="form-label small fw-semibold text-dark mb-1">Status</label>
+                  <select name="status" class="form-select form-select-sm">
+                    <option value="Open" <%= t.status === 'Open' ? 'selected' : '' %>>Open</option>
+                    <option value="In Progress" <%= t.status === 'In Progress' ? 'selected' : '' %>>In Progress</option>
+                    <option value="Resolved" <%= t.status === 'Resolved' ? 'selected' : '' %>>Resolved</option>
+                    <option value="Closed" <%= t.status === 'Closed' ? 'selected' : '' %>>Closed</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold text-dark mb-1">Resolution Explanation</label>
+                  <input type="text" name="resolutionNotes" class="form-control form-control-sm" value="<%= t.resolutionNotes || '' %>" placeholder="Official resolution remarks...">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label small fw-semibold text-dark mb-1">Add Comment / Note</label>
+                  <input type="text" name="commentText" class="form-control form-control-sm" placeholder="Post public message...">
+                </div>
+                <div class="col-md-2 text-md-end">
+                  <button type="submit" class="btn btn-primary btn-sm rounded-pill px-3 w-100 fw-semibold shadow-sm">
+                    <i class="fa-solid fa-floppy-disk me-1"></i> Update
+                  </button>
+                </div>
+              </div>
+            </form>
+
+          </div>
+        <% }) %>
+      </div>
     <% } %>
-  </div>
+
+  </main>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    function filterManage(status) {
+      const tabs = document.querySelectorAll('#manageFilterTabs .nav-link');
+      tabs.forEach(t => t.classList.remove('active'));
+      event.target.classList.add('active');
+
+      const items = document.querySelectorAll('.manage-item');
+      items.forEach(item => {
+        const itemStatus = item.getAttribute('data-status');
+        if (status === 'all') {
+          item.style.display = 'block';
+        } else if (status === 'Resolved') {
+          item.style.display = (itemStatus === 'Resolved' || itemStatus === 'Closed') ? 'block' : 'none';
+        } else {
+          item.style.display = (itemStatus === status) ? 'block' : 'none';
+        }
+      });
+    }
+
+    function searchManage() {
+      const q = document.getElementById('manageSearchInput').value.toLowerCase().trim();
+      const items = document.querySelectorAll('.manage-item');
+      items.forEach(item => {
+        const searchData = item.getAttribute('data-search');
+        if (!q || searchData.includes(q)) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+  </script>
 </body>
+
 </html>

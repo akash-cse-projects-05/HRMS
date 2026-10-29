@@ -114,22 +114,43 @@
 
     <nav class="navbar navbar-expand-lg sticky-top">
       <div class="container">
-        <a class="navbar-brand" href="/dashboard">
+        <a class="navbar-brand" href="<%= (typeof isHr !== 'undefined' && isHr) ? '/hr/dashboard' : '/dashboard' %>">
           <i class="fa-solid fa-paper-plane me-2"></i> HRMS
         </a>
-        <div class="ms-auto">
-          <a href="/dashboard" class="btn btn-outline-dark btn-sm rounded-pill px-3">Back to Home</a>
+        <div class="ms-auto d-flex align-items-center gap-2">
+          <% if (typeof allDepartments !== 'undefined' && allDepartments && allDepartments.length > 0) { %>
+            <div class="d-flex align-items-center gap-1 me-2">
+              <span class="small text-muted fw-bold d-none d-sm-inline" style="font-size: 0.75rem;">DEPT:</span>
+              <select class="form-select form-select-sm shadow-none" style="border-radius: 20px; font-weight: 700; font-size: 0.8rem; padding-left: 12px; padding-right: 28px;" onchange="if(this.value) window.location.href='/department/' + encodeURIComponent(this.value)">
+                <% allDepartments.forEach(d => { %>
+                  <option value="<%= d %>" <%= d.toUpperCase() === department.toUpperCase() ? 'selected' : '' %>><%= d %></option>
+                <% }) %>
+              </select>
+            </div>
+          <% } %>
+          <a href="<%= (typeof isHr !== 'undefined' && isHr) ? '/hr/dashboard' : '/dashboard' %>" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-bold">
+            <i class="fa-solid fa-arrow-left me-1"></i> <%= (typeof isHr !== 'undefined' && isHr) ? 'HR Commander' : 'Home' %>
+          </a>
         </div>
       </div>
     </nav>
 
     <header class="page-header">
       <div class="container">
-        <p class="text-primary fw-bold small mb-1" style="letter-spacing: 0.1em;">DEPARTMENT HUB</p>
-        <h1 class="fw-bold mb-0">
-          <%= department %> Department
-        </h1>
-        <p class="text-muted mt-2">Team monitoring, task allocation, and operational broadcasts.</p>
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+          <div>
+            <p class="text-primary fw-bold small mb-1" style="letter-spacing: 0.1em;">DEPARTMENT HUB</p>
+            <h1 class="fw-bold mb-0">
+              <%= department %> Department
+            </h1>
+            <p class="text-muted mt-2 mb-0">Team monitoring, task allocation, and operational broadcasts.</p>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-2 fw-bold">
+              <i class="fa-solid fa-users me-1"></i> <%= (typeof employees !== 'undefined' && employees) ? employees.length : 0 %> Members
+            </span>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -138,23 +159,31 @@
 
         <div class="col-lg-4">
           <div class="section-card">
-            <div class="card-header-rsr">Team Members</div>
+            <div class="card-header-rsr d-flex justify-content-between align-items-center">
+              <span>Team Members</span>
+              <span class="badge bg-secondary-subtle text-secondary rounded-pill"><%= (typeof employees !== 'undefined' && employees) ? employees.length : 0 %></span>
+            </div>
             <div class="list-group list-group-flush">
-              <% employees.forEach(emp=> { %>
-                <div class="list-group-item d-flex align-items-center">
-                  <div class="rounded-circle bg-primary bg-opacity-10 text-primary p-2 me-3"><i
-                      class="fa-solid fa-user"></i></div>
-                  <div>
-                    <div class="fw-bold small">
-                      <%= emp.firstName %>
-                        <%= emp.lastName %>
-                    </div>
-                    <div class="text-muted small" style="font-size: 11px;">
-                      <%= emp.designation %>
+              <% const memberList = (typeof employees !== 'undefined' && employees) ? employees : []; %>
+              <% if (memberList.length === 0) { %>
+                <div class="p-4 text-center text-muted small">No crew members assigned to this department yet.</div>
+              <% } else { %>
+                <% memberList.forEach(emp=> { %>
+                  <div class="list-group-item d-flex align-items-center">
+                    <div class="rounded-circle bg-primary bg-opacity-10 text-primary p-2 me-3"><i
+                        class="fa-solid fa-user"></i></div>
+                    <div>
+                      <div class="fw-bold small">
+                        <%= emp.firstName %>
+                          <%= emp.lastName %>
+                      </div>
+                      <div class="text-muted small" style="font-size: 11px;">
+                        <%= emp.designation || 'Staff' %>
+                      </div>
                     </div>
                   </div>
-                </div>
                 <% }) %>
+              <% } %>
             </div>
           </div>
 

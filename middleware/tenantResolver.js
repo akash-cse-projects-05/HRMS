@@ -14,7 +14,7 @@ module.exports = async (req, res, next) => {
   // Resolve tenant ID from session, body, query, or custom header
   let tenantId = (req.session && req.session.tenantId) ||
                  (req.body && req.body.tenantId) ||
-                 (req.query && req.query.tenantId) ||
+                 (req.query && (req.query.tenantId || req.query.tenant)) ||
                  (req.headers && req.headers["x-tenant-id"]);
 
   if (tenantId) {

@@ -182,6 +182,19 @@
     </header>
 
     <div class="container pb-5">
+      <% if (typeof success !== 'undefined' && success) { %>
+        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+          <i class="fa-solid fa-circle-check me-2"></i> <%= success === 'photo_updated' ? 'Profile photo updated successfully!' : success %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      <% } %>
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+          <i class="fa-solid fa-triangle-exclamation me-2"></i> <%= error %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      <% } %>
+
       <div class="row g-4">
 
         <div class="col-lg-6">
@@ -190,11 +203,31 @@
 
             <% if (employee) { %>
               <div class="text-center mb-4">
-                <img src="/employee/photo/<%= employee._id %>" alt="Profile Photo" class="rounded-circle shadow-sm"
-                  style="width: 120px; height: 120px; object-fit: cover; border: 4px solid var(--rsr-light);"
-                  onerror="this.src='https://ui-avatars.com/api/?name=<%= employee.firstName %>+<%= employee.lastName %>&background=0052cc&color=fff&size=128'">
+                <div class="position-relative d-inline-block">
+                  <img id="profileAvatarImg" src="/employee/photo/<%= employee._id %>?t=<%= Date.now() %>" alt="Profile Photo" class="rounded-circle shadow-sm"
+                    style="width: 124px; height: 124px; object-fit: cover; border: 4px solid #fff; box-shadow: 0 4px 14px rgba(0, 82, 204, 0.15) !important;"
+                    onerror="this.src='https://ui-avatars.com/api/?name=<%= employee.firstName %>+<%= employee.lastName %>&background=0052cc&color=fff&size=128'">
+                  
+                  <!-- Camera Edit Trigger -->
+                  <form id="avatarUploadForm" action="/employee/profile/photo" method="POST" enctype="multipart/form-data" class="m-0 p-0">
+                    <label for="profilePhotoInput" class="btn btn-sm btn-primary rounded-circle position-absolute shadow" 
+                           style="bottom: 2px; right: 2px; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid #ffffff; transition: transform 0.2s;"
+                           onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"
+                           title="Upload / Change Profile Picture">
+                      <i class="fa-solid fa-camera"></i>
+                    </label>
+                    <input type="file" id="profilePhotoInput" name="photo" accept="image/png, image/jpeg, image/jpg, image/webp" style="display: none;" onchange="submitAvatar(this)">
+                  </form>
+                </div>
+
+                <div class="mt-2">
+                  <label for="profilePhotoInput" class="btn btn-link text-primary text-decoration-none small fw-bold p-0">
+                    <i class="fa-solid fa-cloud-arrow-up me-1"></i> Upload New Photo
+                  </label>
+                  <div id="uploadStatusText" class="small text-muted mt-1" style="display: none;"></div>
+                </div>
               </div>
-              <% } %>
+            <% } %>
 
                 <div class="list-group">
                   <div class="list-group-item">
@@ -390,12 +423,40 @@
       </div>
     </div>
 
-    <!-- Resignation Confirmation Modal (Standard JS confirm used, but custom script added for clarity) -->
+    <!-- Resignation & Avatar Upload Scripts -->
     <script>
       function confirmResignation() {
         if (confirm("Are you sure you want to apply for resignation?\n\nThis action will notify your Manager and HR Department.")) {
           document.getElementById('resignForm').submit();
         }
+      }
+
+      function submitAvatar(input) {
+        if (!input.files || !input.files[0]) return;
+        const file = input.files[0];
+        if (file.size > 5 * 1024 * 1024) {
+          alert("Image size exceeds 5MB limit. Please choose a smaller photo.");
+          input.value = "";
+          return;
+        }
+
+        // Client-side preview immediately
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const avatar = document.getElementById("profileAvatarImg");
+          if (avatar) avatar.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+
+        // Show uploading indicator
+        const status = document.getElementById("uploadStatusText");
+        if (status) {
+          status.style.display = "block";
+          status.innerHTML = '<span class="text-primary"><i class="fa-solid fa-spinner fa-spin me-1"></i> Uploading photo...</span>';
+        }
+
+        // Submit form
+        document.getElementById("avatarUploadForm").submit();
       }
     </script>
 

@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "5d22bfdd-8cec-4cf9-bcb4-ec11b920d7e3"
+      }
+    },
+    "android": {
+      "package": "com.akashcse.rsr_aviation"
+    }
+  }
+}

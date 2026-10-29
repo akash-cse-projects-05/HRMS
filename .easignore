@@ -1,0 +1,4 @@
+# Root .easignore to allow EAS Build to include MOBILE-APPLICATION while git ignores it
+node_modules/
+Videos/
+.git/

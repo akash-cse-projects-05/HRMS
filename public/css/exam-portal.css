@@ -1,0 +1,451 @@
+/* public/css/exam-portal.css */
+/* Modern Enterprise AI Assessment Portal Stylesheet */
+
+:root {
+  --hrms-blue-dark: #050c1e;
+  --hrms-blue-glow: #020612;
+  --hrms-cobalt: #2563eb;
+  --hrms-electric: #38bdf8;
+  --hrms-cyan: #06b6d4;
+  --hrms-bg-light: #f8fafc;
+  --hrms-text-dark: #0f172a;
+  --hrms-text-muted: #64748b;
+  --hrms-border: #e2e8f0;
+  --btn-gradient: linear-gradient(135deg, #2563eb 0%, #0284c7 50%, #06b6d4 100%);
+  --btn-gradient-hover: linear-gradient(135deg, #1d4ed8 0%, #0369a1 50%, #0891b2 100%);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body.exam-body {
+  background-color: var(--hrms-bg-light);
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--hrms-text-dark);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.exam-header {
+  background: linear-gradient(135deg, #050c1e 0%, #0a192f 50%, #0d234a 100%);
+  color: #ffffff;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo-mark {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--hrms-cobalt) 0%, var(--hrms-cyan) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.portal-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.2rem;
+}
+
+.role-badge {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.role-badge strong {
+  color: var(--hrms-electric);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.candidate-pill {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.45rem 1rem;
+  border-radius: 99px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.timer-box {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  padding: 0.45rem 1.1rem;
+  border-radius: 99px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #f87171;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  letter-spacing: 0.05em;
+}
+
+/* Security & Anti-Cheat Strip */
+.security-banner {
+  background: #0f172a;
+  color: #94a3b8;
+  font-size: 0.78rem;
+  padding: 0.5rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #1e293b;
+}
+
+.tab-warn {
+  font-weight: 700;
+  color: #f59e0b;
+}
+
+/* Main Container */
+.exam-container {
+  flex-grow: 1;
+  max-width: 900px;
+  width: 100%;
+  margin: 2.5rem auto;
+  padding: 0 1.5rem;
+}
+
+.exam-card {
+  background: #ffffff;
+  border: 1px solid var(--hrms-border);
+  border-radius: 20px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+}
+
+/* Progress Bar */
+.progress-wrapper {
+  margin-bottom: 2rem;
+}
+
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--hrms-text-muted);
+  margin-bottom: 0.6rem;
+}
+
+.progress-bar-track {
+  width: 100%;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--btn-gradient);
+  border-radius: 99px;
+  transition: width 0.35s ease;
+}
+
+/* Question Steps */
+.question-step {
+  display: none;
+}
+
+.question-step.active {
+  display: block;
+  animation: fadeInStep 0.3s ease;
+}
+
+@keyframes fadeInStep {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.question-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.category-pill {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.3rem 0.85rem;
+  border-radius: 99px;
+  background: #eff6ff;
+  color: var(--hrms-cobalt);
+  border: 1px solid #bfdbfe;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.step-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 0.3rem 0.75rem;
+  border-radius: 99px;
+}
+
+.question-text {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--hrms-text-dark);
+  line-height: 1.45;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.75rem;
+}
+
+/* Input Area */
+.input-wrapper {
+  margin-bottom: 2rem;
+}
+
+.input-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #334155;
+  margin-bottom: 0.6rem;
+}
+
+.word-counter {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.answer-textarea {
+  width: 100%;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 14px;
+  padding: 1.1rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #0f172a;
+  outline: none;
+  transition: all 0.2s ease;
+  resize: vertical;
+  background: #fcfdfe;
+}
+
+.answer-textarea:focus {
+  border-color: var(--hrms-cobalt);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+  background: #ffffff;
+}
+
+/* Controls */
+.exam-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.exam-notice {
+  font-size: 0.78rem;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.6rem;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--btn-gradient);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background: var(--btn-gradient-hover);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: #ffffff;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+
+.btn-secondary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+}
+
+.btn-success:hover {
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Completion Card Screen */
+body.completed-body {
+  justify-content: center;
+  align-items: center;
+  background: #f1f5f9;
+}
+
+.completion-card {
+  background: #ffffff;
+  border: 1px solid var(--hrms-border);
+  border-radius: 24px;
+  padding: 3.5rem 3rem;
+  max-width: 600px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+}
+
+.completion-icon {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  margin-bottom: 1.5rem;
+}
+
+.success-icon {
+  background: #ecfdf5;
+  color: #10b981;
+}
+
+.error-icon {
+  background: #fef2f2;
+  color: #ef4444;
+}
+
+.completion-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 0.75rem;
+}
+
+.completion-desc {
+  font-size: 0.95rem;
+  color: #64748b;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.status-summary-pill {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  margin-bottom: 2rem;
+}
+
+.stat-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-val {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.highlight-green {
+  color: #059669;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 35px;
+  background: #e2e8f0;
+}
+
+.info-note {
+  font-size: 0.85rem;
+  color: #64748b;
+  line-height: 1.5;
+  margin-bottom: 2rem;
+}
+
+.completion-actions {
+  display: flex;
+  justify-content: center;
+}

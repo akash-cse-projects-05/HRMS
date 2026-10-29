@@ -110,6 +110,17 @@
                     </div>
                 </div>
             </form>
+
+            <% if (employee.status === 'Inactive' || employee.status === 'Resigned') { %>
+                <div class="mt-4 pt-3 border-top">
+                    <form action="/hr/delete-employee/<%= employee._id %>" method="POST"
+                        onsubmit="return confirm('⚠️ WARNING: Are you sure you want to PERMANENTLY delete <%= employee.firstName %> <%= employee.lastName %> (<%= employee.employeeCode %>)? All user logins, attendance records, leaves, and documents will be erased. This action CANNOT be undone.');">
+                        <button type="submit" class="btn btn-outline-danger w-100 py-2 fw-bold">
+                            <i class="fa-solid fa-trash-can me-1"></i> Permanently Delete <%= employee.status %> Employee Record
+                        </button>
+                    </form>
+                </div>
+            <% } %>
         </div>
     </div>
 

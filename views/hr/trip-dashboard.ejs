@@ -2,220 +2,746 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Trip Management | HR Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f7f9fc;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trip Management | HR Dashboard</title>
 
-        .avatar-small {
-            width: 30px;
-            height: 30px;
-            background: #e2e8f0;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 0.75rem;
-            color: #475569;
-        }
-    </style>
+  <!-- Google Fonts & Bootstrap -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --hrms-blue-dark: #050c1e;
+      --hrms-blue-glow: #020612;
+      --hrms-electric: #38bdf8;
+      --hrms-cyan: #06b6d4;
+      --hrms-cobalt: #2563eb;
+      --hrms-text-dark: #0f172a;
+      --hrms-text-muted: #475569;
+      --hrms-border: rgba(15, 23, 42, 0.08);
+      --hrms-bg-light: #f8fafc;
+
+      --btn-gradient: linear-gradient(135deg, #2563eb 0%, #0284c7 50%, #06b6d4 100%);
+      --btn-gradient-hover: linear-gradient(135deg, #1d4ed8 0%, #0369a1 50%, #0891b2 100%);
+    }
+
+    body {
+      background-color: var(--hrms-bg-light);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--hrms-text-dark);
+      letter-spacing: -0.02em;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* --- BRANDING NAVBAR (Matching Landing Page) --- */
+    .navbar-landing {
+      background: rgba(255, 255, 255, 0.9) !important;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--hrms-border);
+      padding: 0.75rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 1020;
+    }
+
+    .brand-emblem {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--hrms-cobalt) 0%, var(--hrms-cyan) 100%);
+      border-radius: 8px;
+      color: #ffffff;
+      font-size: 0.95rem;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .brand-emblem i.fa-circle-nodes {
+      font-size: 0.55rem;
+      position: absolute;
+      bottom: 4px;
+      right: 4px;
+      color: var(--hrms-electric);
+      background: var(--hrms-blue-dark);
+      border-radius: 50%;
+      padding: 1px;
+    }
+
+    .navbar-brand {
+      font-weight: 800;
+      color: var(--hrms-blue-dark) !important;
+      letter-spacing: -0.04em;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-size: 1.25rem;
+      text-decoration: none;
+    }
+
+    .brand-accent {
+      background: linear-gradient(to right, var(--hrms-cobalt), var(--hrms-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .btn-outline-nav {
+      background: transparent;
+      color: var(--hrms-cobalt);
+      border: 1.5px solid var(--hrms-cobalt);
+      padding: 6px 18px;
+      border-radius: 99px;
+      font-weight: 700;
+      transition: all 0.2s ease;
+      font-size: 0.85rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-outline-nav:hover {
+      background: rgba(37, 99, 235, 0.05);
+      color: var(--hrms-cobalt);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary-nav {
+      background: var(--btn-gradient);
+      color: #fff !important;
+      border: none;
+      padding: 7px 20px;
+      border-radius: 99px;
+      font-weight: 700;
+      transition: all 0.2s ease;
+      font-size: 0.85rem;
+      text-decoration: none;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary-nav:hover {
+      background: var(--btn-gradient-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+    }
+
+    /* --- PAGE HEADER --- */
+    .page-header {
+      padding: 30px 0 20px;
+      margin-bottom: 24px;
+    }
+
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(37, 99, 235, 0.06);
+      color: var(--hrms-cobalt);
+      border: 1px solid rgba(37, 99, 235, 0.15);
+      border-radius: 99px;
+      padding: 4px 14px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+
+    /* --- FEATURE CARD STYLE (From Landing Page UI) --- */
+    .feature-card {
+      background: #ffffff;
+      border: 1px solid var(--hrms-border);
+      border-radius: 20px;
+      padding: 1.75rem;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      height: 100%;
+      position: relative;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 15px 30px rgba(37, 99, 235, 0.05);
+      border-color: var(--hrms-cobalt);
+    }
+
+    .feature-card.active-card {
+      border: 1.5px solid var(--hrms-cobalt);
+      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.08);
+    }
+
+    .feature-icon-wrapper {
+      width: 46px;
+      height: 46px;
+      background: rgba(37, 99, 235, 0.06);
+      color: var(--hrms-cobalt);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      margin-bottom: 1.25rem;
+      transition: all 0.25s ease;
+    }
+
+    .feature-card:hover .feature-icon-wrapper,
+    .feature-card.active-card .feature-icon-wrapper {
+      background: var(--btn-gradient);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .card-stat-num {
+      font-weight: 800;
+      font-size: 1.85rem;
+      line-height: 1.1;
+      color: var(--hrms-blue-dark);
+      margin-bottom: 4px;
+      letter-spacing: -0.03em;
+    }
+
+    .card-stat-label {
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--hrms-blue-dark);
+      margin-bottom: 4px;
+    }
+
+    .card-stat-sub {
+      color: var(--hrms-text-muted);
+      font-size: 0.85rem;
+      line-height: 1.45;
+      margin-bottom: 0;
+    }
+
+    /* --- DATA SECTION CARDS --- */
+    .content-box {
+      background: #ffffff;
+      border: 1px solid var(--hrms-border);
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 28px;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.02);
+    }
+
+    .content-box-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--hrms-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #ffffff;
+    }
+
+    /* Tabs matching landing accent */
+    .landing-tabs {
+      border-bottom: 1px solid var(--hrms-border);
+      gap: 8px;
+    }
+
+    .landing-tabs .nav-link {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--hrms-text-muted);
+      border: none;
+      border-bottom: 2.5px solid transparent;
+      padding: 12px 20px;
+      border-radius: 0;
+      background: transparent;
+      transition: all 0.2s;
+    }
+
+    .landing-tabs .nav-link:hover {
+      color: var(--hrms-cobalt);
+    }
+
+    .landing-tabs .nav-link.active {
+      color: var(--hrms-cobalt);
+      border-bottom-color: var(--hrms-cobalt);
+      background: transparent;
+    }
+
+    /* Table */
+    .table th {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--hrms-text-muted);
+      background-color: #f8fafc;
+      border-bottom: 1px solid var(--hrms-border);
+      padding: 14px 20px;
+    }
+
+    .table td {
+      padding: 16px 20px;
+      vertical-align: middle;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 0.9rem;
+      color: var(--hrms-text-dark);
+    }
+
+    .table tbody tr:hover td {
+      background-color: #f8fafc;
+    }
+
+    .avatar-pill {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(37, 99, 235, 0.08);
+      color: var(--hrms-cobalt);
+      font-weight: 800;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Badges */
+    .pill-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(37, 99, 235, 0.08);
+      color: var(--hrms-cobalt);
+      padding: 4px 12px;
+      border-radius: 99px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .pill-badge-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #ffffff;
+      color: var(--hrms-text-muted);
+      border: 1px solid var(--hrms-border);
+      padding: 4px 12px;
+      border-radius: 99px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+  </style>
 </head>
 
 <body>
-    <%- include('../partials/anti-cache') %>
+  <%- include('../partials/anti-cache') %>
 
-        <nav class="navbar navbar-dark bg-dark sticky-top px-3">
-            <a class="navbar-brand fw-bold" href="/hr/dashboard"><i class="fa-solid fa-earth-americas me-2"></i> Travel
-                Command Center</a>
-            <a href="/hr/dashboard" class="btn btn-sm btn-outline-light">Back to Dashboard</a>
-        </nav>
-
-        <div class="container py-4">
-
-            <!-- PENDING REQUESTS -->
-            <h5 class="fw-bold mb-3"><i class="fa-solid fa-hourglass-half text-warning me-2"></i> Pending Approvals</h5>
-            <div class="card shadow-sm border-0 mb-5">
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="bg-light">
-                                <tr>
-                                    <th class="ps-4">Employee</th>
-                                    <th>Destination</th>
-                                    <th>Dates</th>
-                                    <th>Purpose</th>
-                                    <th class="text-end pe-4">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% if(pendingTrips.length===0) { %>
-                                    <tr>
-                                        <td colspan="5" class="text-center py-4 text-muted">No pending requests.</td>
-                                    </tr>
-                                    <% } %>
-                                        <% pendingTrips.forEach(trip=> { %>
-                                            <tr>
-                                                <td class="ps-4">
-                                                    <div class="d-flex align-items-center">
-                                                        <div class="avatar-small me-2">
-                                                            <%= (trip.employeeId && trip.employeeId.firstName) ?
-                                                                trip.employeeId.firstName.charAt(0) : "?" %>
-                                                        </div>
-                                                        <div>
-                                                            <div class="fw-bold">
-                                                                <%= (trip.employeeId && trip.employeeId.firstName) ?
-                                                                    trip.employeeId.firstName + " " +
-                                                                    (trip.employeeId.lastName || "" )
-                                                                    : "Unknown Employee" %>
-                                                            </div>
-                                                            <div class="small text-muted">
-                                                                <%= (trip.employeeId && trip.employeeId.department) ?
-                                                                    trip.employeeId.department : "General" %>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td class="fw-bold">
-                                                    <%= trip.destination %>
-                                                </td>
-                                                <td>
-                                                    <div class="small">
-                                                        <%= new Date(trip.startDate).toLocaleDateString() %>
-                                                    </div>
-                                                    <div class="small text-muted">to <%= new
-                                                            Date(trip.endDate).toLocaleDateString() %>
-                                                    </div>
-                                                </td>
-                                                <td><small class="text-muted">
-                                                        <%= trip.purpose %>
-                                                    </small></td>
-                                                <td class="text-end pe-4">
-                                                    <div class="d-flex gap-2 justify-content-end">
-                                                        <form action="/trip/hr/action/<%= trip._id %>" method="POST">
-                                                            <button name="status" value="Approved"
-                                                                class="btn btn-sm btn-success fw-bold px-3">Approve</button>
-                                                        </form>
-
-                                                        <div class="dropdown">
-                                                            <button
-                                                                class="btn btn-sm btn-outline-danger dropdown-toggle"
-                                                                type="button" data-bs-toggle="dropdown">Reject</button>
-                                                            <div class="dropdown-menu p-3 shadow" style="width: 250px;">
-                                                                <form action="/trip/hr/action/<%= trip._id %>"
-                                                                    method="POST">
-                                                                    <input type="hidden" name="status" value="Rejected">
-                                                                    <textarea name="reason" class="form-control mb-2"
-                                                                        rows="2" placeholder="Reason..."
-                                                                        required></textarea>
-                                                                    <button class="btn btn-danger btn-sm w-100">Confirm
-                                                                        Rejection</button>
-                                                                </form>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <% }) %>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ACTIVE TRIPS -->
-            <h5 class="fw-bold mb-3"><i class="fa-solid fa-satellite-dish text-success me-2"></i> Live Tracking (Active
-                Trips)</h5>
-            <div class="row g-4 mb-5">
-                <% if(activeTrips.length===0) { %>
-                    <div class="col-12 text-center text-muted py-3">No personnel currently on approved travel.</div>
-                    <% } %>
-                        <% activeTrips.forEach(trip=> { %>
-                            <div class="col-md-6 col-lg-4">
-                                <div class="card h-100 shadow-sm border-0">
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <div class="badge bg-success bg-opacity-10 text-success"><i
-                                                    class="fa-solid fa-circle me-1" style="font-size: 6px;"></i> LIVE
-                                            </div>
-                                            <small class="text-muted text-uppercase fw-bold">
-                                                <%= trip.destination %>
-                                            </small>
-                                        </div>
-                                        <h5 class="fw-bold mb-1">
-                                            <%= (trip.employeeId) ? trip.employeeId.firstName + " " +
-                                                (trip.employeeId.lastName || "" ) : "Unknown Employee" %>
-                                        </h5>
-                                        <p class="text-muted small mb-3">
-                                            <%= new Date(trip.startDate).toLocaleDateString() %> - <%= new
-                                                    Date(trip.endDate).toLocaleDateString() %>
-                                        </p>
-                                        <a href="/trip/track/<%= trip._id %>"
-                                            class="btn btn-outline-primary w-100 fw-bold">
-                                            <i class="fa-solid fa-map-location-dot me-2"></i> View Route Map
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                            <% }) %>
-            </div>
-
-            <!-- COMPLETED TRIPS (REPORTS) -->
-            <h5 class="fw-bold mb-3"><i class="fa-solid fa-clipboard-check text-primary me-2"></i> Completed Trip
-                Reports</h5>
-            <div class="card shadow-sm border-0 mb-5">
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="bg-light">
-                                <tr>
-                                    <th class="ps-4">Employee</th>
-                                    <th>Destination</th>
-                                    <th>Completion Date</th>
-                                    <th class="text-end pe-4">Report</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% if(typeof completedTrips==='undefined' || completedTrips.length===0) { %>
-                                    <tr>
-                                        <td colspan="4" class="text-center py-4 text-muted">No completed trips found.
-                                        </td>
-                                    </tr>
-                                    <% } else { %>
-                                        <% completedTrips.forEach(trip=> { %>
-                                            <tr>
-                                                <td class="ps-4 fw-bold">
-                                                    <%= (trip.employeeId) ? trip.employeeId.firstName + " " +
-                                                        (trip.employeeId.lastName || "" ) : "Unknown" %>
-                                                </td>
-                                                <td>
-                                                    <%= trip.destination %>
-                                                </td>
-                                                <td>
-                                                    <%= new Date(trip.updatedAt).toLocaleDateString() %>
-                                                </td>
-                                                <td class="text-end pe-4">
-                                                    <a href="/trip/track/<%= trip._id %>"
-                                                        class="btn btn-sm btn-primary">
-                                                        <i class="fa-solid fa-file-invoice me-2"></i> View Logs
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                            <% }) %>
-                                                <% } %>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
+  <!-- Branding Navbar (Exact Landing Page Style) -->
+  <nav class="navbar-landing d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center gap-3">
+      <a class="navbar-brand" href="/hr/dashboard">
+        <div class="brand-emblem">
+          <i class="fa-solid fa-shield-halved"></i>
+          <i class="fa-solid fa-circle-nodes"></i>
         </div>
+        HR<span class="brand-accent">MS</span>
+      </a>
+      <span class="text-muted d-none d-md-inline" style="font-size: 0.9rem;">/</span>
+      <span class="small fw-semibold text-secondary d-none d-md-inline">Trip Management</span>
+    </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <div class="d-flex align-items-center gap-2">
+      <a href="/hr/dashboard" class="btn-outline-nav">
+        <i class="fa-solid fa-arrow-left"></i> HR Dashboard
+      </a>
+      <a href="/expense/hr/dashboard" class="btn-primary-nav">
+        <i class="fa-solid fa-receipt"></i> Expense Tracker
+      </a>
+    </div>
+  </nav>
+
+  <div class="container-fluid px-lg-5 py-4 flex-grow-1">
+    <!-- Header -->
+    <div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-3">
+      <div>
+        <div class="header-badge">
+          <i class="fa-solid fa-plane-up"></i> Field Travel Operations
+        </div>
+        <h2 class="fw-bold mb-1 text-dark" style="letter-spacing: -0.03em;">Trip & Travel Command Center</h2>
+        <p class="card-stat-sub">Review employee travel requests, track in-transit personnel, and inspect GPS route audit trails.</p>
+      </div>
+    </div>
+
+    <!-- 4 Feature Cards (Exact Landing Page Feature-Card Style) -->
+    <div class="row g-4 mb-5">
+      <div class="col-lg-3 col-md-6 col-12">
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <i class="fa-regular fa-clock"></i>
+          </div>
+          <div class="card-stat-num"><%= pendingTrips.length %></div>
+          <h5 class="card-stat-label">Pending Approvals</h5>
+          <p class="card-stat-sub">Travel requests awaiting administrative review and budget sign-off.</p>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6 col-12">
+        <div class="feature-card active-card">
+          <div class="feature-icon-wrapper">
+            <i class="fa-solid fa-plane"></i>
+          </div>
+          <div class="card-stat-num"><%= activeTrips.length %></div>
+          <h5 class="card-stat-label">In-Transit Active</h5>
+          <p class="card-stat-sub">Personnel currently in the field on approved corporate travel.</p>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6 col-12">
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <i class="fa-regular fa-circle-check"></i>
+          </div>
+          <div class="card-stat-num"><%= typeof completedTrips !== 'undefined' ? completedTrips.length : 0 %></div>
+          <h5 class="card-stat-label">Completed Trips</h5>
+          <p class="card-stat-sub">Concluded business trips archived for audit and expense settlement.</p>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6 col-12">
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <i class="fa-solid fa-route"></i>
+          </div>
+          <div class="card-stat-num">
+            <%= pendingTrips.length + activeTrips.length + (typeof completedTrips !== 'undefined' ? completedTrips.length : 0) %>
+          </div>
+          <h5 class="card-stat-label">Total Logs</h5>
+          <p class="card-stat-sub">Aggregated travel authorizations across all company departments.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs landing-tabs mb-4" id="tripTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending-pane" type="button" role="tab">
+          Pending Approvals <span class="pill-badge ms-1.5"><%= pendingTrips.length %></span>
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="active-tab" data-bs-toggle="tab" data-bs-target="#active-pane" type="button" role="tab">
+          Active In-Transit <span class="pill-badge ms-1.5"><%= activeTrips.length %></span>
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="completed-tab" data-bs-toggle="tab" data-bs-target="#completed-pane" type="button" role="tab">
+          Completed Reports <span class="pill-badge-outline ms-1.5"><%= typeof completedTrips !== 'undefined' ? completedTrips.length : 0 %></span>
+        </button>
+      </li>
+    </ul>
+
+    <!-- Tab Contents -->
+    <div class="tab-content" id="tripTabsContent">
+
+      <!-- TAB 1: PENDING APPROVALS -->
+      <div class="tab-pane fade show active" id="pending-pane" role="tabpanel">
+        <div class="content-box">
+          <div class="content-box-header">
+            <div>
+              <h5 class="fw-bold mb-0 text-dark">Pending Travel Authorizations</h5>
+              <div class="small text-muted">Review, authorize, or decline employee travel requests</div>
+            </div>
+            <span class="pill-badge"><%= pendingTrips.length %> Awaiting Decision</span>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table mb-0 align-middle">
+              <thead>
+                <tr>
+                  <th>Employee</th>
+                  <th>Route</th>
+                  <th>Dates of Travel</th>
+                  <th>Estimated Budget</th>
+                  <th>Purpose</th>
+                  <th class="text-end pe-4">HR Authorization</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (pendingTrips.length === 0) { %>
+                  <tr>
+                    <td colspan="6" class="text-center py-5 text-muted">
+                      <div class="py-3">
+                        <i class="fa-solid fa-circle-check fs-2 text-primary mb-2 opacity-50"></i>
+                        <p class="mb-0 fw-semibold text-dark">No pending travel requests requiring authorization.</p>
+                        <small class="text-muted">All business travel submissions have been reviewed.</small>
+                      </div>
+                    </td>
+                  </tr>
+                <% } else { %>
+                  <% pendingTrips.forEach(trip => { %>
+                    <tr>
+                      <td>
+                        <div class="d-flex align-items-center gap-3">
+                          <div class="avatar-pill">
+                            <%= (trip.employeeId && trip.employeeId.firstName) ? trip.employeeId.firstName.charAt(0) : '?' %>
+                          </div>
+                          <div>
+                            <div class="fw-bold text-dark">
+                              <%= (trip.employeeId && trip.employeeId.firstName) ? trip.employeeId.firstName + ' ' + (trip.employeeId.lastName || '') : 'Unknown Personnel' %>
+                            </div>
+                            <div class="small text-muted">
+                              <%= (trip.employeeId && trip.employeeId.department) ? trip.employeeId.department : 'General' %>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+
+                      <td>
+                        <div class="fw-bold text-dark d-flex align-items-center gap-1.5">
+                          <span class="text-muted"><%= trip.source || 'Base' %></span>
+                          <i class="fa-solid fa-arrow-right text-primary fa-xs"></i>
+                          <span style="color: var(--hrms-cobalt);"><%= trip.destination %></span>
+                        </div>
+                      </td>
+
+                      <td>
+                        <div class="fw-semibold text-dark"><%= new Date(trip.startDate).toLocaleDateString() %></div>
+                        <div class="small text-muted">to <%= new Date(trip.endDate).toLocaleDateString() %></div>
+                      </td>
+
+                      <td>
+                        <% if (trip.estimatedCost) { %>
+                          <span class="fw-bold text-dark">₹<%= Number(trip.estimatedCost).toLocaleString('en-IN') %></span>
+                        <% } else { %>
+                          <span class="text-muted">&mdash;</span>
+                        <% } %>
+                      </td>
+
+                      <td>
+                        <div class="p-2.5 rounded-3 bg-light border" style="max-width: 380px; min-width: 220px; font-size: 0.85rem; line-height: 1.45;">
+                          <div class="text-primary fw-bold small text-uppercase mb-1" style="font-size: 0.68rem; letter-spacing: 0.04em;">
+                            <i class="fa-solid fa-file-lines me-1"></i> Purpose & Scope:
+                          </div>
+                          <div class="text-dark fw-medium" style="word-break: break-word;"><%= trip.purpose %></div>
+                        </div>
+                      </td>
+
+                      <td class="text-end pe-4">
+                        <div class="d-flex gap-2 justify-content-end align-items-center">
+                          <form action="/trip/hr/action/<%= trip._id %>" method="POST" style="margin: 0;">
+                            <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
+                            <input type="hidden" name="status" value="Approved">
+                            <button type="submit" class="btn-primary-nav btn-sm py-1.5 px-3">
+                              <i class="fa-solid fa-check"></i> Approve
+                            </button>
+                          </form>
+
+                          <button type="button" class="btn-outline-nav btn-sm py-1.5 px-3" onclick="openRejectModal('<%= trip._id %>')">
+                            Reject
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  <% }) %>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: ACTIVE IN-TRANSIT (Feature Card Layout) -->
+      <div class="tab-pane fade" id="active-pane" role="tabpanel">
+        <% if (activeTrips.length === 0) { %>
+          <div class="content-box p-5 text-center text-muted">
+            <i class="fa-solid fa-plane fs-2 mb-2 text-primary opacity-50"></i>
+            <h6 class="fw-bold text-dark">No Personnel Currently in Transit</h6>
+            <p class="small text-muted mb-0">Active approved trips with current travel dates will be displayed here.</p>
+          </div>
+        <% } else { %>
+          <div class="row g-4">
+            <% activeTrips.forEach(trip => { %>
+              <div class="col-lg-4 col-md-6 col-12">
+                <div class="feature-card active-card d-flex flex-column justify-content-between">
+                  <div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                      <div class="feature-icon-wrapper mb-0">
+                        <i class="fa-solid fa-plane"></i>
+                      </div>
+                      <span class="pill-badge">IN-TRANSIT</span>
+                    </div>
+
+                    <h5 class="fw-bold text-dark mb-1">
+                      <%= (trip.employeeId) ? trip.employeeId.firstName + ' ' + (trip.employeeId.lastName || '') : 'Unknown Personnel' %>
+                    </h5>
+                    <div class="small text-muted mb-3">
+                      <%= (trip.employeeId && trip.employeeId.department) ? trip.employeeId.department : 'Operations' %>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 mb-3 border" style="font-size: 0.85rem;">
+                      <div class="d-flex justify-content-between text-muted mb-1.5">
+                        <span>Origin:</span>
+                        <span class="text-dark fw-semibold"><%= trip.source || 'Base' %></span>
+                      </div>
+                      <div class="d-flex justify-content-between text-muted mb-1.5">
+                        <span>Destination:</span>
+                        <span class="fw-bold" style="color: var(--hrms-cobalt);"><%= trip.destination %></span>
+                      </div>
+                      <div class="d-flex justify-content-between text-muted">
+                        <span>Window:</span>
+                        <span class="text-dark"><%= new Date(trip.startDate).toLocaleDateString() %> &ndash; <%= new Date(trip.endDate).toLocaleDateString() %></span>
+                      </div>
+                    </div>
+
+                    <% if (trip.purpose) { %>
+                      <div class="p-2.5 bg-white rounded-3 mb-3 border" style="font-size: 0.85rem; line-height: 1.45;">
+                        <span class="text-primary fw-bold small text-uppercase d-block mb-1" style="font-size: 0.68rem; letter-spacing: 0.04em;">
+                          <i class="fa-solid fa-file-lines me-1"></i> Mission Description & Scope:
+                        </span>
+                        <div class="text-dark fw-medium" style="word-break: break-word;"><%= trip.purpose %></div>
+                      </div>
+                    <% } %>
+                  </div>
+
+                  <a href="/trip/track/<%= trip._id %>" class="btn-primary-nav w-100 text-center justify-content-center mt-2">
+                    <i class="fa-solid fa-map-location-dot"></i> View Route & GPS Audit
+                  </a>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- TAB 3: COMPLETED TRIP REPORTS -->
+      <div class="tab-pane fade" id="completed-pane" role="tabpanel">
+        <div class="content-box">
+          <div class="content-box-header">
+            <div>
+              <h5 class="fw-bold mb-0 text-dark">Concluded Trip Audits</h5>
+              <div class="small text-muted">Archive of completed corporate travel and GPS waypoints</div>
+            </div>
+            <span class="pill-badge-outline"><%= typeof completedTrips !== 'undefined' ? completedTrips.length : 0 %> Archived</span>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table mb-0 align-middle">
+              <thead>
+                <tr>
+                  <th>Employee</th>
+                  <th>Destination</th>
+                  <th>Trip Description & Scope</th>
+                  <th>Dates of Travel</th>
+                  <th>Conclusion Date</th>
+                  <th>Waypoints</th>
+                  <th class="text-end pe-4">Audit Telemetry</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (typeof completedTrips === 'undefined' || completedTrips.length === 0) { %>
+                  <tr>
+                    <td colspan="7" class="text-center py-5 text-muted">
+                      <p class="mb-0 fw-semibold text-dark">No completed trip records found.</p>
+                      <small class="text-muted">Concluded trips will appear here for expense and route reconciliation.</small>
+                    </td>
+                  </tr>
+                <% } else { %>
+                  <% completedTrips.forEach(trip => { %>
+                    <tr>
+                      <td>
+                        <div class="d-flex align-items-center gap-3">
+                          <div class="avatar-pill">
+                            <%= (trip.employeeId && trip.employeeId.firstName) ? trip.employeeId.firstName.charAt(0) : '?' %>
+                          </div>
+                          <div>
+                            <div class="fw-bold text-dark">
+                              <%= (trip.employeeId) ? trip.employeeId.firstName + ' ' + (trip.employeeId.lastName || '') : 'Unknown' %>
+                            </div>
+                            <div class="small text-muted"><%= (trip.employeeId && trip.employeeId.department) ? trip.employeeId.department : 'General' %></div>
+                          </div>
+                        </div>
+                      </td>
+
+                      <td>
+                        <span class="fw-bold" style="color: var(--hrms-cobalt);"><%= trip.destination %></span>
+                        <div class="small text-muted">From: <%= trip.source || 'Base' %></div>
+                      </td>
+
+                      <td>
+                        <div class="p-2 rounded-3 bg-light border small text-dark" style="max-width: 320px; min-width: 200px; line-height: 1.4; word-break: break-word;">
+                          <div class="text-muted fw-bold small text-uppercase mb-1" style="font-size: 0.68rem;">
+                            <i class="fa-solid fa-file-lines text-primary me-1"></i> Purpose & Scope:
+                          </div>
+                          <%= trip.purpose || 'No description provided' %>
+                        </div>
+                      </td>
+
+                      <td>
+                        <div class="fw-semibold text-dark"><%= new Date(trip.startDate).toLocaleDateString() %></div>
+                        <div class="small text-muted">to <%= new Date(trip.endDate).toLocaleDateString() %></div>
+                      </td>
+
+                      <td>
+                        <span class="text-muted"><%= new Date(trip.updatedAt).toLocaleDateString() %></span>
+                      </td>
+
+                      <td>
+                        <span class="pill-badge"><%= (trip.locations && trip.locations.length) ? trip.locations.length : 0 %> Waypoints</span>
+                      </td>
+
+                      <td class="text-end pe-4">
+                        <a href="/trip/track/<%= trip._id %>" class="btn-outline-nav btn-sm py-1.5 px-3">
+                          <i class="fa-solid fa-file-invoice"></i> Audit Route
+                        </a>
+                      </td>
+                    </tr>
+                  <% }) %>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Rejection Modal -->
+  <div class="modal fade" id="rejectTripModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg rounded-4">
+        <div class="modal-header border-bottom">
+          <h6 class="modal-title fw-bold text-dark">Reject Travel Authorization</h6>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="rejectTripForm" method="POST" action="">
+          <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
+          <input type="hidden" name="status" value="Rejected">
+          <div class="modal-body p-4">
+            <label class="form-label small fw-semibold text-muted mb-1">Reason for Rejection *</label>
+            <textarea name="reason" id="rejectionReasonInput" class="form-control rounded-3" rows="3" placeholder="Provide a brief explanation for employee records..." required></textarea>
+          </div>
+          <div class="modal-footer border-top bg-light py-2 px-4">
+            <button type="button" class="btn-outline-nav btn-sm" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn-primary-nav btn-sm">Confirm Rejection</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function openRejectModal(tripId) {
+      const form = document.getElementById('rejectTripForm');
+      form.action = `/trip/hr/action/${tripId}`;
+      document.getElementById('rejectionReasonInput').value = '';
+      const modal = new bootstrap.Modal(document.getElementById('rejectTripModal'));
+      modal.show();
+    }
+  </script>
 </body>
 
 </html>

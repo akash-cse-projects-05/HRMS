@@ -81,8 +81,11 @@ The software is free to use, but you take a cut of the money moving through it.
 1.  **Finalize the MVP:** Finish the core features and ensure there are no breaking bugs.
 2.  **Containerize (Optional but recommended):** Write a `Dockerfile` for your Node.js backend.
 3.  **Deploy Backend:** Push your database to MongoDB Atlas and deploy your server to Render or a DigitalOcean droplet.
-4.  **Integrate Payments:** Create a Stripe developer account and build the checkout flow into your app.
-5.  **Marketing & Sales:**
+5.  **Legal & Data Protection Terms:**
+    *   Deploy the Enterprise Master Subscription Agreement & Privacy Policy ([HRMS_LEGAL_DATA_PRIVACY_AND_TERMS_OF_SERVICE.md](file:///Users/akashd/Documents/PROJECTS/HRMS/HRMS/HRMS_LEGAL_DATA_PRIVACY_AND_TERMS_OF_SERVICE.md)).
+    *   Ensure all tenant sign-ups require checking "I accept the Master SaaS Agreement & Privacy Terms".
+6.  **Marketing & Sales:**
     *   Create a clean, professional landing page.
     *   Start reaching out to your target audience (e.g., event organizers, aviation companies, freelancers) via LinkedIn, cold email, or local meetups.
     *   Offer them a 14-day free trial to get them onboarded.
+

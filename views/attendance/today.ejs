@@ -4,16 +4,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>Attendance | HRMS</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <!-- MapLibre GL CSS & JS for OpenStreetMap 3D Interactive Maps -->
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 
   <style>
     :root {
@@ -79,7 +79,7 @@
       letter-spacing: -0.02em;
     }
 
-    /* Map - Explicit height is required for Leaflet */
+    /* Map container */
     #map {
       height: 350px;
       border-radius: 12px;
@@ -185,16 +185,30 @@
     <div class="row g-4 mb-5">
       <div class="col-lg-8">
         <div class="attendance-card h-100">
-          <div class="card-header"><i class="fa-solid fa-location-dot me-2 text-primary"></i> GPS Verification</div>
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="fa-solid fa-location-dot me-2 text-primary"></i> GPS Verification</span>
+            <button type="button" id="btnToggle3D" class="btn btn-primary btn-sm fw-bold rounded-pill px-3" onclick="toggle3DPerspective()">
+              <i class="fa-solid fa-cube me-1"></i> 3D Mode: ON
+            </button>
+          </div>
           <div class="card-body p-4">
             <div id="map" class="mb-4"></div>
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-              <button id="fetchLocationBtn" class="btn btn-main">
-                <i class="fa-solid fa-location-crosshairs me-2"></i> Fetch My Location
-              </button>
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+              <div class="d-flex gap-2 flex-wrap">
+                <button id="fetchLocationBtn" class="btn btn-main">
+                  <i class="fa-solid fa-location-crosshairs me-2"></i> Fetch My Location
+                </button>
+                <button id="useOfficeBtn" type="button" class="btn btn-outline-primary fw-semibold">
+                  <i class="fa-solid fa-building me-1"></i> Use Office Location
+                </button>
+              </div>
               <div id="locationDetails" class="d-none">
                 <span id="matchBadge" class="status-badge bg-secondary text-white">Checking...</span>
               </div>
+            </div>
+            <div class="mt-3 text-muted small d-flex align-items-center">
+              <i class="fa-solid fa-circle-info text-primary me-2"></i>
+              <span>Click or tap anywhere on the 3D map to drop your location pin if browser GPS is unavailable.</span>
             </div>
           </div>
         </div>
@@ -308,29 +322,171 @@ const punchInTime = new Date('<%= attendance.punchIn.toISOString() %>');
       }, 1000);
 <% } %>
 
-/* CONFIG */
-const RSR = { lat: 19.05973973209058, lng: 73.11899471349244 };
-    const ALLOWED = 200;
+    /* CONFIG FROM SETTINGS */
+    const OFFICE = {
+      lat: <%= (typeof companySettings !== 'undefined' && companySettings && companySettings.officeLat) ? companySettings.officeLat : 19.0597397 %>,
+      lng: <%= (typeof companySettings !== 'undefined' && companySettings && companySettings.officeLng) ? companySettings.officeLng : 73.1189947 %>
+    };
+    const ALLOWED = <%= (typeof companySettings !== 'undefined' && companySettings && companySettings.officeRadius) ? companySettings.officeRadius : 200 %>;
+    const officeName = "<%= (typeof companySettings !== 'undefined' && companySettings && companySettings.companyName) ? companySettings.companyName : 'Office' %>";
 
-    /* MAP */
-    // Initialize Leaflet map
-    const map = L.map('map').setView([RSR.lat, RSR.lng], 15);
+    /* MAP - OpenFreeMap 3D Vector with MapLibre GL */
+    let is3DMode = true;
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+    // Helper: Generate GeoJSON Polygon coordinates for circle radius in meters
+    function createGeoJSONCircle(centerLng, centerLat, radiusMeters, points = 64) {
+      const km = radiusMeters / 1000;
+      const coords = [];
+      const distanceX = km / (111.320 * Math.cos((centerLat * Math.PI) / 180));
+      const distanceY = km / 110.574;
 
-    // Office Marker
-    const officeMarker = L.marker([RSR.lat, RSR.lng]).addTo(map);
-    officeMarker.bindPopup("HRMS Head Office").openPopup();
+      for (let i = 0; i < points; i++) {
+        const theta = (i / points) * (2 * Math.PI);
+        const x = distanceX * Math.cos(theta);
+        const y = distanceY * Math.sin(theta);
+        coords.push([centerLng + x, centerLat + y]);
+      }
+      coords.push(coords[0]); // Close polygon loop
 
-    // Geofence Circle
-    L.circle([RSR.lat, RSR.lng], {
-      color: '#0052cc',
-      fillColor: '#0052cc',
-      fillOpacity: 0.1,
-      radius: ALLOWED
-    }).addTo(map);
+      return {
+        type: 'Feature',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [coords]
+        }
+      };
+    }
+
+    // Initialize MapLibre GL 3D Map with OpenFreeMap Liberty
+    const map = new maplibregl.Map({
+      container: 'map',
+      style: 'https://tiles.openfreemap.org/styles/liberty',
+      center: [OFFICE.lng, OFFICE.lat],
+      zoom: 16.5,
+      pitch: 62, // 3D Camera Tilt
+      bearing: -15,
+      maxPitch: 85,
+      dragRotate: true,
+      pitchWithRotate: true,
+      attributionControl: false
+    });
+
+    map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
+    map.addControl(new maplibregl.FullscreenControl(), 'top-right');
+    map.addControl(new maplibregl.AttributionControl({
+      compact: true,
+      customAttribution: '<a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
+    }), 'bottom-right');
+
+    map.on('load', () => {
+      map.resize();
+
+      // 1. Office Marker
+      const officePopup = new maplibregl.Popup({ offset: 25 })
+        .setHTML("<b>" + officeName + "</b><br>Authorized Punch-In Zone (" + ALLOWED + "m radius)");
+
+      new maplibregl.Marker({ color: '#0052cc' })
+        .setLngLat([OFFICE.lng, OFFICE.lat])
+        .setPopup(officePopup)
+        .addTo(map);
+
+      // 2. Geofence Circle
+      const circleGeoJSON = createGeoJSONCircle(OFFICE.lng, OFFICE.lat, ALLOWED);
+      map.addSource('geofence-circle', {
+        type: 'geojson',
+        data: circleGeoJSON
+      });
+
+      map.addLayer({
+        id: 'geofence-circle-fill',
+        type: 'fill',
+        source: 'geofence-circle',
+        paint: {
+          'fill-color': '#0052cc',
+          'fill-opacity': 0.16
+        }
+      });
+
+      map.addLayer({
+        id: 'geofence-circle-stroke',
+        type: 'line',
+        source: 'geofence-circle',
+        paint: {
+          'line-color': '#0052cc',
+          'line-width': 2.5,
+          'line-dasharray': [2, 1]
+        }
+      });
+
+      // 3. High-Definition 3D Building Extrusions with guaranteed heights & shading
+      const beforeLayer = map.getLayer('boundary_3') ? 'boundary_3' : undefined;
+      if (map.getLayer('building-3d')) {
+        map.removeLayer('building-3d');
+      }
+
+      map.addLayer({
+        id: 'building-3d',
+        type: 'fill-extrusion',
+        source: 'openmaptiles',
+        'source-layer': 'building',
+        minzoom: 13,
+        paint: {
+          'fill-extrusion-base': [
+            'case',
+            ['has', 'render_min_height'],
+            ['get', 'render_min_height'],
+            0
+          ],
+          'fill-extrusion-height': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            13, 0,
+            14.5, [
+              'case',
+              ['has', 'render_height'],
+              ['max', ['get', 'render_height'], 12],
+              16 // 16m fallback guarantee
+            ]
+          ],
+          'fill-extrusion-color': [
+            'interpolate',
+            ['linear'],
+            ['coalesce', ['get', 'render_height'], 16],
+            0, '#e2e8f0',
+            15, '#cbd5e1',
+            30, '#94a3b8',
+            60, '#3b82f6'
+          ],
+          'fill-extrusion-opacity': 0.95,
+          'fill-extrusion-vertical-gradient': true
+        }
+      }, beforeLayer);
+
+      // 4. Directional sunlight lighting
+      map.setLight({
+        anchor: 'viewport',
+        color: '#ffffff',
+        intensity: 0.65,
+        position: [1.15, 210, 30]
+      });
+    });
+
+    function toggle3DPerspective() {
+      is3DMode = !is3DMode;
+      const btn = document.getElementById('btnToggle3D');
+      if (map) {
+        map.easeTo({
+          pitch: is3DMode ? 62 : 0,
+          bearing: is3DMode ? -15 : 0,
+          duration: 900
+        });
+      }
+      if (btn) {
+        btn.className = is3DMode ? 'btn btn-primary btn-sm fw-bold' : 'btn btn-outline-primary btn-sm fw-bold';
+        btn.innerHTML = `<i class="fa-solid fa-cube me-1"></i> 3D Mode: ${is3DMode ? 'ON' : 'OFF'}`;
+      }
+    }
 
     let userMarker, currentLat, currentLng;
 
@@ -346,95 +502,186 @@ const RSR = { lat: 19.05973973209058, lng: 73.11899471349244 };
       return R * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
     }
 
-    /* FETCH LOCATION */
+    /* APPLY USER LOCATION */
+    function applyUserLocation(latitude, longitude, source = "Verified Location") {
+      currentLat = Number(latitude);
+      currentLng = Number(longitude);
+
+      document.getElementById('locationDetails').classList.remove("d-none");
+      document.getElementById('lat').innerText = currentLat.toFixed(6);
+      document.getElementById('lng').innerText = currentLng.toFixed(6);
+
+      if (!userMarker) {
+        userMarker = new maplibregl.Marker({ color: '#10b981', draggable: true })
+          .setLngLat([currentLng, currentLat])
+          .setPopup(new maplibregl.Popup({ offset: 25 }).setHTML(`<b>Your Location</b><br><small class="text-muted">${source}</small>`))
+          .addTo(map);
+
+        userMarker.on('dragend', () => {
+          const lngLat = userMarker.getLngLat();
+          applyUserLocation(lngLat.lat, lngLat.lng, "Adjusted via Pin Drag");
+        });
+      } else {
+        userMarker.setLngLat([currentLng, currentLat]);
+        userMarker.setPopup(new maplibregl.Popup({ offset: 25 }).setHTML(`<b>Your Location</b><br><small class="text-muted">${source}</small>`));
+      }
+
+      map.flyTo({ center: [currentLng, currentLat], zoom: 16.5, pitch: is3DMode ? 55 : 0, essential: true });
+
+      const d = dist(currentLat, currentLng, OFFICE.lat, OFFICE.lng);
+      document.getElementById('distance').innerText = Math.round(d) + " meters";
+
+      const matchBadge = document.getElementById('matchBadge');
+      if (d <= ALLOWED) {
+        matchBadge.innerText = "LOCATION MATCHED (" + Math.round(d) + "m)";
+        matchBadge.className = "status-badge bg-success text-white";
+      } else {
+        matchBadge.innerText = "OUTSIDE RADIUS (" + Math.round(d) + "m)";
+        matchBadge.className = "status-badge bg-danger text-white";
+      }
+
+      // Reverse Geocoding via OSM Nominatim API with safe fallback
+      const addrElem = document.getElementById('address');
+      addrElem.innerText = "Resolving street address...";
+
+      fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${currentLat}&lon=${currentLng}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.display_name) {
+            addrElem.innerText = data.display_name;
+          } else {
+            addrElem.innerText = `Lat: ${currentLat.toFixed(4)}, Lng: ${currentLng.toFixed(4)} (${source})`;
+          }
+        })
+        .catch(() => {
+          addrElem.innerText = `Lat: ${currentLat.toFixed(4)}, Lng: ${currentLng.toFixed(4)} (${source})`;
+        });
+    }
+
+    /* CLICK TO PLACE PIN ON MAP */
+    map.on('click', (e) => {
+      applyUserLocation(e.lngLat.lat, e.lngLat.lng, "Selected on Map");
+    });
+
+    /* USE OFFICE LOCATION SHORTCUT */
+    const useOfficeBtn = document.getElementById('useOfficeBtn');
+    if (useOfficeBtn) {
+      useOfficeBtn.onclick = () => {
+        applyUserLocation(OFFICE.lat, OFFICE.lng, "Office Headquarters");
+      };
+    }
+
+    /* MULTI-TIER GEOLOCATION RESOLUTION */
     const fetchLocationBtn = document.getElementById('fetchLocationBtn');
     fetchLocationBtn.onclick = () => {
+      fetchLocationBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Locating...';
+
+      async function fallbackToIP(reasonMsg) {
+        console.warn("Falling back to IP geolocation:", reasonMsg);
+        fetchLocationBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Resolving Network Location...';
+        try {
+          const res = await fetch('https://get.geojs.io/v1/ip/geo.json');
+          const data = await res.json();
+          if (data && data.latitude && data.longitude) {
+            fetchLocationBtn.innerHTML = '<i class="fa-solid fa-location-crosshairs me-2"></i> Fetch My Location';
+            applyUserLocation(Number(data.latitude), Number(data.longitude), "IP Network Location");
+            return true;
+          }
+        } catch (e1) {
+          try {
+            const res2 = await fetch('https://ipapi.co/json/');
+            const data2 = await res2.json();
+            if (data2 && data2.latitude && data2.longitude) {
+              fetchLocationBtn.innerHTML = '<i class="fa-solid fa-location-crosshairs me-2"></i> Fetch My Location';
+              applyUserLocation(Number(data2.latitude), Number(data2.longitude), "IP Network Location");
+              return true;
+            }
+          } catch (e2) {}
+        }
+        return false;
+      }
+
+      // If browser doesn't support or blocks geolocation API (e.g. non-HTTPS IP origin)
       if (!navigator.geolocation) {
-        alert("Geolocation is not supported by your browser.");
+        fallbackToIP("Browser geolocation not available").then(ok => {
+          fetchLocationBtn.innerHTML = '<i class="fa-solid fa-location-crosshairs me-2"></i> Fetch My Location';
+          if (!ok) {
+            alert("Browser location blocked. You can click anywhere on the 3D map or use 'Use Office Location'.");
+          }
+        });
         return;
       }
 
-      fetchLocationBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Locating...';
-
+      // Try browser geolocation with progressive fallback
       navigator.geolocation.getCurrentPosition(
-        async pos => {
+        pos => {
           fetchLocationBtn.innerHTML = '<i class="fa-solid fa-location-crosshairs me-2"></i> Fetch My Location';
-          currentLat = pos.coords.latitude;
-          currentLng = pos.coords.longitude;
-
-          document.getElementById('locationDetails').classList.remove("d-none");
-          document.getElementById('lat').innerText = currentLat.toFixed(6);
-          document.getElementById('lng').innerText = currentLng.toFixed(6);
-
-          const posLatLgn = [currentLat, currentLng];
-
-          if (!userMarker) {
-            userMarker = L.marker(posLatLgn).addTo(map);
-            userMarker.bindPopup("Your Location").openPopup();
-          } else {
-            userMarker.setLatLng(posLatLgn);
-          }
-
-          map.setView(posLatLgn, 16);
-
-          const d = dist(currentLat, currentLng, RSR.lat, RSR.lng);
-          document.getElementById('distance').innerText = Math.round(d) + " meters";
-
-          // Reverse Geocoding via OSM Nominatim API
-          try {
-            fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${currentLat}&lon=${currentLng}`)
-              .then(res => res.json())
-              .then(data => {
-                if (data && data.display_name) {
-                  document.getElementById('address').innerText = data.display_name;
-                } else {
-                  document.getElementById('address').innerText = "Address not found";
-                }
-              })
-              .catch(() => {
-                document.getElementById('address').innerText = "Address not found";
-              });
-          } catch (err) {
-            document.getElementById('address').innerText = "Error fetching address details";
-          }
-
-          const matchBadge = document.getElementById('matchBadge');
-          if (d <= ALLOWED) {
-            matchBadge.innerText = "LOCATION MATCHED";
-            matchBadge.className = "status-badge bg-success text-white";
-          } else {
-            matchBadge.innerText = "OUTSIDE RADIUS";
-            matchBadge.className = "status-badge bg-danger text-white";
-          }
+          applyUserLocation(pos.coords.latitude, pos.coords.longitude, "Browser GPS/Wi-Fi");
         },
-        error => {
-          fetchLocationBtn.innerHTML = '<i class="fa-solid fa-location-crosshairs me-2"></i> Fetch My Location';
-          alert("Error fetching location: " + error.message);
+        async error => {
+          console.warn("Primary geolocation error:", error.message, "Trying low accuracy mode...");
+          navigator.geolocation.getCurrentPosition(
+            pos2 => {
+              fetchLocationBtn.innerHTML = '<i class="fa-solid fa-location-crosshairs me-2"></i> Fetch My Location';
+              applyUserLocation(pos2.coords.latitude, pos2.coords.longitude, "Browser Network");
+            },
+            async error2 => {
+              console.warn("Low accuracy geolocation failed:", error2.message, "Triggering IP fallback...");
+              const ipOk = await fallbackToIP(error2.message);
+              fetchLocationBtn.innerHTML = '<i class="fa-solid fa-location-crosshairs me-2"></i> Fetch My Location';
+              if (!ipOk) {
+                alert("Could not access browser GPS. Click anywhere on the map to set your location pin, or click 'Use Office Location'.");
+              }
+            },
+            { enableHighAccuracy: false, timeout: 6000, maximumAge: 300000 }
+          );
         },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 60000 }
       );
     };
 
     /* ATTENDANCE SUBMISSION */
-    function submitAttendance(url, data = {}) {
+    async function submitAttendance(url, data = {}) {
       const payload = { ...data };
+
+      // For punch-in, ensure location is captured
+      if (url === '/attendance/punch-in') {
+        if (!currentLat || !currentLng) {
+          alert("Please fetch your location first by clicking 'Fetch My Location', tapping anywhere on the 3D map, or clicking 'Use Office Location'.");
+          return;
+        }
+      }
+
       if (currentLat && currentLng) {
         payload.lat = currentLat;
         payload.lng = currentLng;
         const addrElement = document.getElementById('address');
         if (addrElement) {
           const addrText = addrElement.innerText;
-          if (addrText && !['--', 'Waiting for signal...', 'Address not found', 'Error fetching address details'].includes(addrText)) {
+          if (addrText && !['--', 'Waiting for signal...', 'Address not found', 'Error fetching address details', 'Resolving street address...'].includes(addrText)) {
             payload.address = addrText;
           }
         }
       }
 
-      fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      }).then(() => location.reload());
+      try {
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await res.json();
+        if (result && result.success === false) {
+          alert(result.message || "Attendance request rejected.");
+          return;
+        }
+
+        location.reload();
+      } catch (err) {
+        console.error(err);
+        alert("Network request error. Please try again.");
+      }
     }
 
     function promptWFH() {
