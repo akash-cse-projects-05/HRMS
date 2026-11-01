@@ -183,9 +183,12 @@ app.use(flash());
 
 // Global variables for flash messages
 app.use((req, res, next) => {
-    res.locals.success_msg = req.flash('success_msg');
-    res.locals.error_msg = req.flash('error_msg');
-    res.locals.error = req.flash('error'); // For passport errors if any
+    const sMsg = req.flash('success_msg');
+    const eMsg = req.flash('error_msg');
+    const err = req.flash('error');
+    res.locals.success_msg = (Array.isArray(sMsg) && sMsg.length > 0) ? sMsg[0] : null;
+    res.locals.error_msg = (Array.isArray(eMsg) && eMsg.length > 0) ? eMsg[0] : null;
+    res.locals.error = (Array.isArray(err) && err.length > 0) ? err[0] : null;
     next();
 });
 

@@ -611,10 +611,23 @@
           </div>
         </div>
 
-        <% if (typeof error !== "undefined" && error) { %>
+        <% 
+          let hasDisplayError = false;
+          let errorMessage = '';
+          if (typeof error !== "undefined" && error) {
+            if (Array.isArray(error) && error.length > 0 && String(error[0]).trim().length > 0) {
+              hasDisplayError = true;
+              errorMessage = error[0];
+            } else if (!Array.isArray(error) && String(error).trim().length > 0) {
+              hasDisplayError = true;
+              errorMessage = error;
+            }
+          }
+        %>
+        <% if (hasDisplayError) { %>
           <div class="alert alert-danger-custom d-flex align-items-center">
             <i class="fa-solid fa-circle-exclamation me-3 fs-5"></i>
-            <div><%= error %></div>
+            <div><%= errorMessage %></div>
           </div>
         <% } %>
 
@@ -637,21 +650,21 @@
               <div class="col-md-6">
                 <label class="form-label" for="companyName">Company Name</label>
                 <div class="input-wrapper">
-                  <input type="text" id="companyName" name="companyName" class="form-control-custom" placeholder="e.g. Acme Corp" required autocomplete="organization">
+                  <input type="text" id="companyName" name="companyName" class="form-control-custom" required autocomplete="off">
                   <i class="fa-solid fa-building input-icon"></i>
                 </div>
               </div>
               <div class="col-md-6">
                 <label class="form-label" for="tenantId">Company Slug (Tenant ID)</label>
                 <div class="input-wrapper">
-                  <input type="text" id="tenantId" name="tenantId" class="form-control-custom" placeholder="e.g. acme" pattern="^[a-z0-9-]+$" required autocomplete="off">
+                  <input type="text" id="tenantId" name="tenantId" class="form-control-custom" pattern="^[a-z0-9-]+$" required autocomplete="off">
                   <i class="fa-solid fa-link input-icon"></i>
                 </div>
               </div>
               <div class="col-12">
                 <div class="form-text small text-muted mt-1 px-1">
                   Only lowercase letters, numbers, and dashes.
-                  <span class="d-block mt-1">Tenant Database instance: <strong id="slug-preview" class="text-primary">acme</strong>.db</span>
+                  <span class="d-block mt-1">Tenant Database instance: <strong id="slug-preview" class="text-primary">---</strong>.db</span>
                 </div>
               </div>
             </div>
@@ -664,35 +677,35 @@
               <div class="col-md-6">
                 <label class="form-label" for="adminFirstName">HR First Name</label>
                 <div class="input-wrapper">
-                  <input type="text" id="adminFirstName" name="adminFirstName" class="form-control-custom" placeholder="e.g. Aditi" required autocomplete="given-name">
+                  <input type="text" id="adminFirstName" name="adminFirstName" class="form-control-custom" required autocomplete="off">
                   <i class="fa-solid fa-user input-icon"></i>
                 </div>
               </div>
               <div class="col-md-6">
                 <label class="form-label" for="adminLastName">HR Last Name</label>
                 <div class="input-wrapper">
-                  <input type="text" id="adminLastName" name="adminLastName" class="form-control-custom" placeholder="e.g. Dwivedi" required autocomplete="family-name">
+                  <input type="text" id="adminLastName" name="adminLastName" class="form-control-custom" required autocomplete="off">
                   <i class="fa-solid fa-user input-icon"></i>
                 </div>
               </div>
               <div class="col-md-6">
                 <label class="form-label" for="adminEmail">HR Email Address</label>
                 <div class="input-wrapper">
-                  <input type="email" id="adminEmail" name="adminEmail" class="form-control-custom" placeholder="e.g. hr@acme.com" required autocomplete="email">
+                  <input type="email" id="adminEmail" name="adminEmail" class="form-control-custom" required autocomplete="off">
                   <i class="fa-solid fa-envelope input-icon"></i>
                 </div>
               </div>
               <div class="col-md-6">
                 <label class="form-label" for="adminCode">Admin Employee Code</label>
                 <div class="input-wrapper">
-                  <input type="text" id="adminCode" name="adminCode" class="form-control-custom" placeholder="e.g. HR001" required autocomplete="off">
+                  <input type="text" id="adminCode" name="adminCode" class="form-control-custom" required autocomplete="off">
                   <i class="fa-solid fa-id-badge input-icon"></i>
                 </div>
               </div>
               <div class="col-12">
                 <label class="form-label" for="adminPassword">HR Administrator Password</label>
                 <div class="input-wrapper">
-                  <input type="password" id="adminPassword" name="adminPassword" class="form-control-custom" placeholder="••••••••" minlength="6" required autocomplete="new-password">
+                  <input type="password" id="adminPassword" name="adminPassword" class="form-control-custom" minlength="6" required autocomplete="new-password">
                   <i class="fa-solid fa-lock input-icon"></i>
                 </div>
                 <div class="form-text small text-muted mt-1 px-1">At least 6 characters. Secure your dashboard administration credentials.</div>
@@ -825,7 +838,7 @@
       const slugPreview = document.getElementById('slug-preview');
       tenantInput.addEventListener('input', () => {
         const val = tenantInput.value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
-        slugPreview.textContent = val || 'acme';
+        slugPreview.textContent = val || '---';
       });
 
       // Wizard Navigation: Step 1 -> Step 2

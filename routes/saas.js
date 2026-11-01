@@ -14,7 +14,7 @@ const razorpay = new Razorpay({
 
 // GET: Register Company Page
 router.get("/register-company", (req, res) => {
-  res.render("auth/register", { razorpayKeyId: process.env.RAZORPAY_KEY_ID });
+  res.render("auth/register", { razorpayKeyId: process.env.RAZORPAY_KEY_ID, error: null });
 });
 
 // POST: Create Razorpay Order
