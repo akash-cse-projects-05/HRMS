@@ -191,7 +191,15 @@ router.post('/hr/action/:id', requireAuth, async (req, res) => {
         return res.redirect('/dashboard');
     }
     try {
-        const { status, reason } = req.body;
+        let { status, reason } = req.body;
+        if (status) {
+            const s = status.trim().toLowerCase();
+            if (s === 'approved') status = 'Approved';
+            else if (s === 'rejected') status = 'Rejected';
+            else if (s === 'in progress') status = 'In Progress';
+            else if (s === 'completed') status = 'Completed';
+            else if (s === 'pending') status = 'Pending';
+        }
         const trip = await Trip.findById(req.params.id);
         if (!trip) {
             if (req.headers.accept?.includes('application/json')) {

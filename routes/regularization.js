@@ -58,7 +58,7 @@ router.post("/request", async (req, res) => {
     if (req.headers.accept?.includes('application/json') || req.body.format === 'json') {
       return res.json({ success: true, request: created });
     }
-    res.redirect('/regularization/hr');
+    res.redirect('/regularization');
   } catch (err) {
     if (req.headers.accept?.includes('application/json')) {
       return res.status(500).json({ error: err.message });
@@ -70,7 +70,12 @@ router.post("/request", async (req, res) => {
 // HR can approve/reject requests
 router.post("/review/:id", async (req, res) => {
   try {
-    const { status } = req.body; // "Approved" or "Rejected"
+    let { status } = req.body; // "Approved" or "Rejected"
+    if (status) {
+      const s = status.trim().toLowerCase();
+      if (s === 'approved') status = 'Approved';
+      else if (s === 'rejected') status = 'Rejected';
+    }
     const reg = await Regularization.findById(req.params.id);
     if (!reg) {
       if (req.headers.accept?.includes('application/json')) {

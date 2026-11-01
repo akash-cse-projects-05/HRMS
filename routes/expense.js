@@ -183,7 +183,13 @@ router.post('/hr/action/:id', requireAuth, async (req, res) => {
     }
 
     try {
-        const { status, reason } = req.body;
+        let { status, reason } = req.body;
+        if (status) {
+            const s = status.trim().toLowerCase();
+            if (s === 'approved') status = 'Approved';
+            else if (s === 'rejected') status = 'Rejected';
+            else if (s === 'pending') status = 'Pending';
+        }
         const expense = await Expense.findById(req.params.id);
 
         if (!expense) {
