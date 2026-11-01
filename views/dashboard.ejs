@@ -357,34 +357,32 @@
                         </div>
                         <% } %>
 
-                          <% /* Today's Notifications Logic */ let todayNotifications=[]; if (typeof notifications
-                            !=='undefined' && notifications.length> 0) {
-                            const today = new Date();
-                            todayNotifications = notifications.filter(n => {
-                            const nDate = new Date(n.date);
-                            return nDate.getDate() === today.getDate() &&
-                            nDate.getMonth() === today.getMonth() &&
-                            nDate.getFullYear() === today.getFullYear();
-                            });
+                          <% /* Notifications Logic: Show notifications within the last 7 days so no personal schedule updates are missed */ 
+                            let activeNotifications = []; 
+                            if (typeof notifications !== 'undefined' && notifications && notifications.length > 0) {
+                              const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+                              activeNotifications = notifications.filter(n => {
+                                const nDate = new Date(n.date);
+                                return nDate >= sevenDaysAgo;
+                              });
                             }
-                            %>
+                          %>
 
-                            <% if (todayNotifications.length> 0) { %>
-                              <div class="alert alert-primary border-0 shadow-sm d-flex align-items-center mb-4"
-                                style="background-color: #cff4fc; color: #055160;">
-                                <span class="fs-4 me-3">ℹ️</span>
-                                <div>
-                                  <h5 class="mb-1 fw-bold">Daily Notification</h5>
-                                  <% todayNotifications.forEach(n=> { %>
-                                    <div><strong>
-                                        <%= n.title %>:
-                                      </strong>
-                                      <%= n.message %>
-                                    </div>
-                                    <% }) %>
-                                </div>
+                          <% if (activeNotifications.length > 0) { %>
+                            <div class="alert alert-primary border-0 shadow-sm d-flex align-items-start mb-4 rounded-4"
+                              style="background-color: #f0f9ff; color: #0369a1; border-left: 4px solid #0284c7 !important;">
+                              <i class="fa-solid fa-bell fs-4 me-3 text-primary mt-1"></i>
+                              <div class="w-100">
+                                <h6 class="mb-2 fw-bold text-dark">Notifications & Schedule Updates</h6>
+                                <% activeNotifications.forEach(n => { %>
+                                  <div class="small py-1 text-secondary">
+                                    <strong class="text-dark"><i class="fa-solid fa-calendar-check me-1 text-primary"></i> <%= n.title %>:</strong>
+                                    <span><%= n.message %></span>
+                                  </div>
+                                <% }) %>
                               </div>
-                              <% } %>
+                            </div>
+                          <% } %>
 
                                 <div class="row g-4 mb-5">
 
@@ -393,6 +391,18 @@
                                       <div class="card-header"><i class="fa-solid fa-clock me-2"></i> Today's Attendance
                                       </div>
                                       <div class="card-body p-4">
+                                        <% if (typeof assignedShift !== 'undefined' && assignedShift) { %>
+                                          <div class="mb-3 p-2 px-3 rounded-3" style="background: #f8fafc; border: 1px solid #e2e8f0; border-left: 3px solid #2563eb;">
+                                            <div class="small text-muted text-uppercase fw-bold" style="font-size: 0.7rem; letter-spacing: 0.5px;">Your Assigned Shift Schedule</div>
+                                            <div class="fw-bold text-dark d-flex align-items-center gap-2 mt-1 flex-wrap">
+                                              <i class="fa-solid fa-business-time text-primary"></i>
+                                              <span><%= assignedShift.name %></span>
+                                              <span class="badge bg-white text-dark border ms-1"><%= assignedShift.startTime %> – <%= assignedShift.endTime %></span>
+                                              <span class="small text-muted fw-normal ms-auto">Grace: <%= assignedShift.gracePeriod || 15 %> mins</span>
+                                            </div>
+                                          </div>
+                                        <% } %>
+
                                         <div class="d-flex align-items-center justify-content-between">
                                           <div>
                                             <% if (!attendance) { %>

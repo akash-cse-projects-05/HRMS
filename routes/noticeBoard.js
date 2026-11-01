@@ -20,8 +20,14 @@ router.get('/', async (req, res) => {
       date: { $gte: fifteenDaysAgo },
       $or: [{ department: { $exists: false } }, { department: null }]
     }).sort({ date: -1 });
+    const currentEmpId = req.session?.employeeId || req.user?.employeeId || null;
     const notifications = await Notification.find({
-      date: { $gte: fifteenDaysAgo }
+      date: { $gte: fifteenDaysAgo },
+      $or: [
+        { employeeId: null },
+        { employeeId: { $exists: false } },
+        ...(currentEmpId ? [{ employeeId: currentEmpId }] : [])
+      ]
     }).sort({ date: -1 });
 
     // 2. Fetch ALL Active Employees once to process logic

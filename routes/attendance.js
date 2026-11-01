@@ -23,13 +23,23 @@ router.get("/", async (req, res) => {
 
     const companySettings = await CompanySettings.findOne();
 
+    const Roster = require("../models/Roster");
+    const todayDate = new Date();
+    const activeRoster = await Roster.findOne({
+      employeeId: req.session.employeeId,
+      startDate: { $lte: todayDate },
+      endDate: { $gte: todayDate }
+    }).populate("shiftId");
+    const assignedShift = activeRoster ? activeRoster.shiftId : null;
+
     if (isJson) {
-      return res.json({ attendance: attendance || null, companySettings: companySettings || null });
+      return res.json({ attendance: attendance || null, companySettings: companySettings || null, assignedShift });
     }
 
     res.render("attendance/today", {
       attendance: attendance || null,
-      companySettings: companySettings || null
+      companySettings: companySettings || null,
+      assignedShift
     });
 
   } catch (err) {

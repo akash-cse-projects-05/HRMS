@@ -236,6 +236,15 @@
       <div class="card-header bg-light text-center">Status Control Center</div>
       <div class="card-body p-5 text-center">
 
+        <% if (typeof assignedShift !== 'undefined' && assignedShift) { %>
+          <div class="d-inline-flex align-items-center gap-2 mb-4 px-3 py-2 rounded-pill bg-light border shadow-sm">
+            <i class="fa-solid fa-business-time text-primary"></i>
+            <span class="small fw-bold text-dark">Assigned Shift: <%= assignedShift.name %> (<%= assignedShift.startTime %> – <%= assignedShift.endTime %>)</span>
+            <span class="badge bg-primary text-white ms-1">Grace: <%= assignedShift.gracePeriod || 15 %>m</span>
+          </div>
+          <br>
+        <% } %>
+
         <% if (!attendance) { %>
           <span class="status-badge bg-danger text-white mb-4 d-inline-block">Status: NOT MARKED</span><br>
           <button class="btn btn-main btn-lg px-5 shadow mb-2" onclick="submitAttendance('/attendance/punch-in')">

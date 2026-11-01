@@ -154,6 +154,29 @@ router.post("/roster/assign", hrAuth, async (req, res) => {
       createdBy: req.session.employeeId
     });
 
+    // Send a targeted notification specifically to the assigned employee
+    try {
+      const Notification = require("../models/Notification");
+      const assignedShift = await Shift.findById(shiftId);
+      const shiftName = assignedShift ? assignedShift.name : "New Shift";
+      const startTime = assignedShift ? assignedShift.startTime : "";
+      const endTime = assignedShift ? assignedShift.endTime : "";
+      const gracePeriod = assignedShift ? (assignedShift.gracePeriod || 15) : 15;
+      
+      const formatOptions = { day: "numeric", month: "short", year: "numeric" };
+      const formattedStart = start.toLocaleDateString("en-IN", formatOptions);
+      const formattedEnd = end.toLocaleDateString("en-IN", formatOptions);
+
+      await Notification.create({
+        title: `Shift Schedule: ${shiftName}`,
+        message: `You have been assigned to '${shiftName}' (${startTime} - ${endTime}) from ${formattedStart} to ${formattedEnd}. Allowed grace period: ${gracePeriod} minutes.`,
+        employeeId: employeeId,
+        date: new Date()
+      });
+    } catch (notifErr) {
+      console.error("[Shift Notification Error]:", notifErr);
+    }
+
     if (isJson) {
       return res.json({ success: true, message: "Roster assigned successfully", roster: newRoster });
     }

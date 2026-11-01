@@ -476,7 +476,27 @@ app.get("/dashboard", requireAuth, async (req, res) => {
            ANNOUNCEMENTS & NOTIFICATIONS
            -------------------*/
         const announcements = await Announcement.find().sort({ date: -1 });
-        const notifications = await Notification.find().sort({ date: -1 });
+        // Targeted notifications: only company-wide (null) or personal to this employee
+        const notifications = await Notification.find({
+            $or: [
+                { employeeId: null },
+                { employeeId: { $exists: false } },
+                { employeeId: employeeId }
+            ]
+        }).sort({ date: -1 }).limit(15);
+
+        // Resolve current active shift for today from Roster
+        const Roster = require("./models/Roster");
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+        const todayEnd = new Date();
+        todayEnd.setHours(23, 59, 59, 999);
+        const activeRoster = await Roster.findOne({
+            employeeId,
+            startDate: { $lte: todayEnd },
+            endDate: { $gte: todayStart }
+        }).populate("shiftId");
+        const assignedShift = activeRoster ? activeRoster.shiftId : null;
 
         /* =========================
            EMPLOYEE DETAILS
@@ -559,7 +579,8 @@ app.get("/dashboard", requireAuth, async (req, res) => {
                 announcements,
                 notifications,
                 goals,
-                projects
+                projects,
+                assignedShift: assignedShift || null
             });
         }
 
@@ -578,6 +599,7 @@ app.get("/dashboard", requireAuth, async (req, res) => {
             notifications,
             goals,
             projects,
+            assignedShift: assignedShift || null,
             passwordUpdated: req.query.passwordUpdated === "true"
         });
 
